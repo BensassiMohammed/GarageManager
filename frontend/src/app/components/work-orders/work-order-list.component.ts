@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
-import { WorkOrder, WorkOrderProductLine, WorkOrderServiceLine, WorkOrderTotals, Client, Vehicle, Company, Product, ServiceItem } from '../../models/models';
+import { WorkOrder, WorkOrderProductLine, WorkOrderServiceLine, WorkOrderTotals, Client, Vehicle, Company } from '../../models/models';
 
 @Component({
   selector: 'app-work-order-list',
@@ -185,12 +185,12 @@ import { WorkOrder, WorkOrderProductLine, WorkOrderServiceLine, WorkOrderTotals,
 
     @if (showCreateModal) {
       <div class="modal-overlay" (click)="showCreateModal = false">
-        <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
           <div class="modal-header">
             <h3>Create Work Order</h3>
             <button class="btn-close" (click)="showCreateModal = false">&times;</button>
           </div>
-          <div class="modal-body modal-scrollable">
+          <div class="modal-body">
             <div class="form-group">
               <label class="required">Client</label>
               <select [(ngModel)]="newOrder.clientId" class="form-control">
@@ -215,111 +215,8 @@ import { WorkOrder, WorkOrderProductLine, WorkOrderServiceLine, WorkOrderTotals,
             </div>
             <div class="form-group">
               <label>Description</label>
-              <textarea [(ngModel)]="newOrder.description" class="form-control" rows="2"></textarea>
+              <textarea [(ngModel)]="newOrder.description" class="form-control" rows="3"></textarea>
             </div>
-
-            <h4>Add Services</h4>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Service</label>
-                <select [(ngModel)]="newServiceLine.serviceId" class="form-control">
-                  <option [ngValue]="null">-- Select Service --</option>
-                  @for (service of services; track service.id) {
-                    <option [ngValue]="service.id">{{ service.name }} ({{ service.sellingPrice | currency }})</option>
-                  }
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Quantity</label>
-                <input type="number" [(ngModel)]="newServiceLine.quantity" class="form-control" min="1" value="1">
-              </div>
-              <div class="form-group" style="align-self: flex-end;">
-                <button class="btn btn-sm btn-secondary" (click)="addServiceLine()" [disabled]="!newServiceLine.serviceId">Add</button>
-              </div>
-            </div>
-
-            @if (newOrderServiceLines.length > 0) {
-              <div class="table-container">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Service</th>
-                      <th>Qty</th>
-                      <th>Price</th>
-                      <th>Total</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (line of newOrderServiceLines; track $index; let i = $index) {
-                      <tr>
-                        <td>{{ line.service?.name }}</td>
-                        <td>{{ line.quantity }}</td>
-                        <td>{{ line.unitPrice | currency }}</td>
-                        <td>{{ (line.quantity * (line.unitPrice || 0)) | currency }}</td>
-                        <td><button class="btn btn-xs btn-danger" (click)="removeServiceLine(i)">Remove</button></td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
-            }
-
-            <h4>Add Products</h4>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Product</label>
-                <select [(ngModel)]="newProductLine.productId" class="form-control">
-                  <option [ngValue]="null">-- Select Product --</option>
-                  @for (product of products; track product.id) {
-                    <option [ngValue]="product.id">{{ product.name }} ({{ product.sellingPrice | currency }})</option>
-                  }
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Qty</label>
-                <input type="number" [(ngModel)]="newProductLine.quantity" class="form-control" min="1" value="1">
-              </div>
-              <div class="form-group">
-                <label>Discount %</label>
-                <input type="number" [(ngModel)]="newProductLine.discountPercent" class="form-control" min="0" max="100" value="0">
-              </div>
-              <div class="form-group" style="align-self: flex-end;">
-                <button class="btn btn-sm btn-secondary" (click)="addProductLine()" [disabled]="!newProductLine.productId">Add</button>
-              </div>
-            </div>
-
-            @if (newOrderProductLines.length > 0) {
-              <div class="table-container">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Product</th>
-                      <th>Qty</th>
-                      <th>Price</th>
-                      <th>Discount</th>
-                      <th>Final Price</th>
-                      <th>Total</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (line of newOrderProductLines; track $index; let i = $index) {
-                      <tr>
-                        <td>{{ line.product?.name }}</td>
-                        <td>{{ line.quantity }}</td>
-                        <td>{{ line.standardPrice | currency }}</td>
-                        <td>{{ line.discountPercent }}%</td>
-                        <td>{{ line.finalUnitPrice | currency }}</td>
-                        <td>{{ line.lineTotal | currency }}</td>
-                        <td><button class="btn btn-xs btn-danger" (click)="removeProductLine(i)">Remove</button></td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
-            }
-
             <div class="form-actions">
               <button class="btn btn-primary" (click)="createWorkOrder()" [disabled]="!newOrder.clientId || !newOrder.date">Create</button>
               <button class="btn btn-secondary" (click)="showCreateModal = false">Cancel</button>
@@ -414,109 +311,6 @@ import { WorkOrder, WorkOrderProductLine, WorkOrderServiceLine, WorkOrderTotals,
     h4 {
       margin: 1.5rem 0 1rem;
     }
-    .form-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 1rem;
-      align-items: flex-end;
-      margin-bottom: 1.5rem;
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .form-group label {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text);
-    }
-    .form-group label.required::after {
-      content: ' *';
-      color: var(--danger);
-    }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      padding: 0.75rem !important;
-      border: 1px solid var(--border) !important;
-      border-radius: 4px !important;
-      font-size: 1rem !important;
-      font-family: inherit !important;
-      background-color: var(--surface) !important;
-      color: var(--text) !important;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none !important;
-      border-color: var(--primary) !important;
-      background-color: var(--surface) !important;
-      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1) !important;
-    }
-    .modal-body {
-      padding: 1.5rem !important;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .modal-scrollable {
-      padding: 1.5rem;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .modal-body h4 {
-      font-size: 1.125rem;
-      font-weight: 600;
-      margin: 2rem 0 1rem;
-      color: var(--text);
-      padding-bottom: 0.75rem;
-      border-bottom: 2px solid var(--border);
-    }
-    .modal-body h4:first-child {
-      margin-top: 0;
-    }
-    .form-actions {
-      display: flex;
-      gap: 1rem;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border);
-    }
-    .btn-sm {
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-    }
-    .btn-xs {
-      padding: 0.35rem 0.65rem;
-      font-size: 0.75rem;
-    }
-    .table-container {
-      margin: 1rem 0;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      overflow-x: auto;
-    }
-    .table-container table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-    }
-    .table-container th {
-      background-color: var(--surface);
-      padding: 0.75rem;
-      text-align: left;
-      font-weight: 600;
-      border-bottom: 2px solid var(--border);
-    }
-    .table-container td {
-      padding: 0.75rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .table-container tbody tr:last-child td {
-      border-bottom: none;
-    }
   `]
 })
 export class WorkOrderListComponent implements OnInit {
@@ -536,28 +330,12 @@ export class WorkOrderListComponent implements OnInit {
   clients: Client[] = [];
   vehicles: Vehicle[] = [];
   companies: Company[] = [];
-  products: Product[] = [];
-  services: ServiceItem[] = [];
   
   newOrder = {
     clientId: null as number | null,
     vehicleId: null as number | null,
     date: new Date().toISOString().split('T')[0],
     description: ''
-  };
-
-  newOrderServiceLines: WorkOrderServiceLine[] = [];
-  newOrderProductLines: WorkOrderProductLine[] = [];
-
-  newServiceLine = {
-    serviceId: null as number | null,
-    quantity: 1
-  };
-
-  newProductLine = {
-    productId: null as number | null,
-    quantity: 1,
-    discountPercent: 0
   };
 
   constructor(private api: ApiService) {}
@@ -574,8 +352,6 @@ export class WorkOrderListComponent implements OnInit {
     this.api.getClients().subscribe(data => this.clients = data);
     this.api.getVehicles().subscribe(data => this.vehicles = data);
     this.api.getCompanies().subscribe(data => this.companies = data);
-    this.api.getProducts().subscribe(data => this.products = data);
-    this.api.getServices().subscribe(data => this.services = data);
   }
 
   filterOrders() {
@@ -633,70 +409,11 @@ export class WorkOrderListComponent implements OnInit {
     }
   }
 
-  addServiceLine() {
-    if (!this.newServiceLine.serviceId) return;
-    const service = this.services.find(s => s.id === this.newServiceLine.serviceId);
-    if (!service) return;
-    
-    const line: WorkOrderServiceLine = {
-      service,
-      quantity: this.newServiceLine.quantity,
-      unitPrice: service.sellingPrice || 0
-    };
-    
-    this.newOrderServiceLines.push(line);
-    this.newServiceLine = { serviceId: null, quantity: 1 };
-  }
-
-  removeServiceLine(index: number) {
-    this.newOrderServiceLines.splice(index, 1);
-  }
-
-  addProductLine() {
-    if (!this.newProductLine.productId) return;
-    const product = this.products.find(p => p.id === this.newProductLine.productId);
-    if (!product) return;
-    
-    const standardPrice = product.sellingPrice || 0;
-    const discount = (standardPrice * this.newProductLine.discountPercent) / 100;
-    const finalUnitPrice = standardPrice - discount;
-    const lineTotal = finalUnitPrice * this.newProductLine.quantity;
-    
-    const line: WorkOrderProductLine = {
-      product,
-      quantity: this.newProductLine.quantity,
-      standardPrice,
-      discountPercent: this.newProductLine.discountPercent,
-      finalUnitPrice,
-      lineTotal
-    };
-    
-    this.newOrderProductLines.push(line);
-    this.newProductLine = { productId: null, quantity: 1, discountPercent: 0 };
-  }
-
-  removeProductLine(index: number) {
-    this.newOrderProductLines.splice(index, 1);
-  }
-
   createWorkOrder() {
     const data: any = {
       date: this.newOrder.date,
       description: this.newOrder.description,
-      status: 'DRAFT',
-      serviceLines: this.newOrderServiceLines.map(l => ({
-        service: { id: l.service?.id },
-        quantity: l.quantity,
-        unitPrice: l.unitPrice
-      })),
-      productLines: this.newOrderProductLines.map(l => ({
-        product: { id: l.product?.id },
-        quantity: l.quantity,
-        standardPrice: l.standardPrice,
-        discountPercent: l.discountPercent,
-        finalUnitPrice: l.finalUnitPrice,
-        lineTotal: l.lineTotal
-      }))
+      status: 'DRAFT'
     };
     
     if (this.newOrder.clientId) {
@@ -715,12 +432,7 @@ export class WorkOrderListComponent implements OnInit {
           date: new Date().toISOString().split('T')[0],
           description: ''
         };
-        this.newOrderServiceLines = [];
-        this.newOrderProductLines = [];
-        this.newServiceLine = { serviceId: null, quantity: 1 };
-        this.newProductLine = { productId: null, quantity: 1, discountPercent: 0 };
         this.loadData();
-        alert('Work order created successfully!');
       },
       error: (err) => {
         alert('Error creating work order: ' + (err.error?.message || err.message));
