@@ -2,49 +2,50 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Expense, ExpenseCategory } from '../../models/models';
 
 @Component({
   selector: 'app-expense-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">Expenses</h2>
-      <a routerLink="/expenses/new" class="btn btn-primary">New Expense</a>
+      <h2 class="page-title">{{ 'expenses.title' | translate }}</h2>
+      <a routerLink="/expenses/new" class="btn btn-primary">{{ 'expenses.newExpense' | translate }}</a>
     </div>
 
     <div class="filter-section">
       <div class="filter-bar">
         <div class="form-group">
-          <label>Category</label>
+          <label>{{ 'common.category' | translate }}</label>
           <select [(ngModel)]="selectedCategoryId" (change)="applyFilters()" class="form-control">
-            <option [ngValue]="null">All Categories</option>
+            <option [ngValue]="null">{{ 'common.all' | translate }}</option>
             @for (cat of categories; track cat.id) {
               <option [ngValue]="cat.id">{{ cat.name }}</option>
             }
           </select>
         </div>
         <div class="form-group">
-          <label>From Date</label>
+          <label>{{ 'expenses.startDate' | translate }}</label>
           <input type="date" [(ngModel)]="startDate" (change)="applyFilters()" class="form-control">
         </div>
         <div class="form-group">
-          <label>To Date</label>
+          <label>{{ 'expenses.endDate' | translate }}</label>
           <input type="date" [(ngModel)]="endDate" (change)="applyFilters()" class="form-control">
         </div>
         <div class="form-group">
-          <label>Quick Filter</label>
+          <label>{{ 'common.filter' | translate }}</label>
           <select [(ngModel)]="quickFilter" (change)="applyQuickFilter()" class="form-control">
-            <option value="">Custom</option>
+            <option value="">{{ 'common.select' | translate }}</option>
             <option value="thisMonth">This Month</option>
             <option value="lastMonth">Last Month</option>
             <option value="thisYear">This Year</option>
           </select>
         </div>
         <div class="form-group filter-actions">
-          <button class="btn btn-secondary" (click)="clearFilters()">Clear Filters</button>
+          <button class="btn btn-secondary" (click)="clearFilters()">{{ 'common.filter' | translate }}</button>
         </div>
       </div>
     </div>
@@ -52,12 +53,12 @@ import { Expense, ExpenseCategory } from '../../models/models';
     <div class="summary-cards">
       <div class="summary-card">
         <div class="summary-value">{{ getTotalAmount() | currency }}</div>
-        <div class="summary-label">Total Expenses ({{ filteredExpenses.length }} items)</div>
+        <div class="summary-label">{{ 'common.total' | translate }} ({{ filteredExpenses.length }} items)</div>
       </div>
       @if (selectedCategoryId) {
         <div class="summary-card">
           <div class="summary-value">{{ getCategoryName() }}</div>
-          <div class="summary-label">Selected Category</div>
+          <div class="summary-label">{{ 'common.category' | translate }}</div>
         </div>
       }
     </div>
@@ -67,12 +68,12 @@ import { Expense, ExpenseCategory } from '../../models/models';
         <table>
           <thead>
             <tr>
-              <th>Date</th>
-              <th>Label</th>
-              <th>Category</th>
-              <th>Amount</th>
-              <th>Payment Method</th>
-              <th>Actions</th>
+              <th>{{ 'common.date' | translate }}</th>
+              <th>{{ 'common.name' | translate }}</th>
+              <th>{{ 'common.category' | translate }}</th>
+              <th>{{ 'common.amount' | translate }}</th>
+              <th>{{ 'payments.paymentMethod' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -84,13 +85,13 @@ import { Expense, ExpenseCategory } from '../../models/models';
                 <td>{{ expense.amount | currency }}</td>
                 <td>{{ expense.paymentMethod || '-' }}</td>
                 <td class="actions">
-                  <a [routerLink]="['/expenses', expense.id]" class="btn btn-sm btn-secondary">Edit</a>
-                  <button class="btn btn-sm btn-danger" (click)="delete(expense)">Delete</button>
+                  <a [routerLink]="['/expenses', expense.id]" class="btn btn-sm btn-secondary">{{ 'common.edit' | translate }}</a>
+                  <button class="btn btn-sm btn-danger" (click)="delete(expense)">{{ 'common.delete' | translate }}</button>
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="6" class="empty-state">No expenses found</td>
+                <td colspan="6" class="empty-state">{{ 'expenses.noExpenses' | translate }}</td>
               </tr>
             }
           </tbody>

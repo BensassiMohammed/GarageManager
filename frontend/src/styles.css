@@ -381,3 +381,89 @@ tr:hover {
   content: ' *';
   color: #e74c3c;
 }
+
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .sidebar {
+  left: auto;
+  right: 0;
+}
+
+[dir="rtl"] .main-content {
+  margin-left: 0;
+  margin-right: 250px;
+}
+
+[dir="rtl"] th,
+[dir="rtl"] td {
+  text-align: right;
+}
+
+[dir="rtl"] .form-actions {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .actions {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .modal-header {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .page-header {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .top-bar {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .user-menu {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .top-bar-actions {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .nav-item {
+  text-align: right;
+}
+
+[dir="rtl"] .nav-section {
+  text-align: right;
+}
+
+[dir="rtl"] .sidebar-header {
+  text-align: right;
+}
+
+[dir="rtl"] .badge {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+[dir="rtl"] .form-row {
+  direction: rtl;
+}
+
+[dir="rtl"] .stats-grid {
+  direction: rtl;
+}
+
+[dir="rtl"] .stat-card {
+  text-align: right;
+}
+
+[dir="rtl"] .empty-state {
+  text-align: center;
+}
+
+[dir="rtl"] .alert {
+  text-align: right;
+}

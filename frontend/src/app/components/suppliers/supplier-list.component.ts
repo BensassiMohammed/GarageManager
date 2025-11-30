@@ -1,17 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Supplier } from '../../models/models';
 
 @Component({
   selector: 'app-supplier-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">Suppliers</h2>
-      <a routerLink="/suppliers/new" class="btn btn-primary">New Supplier</a>
+      <h2 class="page-title">{{ 'suppliers.title' | translate }}</h2>
+      <a routerLink="/suppliers/new" class="btn btn-primary">{{ 'suppliers.newSupplier' | translate }}</a>
     </div>
 
     <div class="card">
@@ -19,11 +20,11 @@ import { Supplier } from '../../models/models';
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{{ 'common.name' | translate }}</th>
+              <th>{{ 'common.email' | translate }}</th>
+              <th>{{ 'common.phone' | translate }}</th>
+              <th>{{ 'common.status' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -34,17 +35,17 @@ import { Supplier } from '../../models/models';
                 <td>{{ supplier.phone || '-' }}</td>
                 <td>
                   <span [class]="supplier.active ? 'badge badge-success' : 'badge badge-danger'">
-                    {{ supplier.active ? 'Active' : 'Inactive' }}
+                    {{ (supplier.active ? 'common.active' : 'common.inactive') | translate }}
                   </span>
                 </td>
                 <td class="actions">
-                  <a [routerLink]="['/suppliers', supplier.id]" class="btn btn-sm btn-secondary">Edit</a>
-                  <button class="btn btn-sm btn-danger" (click)="delete(supplier)">Delete</button>
+                  <a [routerLink]="['/suppliers', supplier.id]" class="btn btn-sm btn-secondary">{{ 'common.edit' | translate }}</a>
+                  <button class="btn btn-sm btn-danger" (click)="delete(supplier)">{{ 'common.delete' | translate }}</button>
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="empty-state">No suppliers found</td>
+                <td colspan="5" class="empty-state">{{ 'suppliers.noSuppliers' | translate }}</td>
               </tr>
             }
           </tbody>

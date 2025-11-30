@@ -2,55 +2,56 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-supplier-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">{{ isEdit ? 'Edit Supplier' : 'New Supplier' }}</h2>
+      <h2 class="page-title">{{ (isEdit ? 'suppliers.editSupplier' : 'suppliers.newSupplier') | translate }}</h2>
     </div>
 
     <div class="card">
       <form [formGroup]="form" (ngSubmit)="save()">
         <div class="form-row">
           <div class="form-group">
-            <label class="required">Name</label>
+            <label class="required">{{ 'common.name' | translate }}</label>
             <input type="text" formControlName="name" class="form-control">
           </div>
           <div class="form-group">
-            <label>Email</label>
+            <label>{{ 'common.email' | translate }}</label>
             <input type="email" formControlName="email" class="form-control">
           </div>
         </div>
         
         <div class="form-row">
           <div class="form-group">
-            <label>Phone</label>
+            <label>{{ 'common.phone' | translate }}</label>
             <input type="text" formControlName="phone" class="form-control">
           </div>
           <div class="form-group">
-            <label>Address</label>
+            <label>{{ 'common.address' | translate }}</label>
             <input type="text" formControlName="address" class="form-control">
           </div>
         </div>
 
         <div class="form-group">
-          <label>Notes</label>
+          <label>{{ 'common.notes' | translate }}</label>
           <textarea formControlName="notes" class="form-control" rows="3"></textarea>
         </div>
 
         <div class="form-group">
           <label>
-            <input type="checkbox" formControlName="active"> Active
+            <input type="checkbox" formControlName="active"> {{ 'common.active' | translate }}
           </label>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
-          <a routerLink="/suppliers" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">{{ 'common.save' | translate }}</button>
+          <a routerLink="/suppliers" class="btn btn-secondary">{{ 'common.cancel' | translate }}</a>
         </div>
       </form>
     </div>

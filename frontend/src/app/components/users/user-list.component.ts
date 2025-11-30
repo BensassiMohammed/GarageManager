@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { TranslateModule } from '@ngx-translate/core';
 
 interface User {
   id: number;
@@ -24,76 +25,76 @@ interface Role {
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="content">
       <div class="page-header">
-        <h2>User Management</h2>
-        <button class="btn btn-primary" (click)="openCreateModal()">New User</button>
+        <h2>{{ 'users.title' | translate }}</h2>
+        <button class="btn btn-primary" (click)="openCreateModal()">{{ 'users.newUser' | translate }}</button>
       </div>
 
       <div class="card">
         <table *ngIf="users.length > 0">
           <thead>
             <tr>
-              <th>Username</th>
-              <th>Roles</th>
-              <th>Status</th>
-              <th>Must Change Password</th>
-              <th>Actions</th>
+              <th>{{ 'users.username' | translate }}</th>
+              <th>{{ 'users.roles' | translate }}</th>
+              <th>{{ 'common.status' | translate }}</th>
+              <th>{{ 'users.mustChangePassword' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let user of users">
               <td>{{ user.username }}</td>
               <td>
-                <span *ngFor="let role of user.roles" class="badge badge-info">{{ role }}</span>
+                <span *ngFor="let role of user.roles" class="badge badge-info">{{ getRoleLabel(role) | translate }}</span>
               </td>
               <td>
                 <span [class]="user.active ? 'badge badge-success' : 'badge badge-danger'">
-                  {{ user.active ? 'Active' : 'Inactive' }}
+                  {{ (user.active ? 'common.active' : 'common.inactive') | translate }}
                 </span>
               </td>
               <td>
                 <span [class]="user.mustChangePassword ? 'badge badge-warning' : 'badge badge-secondary'">
-                  {{ user.mustChangePassword ? 'Yes' : 'No' }}
+                  {{ (user.mustChangePassword ? 'common.yes' : 'common.no') | translate }}
                 </span>
               </td>
               <td>
-                <button class="btn btn-sm btn-secondary" (click)="openEditModal(user)">Edit</button>
-                <button class="btn btn-sm btn-danger" (click)="deleteUser(user)">Delete</button>
+                <button class="btn btn-sm btn-secondary" (click)="openEditModal(user)">{{ 'common.edit' | translate }}</button>
+                <button class="btn btn-sm btn-danger" (click)="deleteUser(user)">{{ 'common.delete' | translate }}</button>
               </td>
             </tr>
           </tbody>
         </table>
-        <p *ngIf="users.length === 0" class="no-data">No users found</p>
+        <p *ngIf="users.length === 0" class="no-data">{{ 'users.noUsers' | translate }}</p>
       </div>
 
       <div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
         <div class="modal-content" (click)="$event.stopPropagation()">
-          <h3>{{ isEditing ? 'Edit User' : 'Create User' }}</h3>
+          <h3>{{ (isEditing ? 'users.editUser' : 'users.newUser') | translate }}</h3>
           
           <div *ngIf="modalError" class="error-message">{{ modalError }}</div>
           
           <form (ngSubmit)="saveUser()">
             <div class="form-group">
-              <label for="username">Username</label>
+              <label for="username">{{ 'users.username' | translate }}</label>
               <input type="text" id="username" [(ngModel)]="currentUser.username" name="username" required>
             </div>
             
             <div class="form-group">
-              <label for="password">{{ isEditing ? 'New Password (leave empty to keep current)' : 'Password' }}</label>
+              <label for="password">{{ (isEditing ? 'auth.newPassword' : 'auth.password') | translate }}</label>
               <input type="password" id="password" [(ngModel)]="currentUser.password" name="password" 
                      [required]="!isEditing" minlength="6">
             </div>
             
             <div class="form-group">
-              <label>Roles</label>
+              <label>{{ 'users.roles' | translate }}</label>
               <div class="checkbox-group">
                 <label *ngFor="let role of roles" class="checkbox-label">
                   <input type="checkbox" [checked]="isRoleSelected(role.name)" 
                          (change)="toggleRole(role.name)">
-                  {{ role.name }} - {{ role.description }}
+                  {{ getRoleLabel(role.name) | translate }} - {{ role.description }}
                 </label>
               </div>
             </div>
@@ -101,20 +102,20 @@ interface Role {
             <div class="form-group">
               <label class="checkbox-label">
                 <input type="checkbox" [(ngModel)]="currentUser.active" name="active">
-                Active
+                {{ 'common.active' | translate }}
               </label>
             </div>
             
             <div class="form-group">
               <label class="checkbox-label">
                 <input type="checkbox" [(ngModel)]="currentUser.mustChangePassword" name="mustChangePassword">
-                Must Change Password
+                {{ 'users.mustChangePassword' | translate }}
               </label>
             </div>
             
             <div class="form-actions">
-              <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
-              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" (click)="closeModal()">{{ 'common.cancel' | translate }}</button>
+              <button type="submit" class="btn btn-primary">{{ 'common.save' | translate }}</button>
             </div>
           </form>
         </div>
@@ -194,6 +195,15 @@ export class UserListComponent implements OnInit {
       },
       error: (err) => console.error('Failed to load roles', err)
     });
+  }
+
+  getRoleLabel(roleName: string): string {
+    const labels: { [key: string]: string } = {
+      'ADMIN': 'users.admin',
+      'MANAGER': 'users.manager',
+      'STAFF': 'users.staff'
+    };
+    return labels[roleName] || roleName;
   }
 
   openCreateModal(): void {

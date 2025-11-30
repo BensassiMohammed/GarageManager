@@ -2,18 +2,35 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService, ChangePasswordRequest } from '../../services/auth.service';
+import { LanguageService, Language } from '../../services/language.service';
 
 @Component({
   selector: 'app-change-password',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="change-password-container">
+      <div class="lang-switcher">
+        <button class="lang-btn" (click)="toggleLangMenu()">
+          <span class="lang-icon">🌐</span>
+          <span>{{ getCurrentLangInfo().nativeName }}</span>
+        </button>
+        <div class="lang-menu" *ngIf="showLangMenu">
+          <button 
+            *ngFor="let lang of supportedLanguages" 
+            class="lang-option"
+            [class.active]="lang.code === currentLang"
+            (click)="setLanguage(lang.code)">
+            {{ lang.nativeName }}
+          </button>
+        </div>
+      </div>
       <div class="change-password-card">
-        <h1>Change Password</h1>
+        <h1>{{ 'auth.changePassword' | translate }}</h1>
         <p *ngIf="isForced" class="warning">
-          You must change your password before continuing.
+          {{ 'auth.mustChangePassword' | translate }}
         </p>
         
         <div *ngIf="error" class="error-message">
@@ -26,18 +43,18 @@ import { AuthService, ChangePasswordRequest } from '../../services/auth.service'
         
         <form (ngSubmit)="onSubmit()" #passwordForm="ngForm">
           <div class="form-group">
-            <label for="oldPassword">Current Password</label>
+            <label for="oldPassword">{{ 'auth.currentPassword' | translate }}</label>
             <input 
               type="password" 
               id="oldPassword" 
               name="oldPassword"
               [(ngModel)]="passwords.oldPassword" 
               required
-              placeholder="Enter current password">
+              [placeholder]="'auth.enterCurrentPassword' | translate">
           </div>
           
           <div class="form-group">
-            <label for="newPassword">New Password</label>
+            <label for="newPassword">{{ 'auth.newPassword' | translate }}</label>
             <input 
               type="password" 
               id="newPassword" 
@@ -45,26 +62,26 @@ import { AuthService, ChangePasswordRequest } from '../../services/auth.service'
               [(ngModel)]="passwords.newPassword" 
               required
               minlength="6"
-              placeholder="Enter new password (min 6 characters)">
+              [placeholder]="'auth.enterNewPassword' | translate">
           </div>
           
           <div class="form-group">
-            <label for="confirmPassword">Confirm New Password</label>
+            <label for="confirmPassword">{{ 'auth.confirmPassword' | translate }}</label>
             <input 
               type="password" 
               id="confirmPassword" 
               name="confirmPassword"
               [(ngModel)]="confirmPassword" 
               required
-              placeholder="Confirm new password">
+              [placeholder]="'auth.confirmNewPassword' | translate">
           </div>
           
           <button type="submit" class="btn btn-primary" [disabled]="loading || !passwordForm.valid">
-            {{ loading ? 'Changing...' : 'Change Password' }}
+            {{ loading ? ('auth.changing' | translate) : ('auth.changePassword' | translate) }}
           </button>
           
           <button *ngIf="!isForced" type="button" class="btn btn-secondary" (click)="cancel()">
-            Cancel
+            {{ 'common.cancel' | translate }}
           </button>
         </form>
       </div>
@@ -77,6 +94,81 @@ import { AuthService, ChangePasswordRequest } from '../../services/auth.service'
       align-items: center;
       min-height: 100vh;
       background: linear-gradient(135deg, #1a2a3a 0%, #2d4a5a 100%);
+      position: relative;
+    }
+    
+    .lang-switcher {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+    }
+    
+    :host-context([dir="rtl"]) .lang-switcher {
+      right: auto;
+      left: 1rem;
+    }
+    
+    .lang-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    
+    .lang-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .lang-icon {
+      font-size: 1rem;
+    }
+    
+    .lang-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 0.25rem;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      min-width: 120px;
+    }
+    
+    :host-context([dir="rtl"]) .lang-menu {
+      right: auto;
+      left: 0;
+    }
+    
+    .lang-option {
+      display: block;
+      width: 100%;
+      padding: 0.5rem 1rem;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    
+    :host-context([dir="rtl"]) .lang-option {
+      text-align: right;
+    }
+    
+    .lang-option:hover {
+      background: #f5f5f5;
+    }
+    
+    .lang-option.active {
+      background: #e3f2fd;
+      color: #1976d2;
     }
     
     .change-password-card {
@@ -190,13 +282,34 @@ export class ChangePasswordComponent {
   error = '';
   success = '';
   isForced = false;
+  showLangMenu = false;
+  supportedLanguages: Language[] = [];
+  currentLang: string = 'en';
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private langService: LanguageService
   ) {
     this.isForced = this.authService.mustChangePassword();
+    this.supportedLanguages = this.langService.supportedLanguages;
+    this.langService.currentLang$.subscribe(lang => {
+      this.currentLang = lang;
+    });
+  }
+
+  toggleLangMenu(): void {
+    this.showLangMenu = !this.showLangMenu;
+  }
+
+  setLanguage(langCode: string): void {
+    this.langService.setLanguage(langCode);
+    this.showLangMenu = false;
+  }
+
+  getCurrentLangInfo(): Language {
+    return this.langService.getCurrentLanguageInfo();
   }
 
   onSubmit(): void {

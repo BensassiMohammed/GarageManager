@@ -2,17 +2,34 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService, LoginRequest } from '../../services/auth.service';
+import { LanguageService, Language } from '../../services/language.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="login-container">
+      <div class="lang-switcher">
+        <button class="lang-btn" (click)="toggleLangMenu()">
+          <span class="lang-icon">🌐</span>
+          <span>{{ getCurrentLangInfo().nativeName }}</span>
+        </button>
+        <div class="lang-menu" *ngIf="showLangMenu">
+          <button 
+            *ngFor="let lang of supportedLanguages" 
+            class="lang-option"
+            [class.active]="lang.code === currentLang"
+            (click)="setLanguage(lang.code)">
+            {{ lang.nativeName }}
+          </button>
+        </div>
+      </div>
       <div class="login-card">
-        <h1>Garage Management System</h1>
-        <h2>Sign In</h2>
+        <h1>{{ 'app.title' | translate }}</h1>
+        <h2>{{ 'auth.login' | translate }}</h2>
         
         <div *ngIf="error" class="error-message">
           {{ error }}
@@ -20,29 +37,29 @@ import { AuthService, LoginRequest } from '../../services/auth.service';
         
         <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
           <div class="form-group">
-            <label for="username">Username</label>
+            <label for="username">{{ 'auth.username' | translate }}</label>
             <input 
               type="text" 
               id="username" 
               name="username"
               [(ngModel)]="credentials.username" 
               required
-              placeholder="Enter username">
+              [placeholder]="'auth.enterUsername' | translate">
           </div>
           
           <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password">{{ 'auth.password' | translate }}</label>
             <input 
               type="password" 
               id="password" 
               name="password"
               [(ngModel)]="credentials.password" 
               required
-              placeholder="Enter password">
+              [placeholder]="'auth.enterPassword' | translate">
           </div>
           
           <button type="submit" class="btn btn-primary" [disabled]="loading || !loginForm.valid">
-            {{ loading ? 'Signing in...' : 'Sign In' }}
+            {{ loading ? ('auth.signingIn' | translate) : ('auth.login' | translate) }}
           </button>
         </form>
       </div>
@@ -55,6 +72,81 @@ import { AuthService, LoginRequest } from '../../services/auth.service';
       align-items: center;
       min-height: 100vh;
       background: linear-gradient(135deg, #1a2a3a 0%, #2d4a5a 100%);
+      position: relative;
+    }
+    
+    .lang-switcher {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+    }
+    
+    :host-context([dir="rtl"]) .lang-switcher {
+      right: auto;
+      left: 1rem;
+    }
+    
+    .lang-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    
+    .lang-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .lang-icon {
+      font-size: 1rem;
+    }
+    
+    .lang-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 0.25rem;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      min-width: 120px;
+    }
+    
+    :host-context([dir="rtl"]) .lang-menu {
+      right: auto;
+      left: 0;
+    }
+    
+    .lang-option {
+      display: block;
+      width: 100%;
+      padding: 0.5rem 1rem;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    
+    :host-context([dir="rtl"]) .lang-option {
+      text-align: right;
+    }
+    
+    .lang-option:hover {
+      background: #f5f5f5;
+    }
+    
+    .lang-option.active {
+      background: #e3f2fd;
+      color: #1976d2;
     }
     
     .login-card {
@@ -148,12 +240,34 @@ export class LoginComponent {
   };
   loading = false;
   error = '';
+  showLangMenu = false;
+  supportedLanguages: Language[] = [];
+  currentLang: string = 'en';
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private langService: LanguageService
+  ) {
+    this.supportedLanguages = this.langService.supportedLanguages;
+    this.langService.currentLang$.subscribe(lang => {
+      this.currentLang = lang;
+    });
+  }
+
+  toggleLangMenu(): void {
+    this.showLangMenu = !this.showLangMenu;
+  }
+
+  setLanguage(langCode: string): void {
+    this.langService.setLanguage(langCode);
+    this.showLangMenu = false;
+  }
+
+  getCurrentLangInfo(): Language {
+    return this.langService.getCurrentLanguageInfo();
+  }
 
   onSubmit(): void {
     this.loading = true;

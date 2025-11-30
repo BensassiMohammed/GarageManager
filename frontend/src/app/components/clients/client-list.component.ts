@@ -1,17 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Client } from '../../models/models';
 
 @Component({
   selector: 'app-client-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">Clients</h2>
-      <a routerLink="/clients/new" class="btn btn-primary">New Client</a>
+      <h2 class="page-title">{{ 'clients.title' | translate }}</h2>
+      <a routerLink="/clients/new" class="btn btn-primary">{{ 'clients.newClient' | translate }}</a>
     </div>
 
     <div class="card">
@@ -19,12 +20,12 @@ import { Client } from '../../models/models';
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Company</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{{ 'common.name' | translate }}</th>
+              <th>{{ 'common.email' | translate }}</th>
+              <th>{{ 'common.phone' | translate }}</th>
+              <th>{{ 'clients.company' | translate }}</th>
+              <th>{{ 'common.status' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -36,17 +37,17 @@ import { Client } from '../../models/models';
                 <td>{{ client.company?.name || '-' }}</td>
                 <td>
                   <span [class]="client.active ? 'badge badge-success' : 'badge badge-danger'">
-                    {{ client.active ? 'Active' : 'Inactive' }}
+                    {{ (client.active ? 'common.active' : 'common.inactive') | translate }}
                   </span>
                 </td>
                 <td class="actions">
-                  <a [routerLink]="['/clients', client.id]" class="btn btn-sm btn-secondary">Edit</a>
-                  <button class="btn btn-sm btn-danger" (click)="delete(client)">Delete</button>
+                  <a [routerLink]="['/clients', client.id]" class="btn btn-sm btn-secondary">{{ 'common.edit' | translate }}</a>
+                  <button class="btn btn-sm btn-danger" (click)="delete(client)">{{ 'common.delete' | translate }}</button>
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="6" class="empty-state">No clients found</td>
+                <td colspan="6" class="empty-state">{{ 'clients.noClients' | translate }}</td>
               </tr>
             }
           </tbody>

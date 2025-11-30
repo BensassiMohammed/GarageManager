@@ -1,26 +1,27 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { SupplierOrder, SupplierOrderLine, Supplier, Product } from '../../models/models';
 
 @Component({
   selector: 'app-supplier-order-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">Supplier Orders</h2>
-      <button class="btn btn-primary" (click)="showCreateModal = true">New Order</button>
+      <h2 class="page-title">{{ 'supplierOrders.title' | translate }}</h2>
+      <button class="btn btn-primary" (click)="showCreateModal = true">{{ 'supplierOrders.newOrder' | translate }}</button>
     </div>
 
     <div class="filter-bar">
       <select [(ngModel)]="statusFilter" (change)="filterOrders()" class="form-control">
-        <option value="">All Status</option>
-        <option value="DRAFT">Draft</option>
-        <option value="ORDERED">Ordered</option>
-        <option value="RECEIVED">Received</option>
-        <option value="CANCELLED">Cancelled</option>
+        <option value="">{{ 'common.all' | translate }} {{ 'common.status' | translate }}</option>
+        <option value="DRAFT">{{ 'invoices.draft' | translate }}</option>
+        <option value="ORDERED">{{ 'supplierOrders.pending' | translate }}</option>
+        <option value="RECEIVED">{{ 'supplierOrders.received' | translate }}</option>
+        <option value="CANCELLED">{{ 'invoices.cancelled' | translate }}</option>
       </select>
     </div>
 
@@ -29,12 +30,12 @@ import { SupplierOrder, SupplierOrderLine, Supplier, Product } from '../../model
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Supplier</th>
-              <th>Order Date</th>
-              <th>Status</th>
-              <th>Total</th>
-              <th>Actions</th>
+              <th>{{ 'supplierOrders.orderNumber' | translate }}</th>
+              <th>{{ 'supplierOrders.supplier' | translate }}</th>
+              <th>{{ 'supplierOrders.orderDate' | translate }}</th>
+              <th>{{ 'common.status' | translate }}</th>
+              <th>{{ 'common.total' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -44,19 +45,19 @@ import { SupplierOrder, SupplierOrderLine, Supplier, Product } from '../../model
                 <td>{{ order.supplier?.name || '-' }}</td>
                 <td>{{ order.orderDate }}</td>
                 <td>
-                  <span [class]="getStatusClass(order.status)">{{ order.status }}</span>
+                  <span [class]="getStatusClass(order.status)">{{ getStatusLabel(order.status) | translate }}</span>
                 </td>
                 <td>{{ order.totalAmount | currency }}</td>
                 <td class="actions">
-                  <button class="btn btn-sm btn-secondary" (click)="viewDetails(order)">Details</button>
+                  <button class="btn btn-sm btn-secondary" (click)="viewDetails(order)">{{ 'common.details' | translate }}</button>
                   @if (order.status === 'ORDERED') {
-                    <button class="btn btn-sm btn-success" (click)="receiveOrder(order)">Receive</button>
+                    <button class="btn btn-sm btn-success" (click)="receiveOrder(order)">{{ 'supplierOrders.receive' | translate }}</button>
                   }
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="6" class="empty-state">No supplier orders found</td>
+                <td colspan="6" class="empty-state">{{ 'supplierOrders.noOrders' | translate }}</td>
               </tr>
             }
           </tbody>
@@ -68,34 +69,34 @@ import { SupplierOrder, SupplierOrderLine, Supplier, Product } from '../../model
       <div class="modal-overlay" (click)="showDetails = false">
         <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3>Supplier Order #{{ selectedOrder.id }}</h3>
+            <h3>{{ 'supplierOrders.title' | translate }} #{{ selectedOrder.id }}</h3>
             <button class="btn-close" (click)="showDetails = false">&times;</button>
           </div>
           <div class="modal-body">
             <div class="order-info">
               <div class="info-group">
-                <label>Supplier:</label>
+                <label>{{ 'supplierOrders.supplier' | translate }}:</label>
                 <span>{{ selectedOrder.supplier?.name }}</span>
               </div>
               <div class="info-group">
-                <label>Order Date:</label>
+                <label>{{ 'supplierOrders.orderDate' | translate }}:</label>
                 <span>{{ selectedOrder.orderDate }}</span>
               </div>
               <div class="info-group">
-                <label>Status:</label>
-                <span [class]="getStatusClass(selectedOrder.status)">{{ selectedOrder.status }}</span>
+                <label>{{ 'common.status' | translate }}:</label>
+                <span [class]="getStatusClass(selectedOrder.status)">{{ getStatusLabel(selectedOrder.status) | translate }}</span>
               </div>
             </div>
 
-            <h4>Order Lines</h4>
+            <h4>{{ 'supplierOrders.orderLines' | translate }}</h4>
             <div class="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Line Total</th>
+                    <th>{{ 'supplierOrders.product' | translate }}</th>
+                    <th>{{ 'common.quantity' | translate }}</th>
+                    <th>{{ 'supplierOrders.unitPrice' | translate }}</th>
+                    <th>{{ 'supplierOrders.lineTotal' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -107,26 +108,26 @@ import { SupplierOrder, SupplierOrderLine, Supplier, Product } from '../../model
                       <td>{{ line.lineTotal | currency }}</td>
                     </tr>
                   } @empty {
-                    <tr><td colspan="4" class="empty-state">No order lines</td></tr>
+                    <tr><td colspan="4" class="empty-state">{{ 'supplierOrders.noOrders' | translate }}</td></tr>
                   }
                 </tbody>
               </table>
             </div>
 
             <div class="order-total">
-              <span>Order Total:</span>
+              <span>{{ 'common.total' | translate }}:</span>
               <span class="total-value">{{ selectedOrder.totalAmount | currency }}</span>
             </div>
 
             @if (selectedOrder.status === 'ORDERED') {
               <div class="receive-section">
-                <p>Receiving this order will:</p>
+                <p>{{ 'supplierOrders.receive' | translate }}:</p>
                 <ul>
-                  <li>Update stock levels for all products</li>
-                  <li>Create stock movement records</li>
-                  <li>Mark the order as RECEIVED</li>
+                  <li>{{ 'stockManagement.title' | translate }}</li>
+                  <li>{{ 'stockManagement.movementsHistory' | translate }}</li>
+                  <li>{{ 'supplierOrders.received' | translate }}</li>
                 </ul>
-                <button class="btn btn-success" (click)="confirmReceive()">Confirm Receipt</button>
+                <button class="btn btn-success" (click)="confirmReceive()">{{ 'common.confirm' | translate }}</button>
               </div>
             }
           </div>
@@ -138,26 +139,26 @@ import { SupplierOrder, SupplierOrderLine, Supplier, Product } from '../../model
       <div class="modal-overlay" (click)="showCreateModal = false">
         <div class="modal-content" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3>Create Supplier Order</h3>
+            <h3>{{ 'supplierOrders.newOrder' | translate }}</h3>
             <button class="btn-close" (click)="showCreateModal = false">&times;</button>
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <label class="required">Supplier</label>
+              <label class="required">{{ 'supplierOrders.supplier' | translate }}</label>
               <select [(ngModel)]="newOrder.supplierId" class="form-control">
-                <option [ngValue]="null">-- Select Supplier --</option>
+                <option [ngValue]="null">{{ 'supplierOrders.selectSupplier' | translate }}</option>
                 @for (supplier of suppliers; track supplier.id) {
                   <option [ngValue]="supplier.id">{{ supplier.name }}</option>
                 }
               </select>
             </div>
             <div class="form-group">
-              <label class="required">Order Date</label>
+              <label class="required">{{ 'supplierOrders.orderDate' | translate }}</label>
               <input type="date" [(ngModel)]="newOrder.orderDate" class="form-control">
             </div>
             <div class="form-actions">
-              <button class="btn btn-primary" (click)="createOrder()" [disabled]="!newOrder.supplierId || !newOrder.orderDate">Create</button>
-              <button class="btn btn-secondary" (click)="showCreateModal = false">Cancel</button>
+              <button class="btn btn-primary" (click)="createOrder()" [disabled]="!newOrder.supplierId || !newOrder.orderDate">{{ 'common.create' | translate }}</button>
+              <button class="btn btn-secondary" (click)="showCreateModal = false">{{ 'common.cancel' | translate }}</button>
             </div>
           </div>
         </div>
@@ -278,6 +279,16 @@ export class SupplierOrderListComponent implements OnInit {
       'CANCELLED': 'badge badge-danger'
     };
     return classes[status || ''] || 'badge badge-secondary';
+  }
+
+  getStatusLabel(status?: string): string {
+    const labels: { [key: string]: string } = {
+      'DRAFT': 'invoices.draft',
+      'ORDERED': 'supplierOrders.pending',
+      'RECEIVED': 'supplierOrders.received',
+      'CANCELLED': 'invoices.cancelled'
+    };
+    return labels[status || ''] || 'invoices.draft';
   }
 
   viewDetails(order: SupplierOrder) {

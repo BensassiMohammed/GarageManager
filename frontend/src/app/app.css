@@ -2,6 +2,12 @@
   display: block;
 }
 
+.top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .user-menu {
   display: flex;
   align-items: center;
@@ -25,4 +31,82 @@
 
 .btn-logout:hover {
   background: #c0392b;
+}
+
+.language-selector {
+  position: relative;
+}
+
+.lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.lang-btn:hover {
+  background: #e0e0e0;
+}
+
+.lang-icon {
+  font-size: 1rem;
+}
+
+.lang-code {
+  font-weight: 500;
+}
+
+.lang-arrow {
+  font-size: 0.7rem;
+  color: #666;
+}
+
+.lang-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.25rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 120px;
+}
+
+:host-context([dir="rtl"]) .lang-menu {
+  right: auto;
+  left: 0;
+}
+
+.lang-option {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+:host-context([dir="rtl"]) .lang-option {
+  text-align: right;
+}
+
+.lang-option:hover {
+  background: #f5f5f5;
+}
+
+.lang-option.active {
+  background: #e3f2fd;
+  color: #1976d2;
+  font-weight: 500;
 }

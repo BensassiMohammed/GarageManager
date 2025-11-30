@@ -1,17 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Company } from '../../models/models';
 
 @Component({
   selector: 'app-company-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">Companies</h2>
-      <a routerLink="/companies/new" class="btn btn-primary">New Company</a>
+      <h2 class="page-title">{{ 'companies.title' | translate }}</h2>
+      <a routerLink="/companies/new" class="btn btn-primary">{{ 'companies.newCompany' | translate }}</a>
     </div>
 
     <div class="card">
@@ -19,11 +20,11 @@ import { Company } from '../../models/models';
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{{ 'common.name' | translate }}</th>
+              <th>{{ 'common.email' | translate }}</th>
+              <th>{{ 'common.phone' | translate }}</th>
+              <th>{{ 'common.status' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -34,17 +35,17 @@ import { Company } from '../../models/models';
                 <td>{{ company.phone || '-' }}</td>
                 <td>
                   <span [class]="company.active ? 'badge badge-success' : 'badge badge-danger'">
-                    {{ company.active ? 'Active' : 'Inactive' }}
+                    {{ (company.active ? 'common.active' : 'common.inactive') | translate }}
                   </span>
                 </td>
                 <td class="actions">
-                  <a [routerLink]="['/companies', company.id]" class="btn btn-sm btn-secondary">Edit</a>
-                  <button class="btn btn-sm btn-danger" (click)="delete(company)">Delete</button>
+                  <a [routerLink]="['/companies', company.id]" class="btn btn-sm btn-secondary">{{ 'common.edit' | translate }}</a>
+                  <button class="btn btn-sm btn-danger" (click)="delete(company)">{{ 'common.delete' | translate }}</button>
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="empty-state">No companies found</td>
+                <td colspan="5" class="empty-state">{{ 'companies.noCompanies' | translate }}</td>
               </tr>
             }
           </tbody>

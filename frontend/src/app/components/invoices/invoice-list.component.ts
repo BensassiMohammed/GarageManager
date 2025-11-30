@@ -1,28 +1,29 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Invoice, InvoiceLine } from '../../models/models';
 
 @Component({
   selector: 'app-invoice-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">Invoices</h2>
+      <h2 class="page-title">{{ 'invoices.title' | translate }}</h2>
     </div>
 
     <div class="filter-bar">
       <select [(ngModel)]="statusFilter" (change)="filterInvoices()" class="form-control">
-        <option value="">All Status</option>
-        <option value="DRAFT">Draft</option>
-        <option value="ISSUED">Issued</option>
+        <option value="">{{ 'common.all' | translate }} {{ 'common.status' | translate }}</option>
+        <option value="DRAFT">{{ 'invoices.draft' | translate }}</option>
+        <option value="ISSUED">{{ 'invoices.issued' | translate }}</option>
         <option value="SENT">Sent</option>
-        <option value="PARTIAL">Partial Payment</option>
-        <option value="PAID">Paid</option>
+        <option value="PARTIAL">{{ 'invoices.partiallyPaid' | translate }}</option>
+        <option value="PAID">{{ 'invoices.paid' | translate }}</option>
       </select>
-      <button class="btn btn-secondary" (click)="showUnpaid()">Show Unpaid Only</button>
+      <button class="btn btn-secondary" (click)="showUnpaid()">{{ 'dashboard.unpaidInvoices' | translate }}</button>
     </div>
 
     <div class="card">
@@ -30,13 +31,13 @@ import { Invoice, InvoiceLine } from '../../models/models';
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Client / Company</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Total</th>
-              <th>Balance</th>
-              <th>Actions</th>
+              <th>{{ 'invoices.invoiceNumber' | translate }}</th>
+              <th>{{ 'invoices.client' | translate }}</th>
+              <th>{{ 'common.date' | translate }}</th>
+              <th>{{ 'common.status' | translate }}</th>
+              <th>{{ 'common.total' | translate }}</th>
+              <th>{{ 'invoices.remainingBalance' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -54,26 +55,26 @@ import { Invoice, InvoiceLine } from '../../models/models';
                 </td>
                 <td>{{ invoice.date }}</td>
                 <td>
-                  <span [class]="getStatusClass(invoice.status)">{{ invoice.status }}</span>
+                  <span [class]="getStatusClass(invoice.status)">{{ getStatusLabel(invoice.status) | translate }}</span>
                 </td>
                 <td>{{ invoice.totalAmount | currency }}</td>
                 <td>
                   @if ((invoice.remainingBalance || 0) > 0) {
                     <span class="text-danger">{{ invoice.remainingBalance | currency }}</span>
                   } @else {
-                    <span class="text-success">Paid</span>
+                    <span class="text-success">{{ 'invoices.paid' | translate }}</span>
                   }
                 </td>
                 <td class="actions">
-                  <button class="btn btn-sm btn-secondary" (click)="viewDetails(invoice)">Details</button>
+                  <button class="btn btn-sm btn-secondary" (click)="viewDetails(invoice)">{{ 'common.details' | translate }}</button>
                   @if (invoice.status === 'DRAFT') {
-                    <button class="btn btn-sm btn-primary" (click)="issueInvoice(invoice)">Issue</button>
+                    <button class="btn btn-sm btn-primary" (click)="issueInvoice(invoice)">{{ 'invoices.markAsIssued' | translate }}</button>
                   }
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="empty-state">No invoices found</td>
+                <td colspan="7" class="empty-state">{{ 'invoices.noInvoices' | translate }}</td>
               </tr>
             }
           </tbody>
@@ -85,13 +86,13 @@ import { Invoice, InvoiceLine } from '../../models/models';
       <div class="modal-overlay" (click)="showDetails = false">
         <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3>Invoice #{{ selectedInvoice.id }}</h3>
+            <h3>{{ 'invoices.invoiceNumber' | translate }} #{{ selectedInvoice.id }}</h3>
             <button class="btn-close" (click)="showDetails = false">&times;</button>
           </div>
           <div class="modal-body">
             <div class="invoice-info">
               <div class="info-group">
-                <label>Bill To:</label>
+                <label>{{ 'invoices.client' | translate }}:</label>
                 <span>
                   @if (selectedInvoice.company) {
                     {{ selectedInvoice.company.name }}
@@ -101,32 +102,32 @@ import { Invoice, InvoiceLine } from '../../models/models';
                 </span>
               </div>
               <div class="info-group">
-                <label>Date:</label>
+                <label>{{ 'common.date' | translate }}:</label>
                 <span>{{ selectedInvoice.date }}</span>
               </div>
               <div class="info-group">
-                <label>Status:</label>
-                <span [class]="getStatusClass(selectedInvoice.status)">{{ selectedInvoice.status }}</span>
+                <label>{{ 'common.status' | translate }}:</label>
+                <span [class]="getStatusClass(selectedInvoice.status)">{{ getStatusLabel(selectedInvoice.status) | translate }}</span>
               </div>
               @if (selectedInvoice.workOrder) {
                 <div class="info-group">
-                  <label>Work Order:</label>
+                  <label>{{ 'invoices.workOrder' | translate }}:</label>
                   <span>#{{ selectedInvoice.workOrder.id }}</span>
                 </div>
               }
             </div>
 
-            <h4>Invoice Lines</h4>
+            <h4>{{ 'invoices.invoiceLines' | translate }}</h4>
             <div class="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th>Description</th>
-                    <th>Qty</th>
-                    <th>Standard Price</th>
-                    <th>Discount %</th>
-                    <th>Final Price</th>
-                    <th>Line Total</th>
+                    <th>{{ 'common.description' | translate }}</th>
+                    <th>{{ 'common.quantity' | translate }}</th>
+                    <th>{{ 'workOrders.stdPrice' | translate }}</th>
+                    <th>{{ 'workOrders.discount' | translate }}</th>
+                    <th>{{ 'workOrders.finalPrice' | translate }}</th>
+                    <th>{{ 'workOrders.lineTotal' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -148,7 +149,7 @@ import { Invoice, InvoiceLine } from '../../models/models';
                       <td>{{ line.lineTotal | currency }}</td>
                     </tr>
                   } @empty {
-                    <tr><td colspan="6" class="empty-state">No invoice lines</td></tr>
+                    <tr><td colspan="6" class="empty-state">{{ 'invoices.noInvoices' | translate }}</td></tr>
                   }
                 </tbody>
               </table>
@@ -156,15 +157,15 @@ import { Invoice, InvoiceLine } from '../../models/models';
 
             <div class="invoice-totals">
               <div class="totals-row">
-                <span>Total Amount:</span>
+                <span>{{ 'invoices.totalAmount' | translate }}:</span>
                 <span>{{ selectedInvoice.totalAmount | currency }}</span>
               </div>
               <div class="totals-row">
-                <span>Paid:</span>
+                <span>{{ 'invoices.paidAmount' | translate }}:</span>
                 <span class="text-success">{{ (selectedInvoice.totalAmount || 0) - (selectedInvoice.remainingBalance || 0) | currency }}</span>
               </div>
               <div class="totals-row balance">
-                <span>Remaining Balance:</span>
+                <span>{{ 'invoices.remainingBalance' | translate }}:</span>
                 <span [class]="(selectedInvoice.remainingBalance || 0) > 0 ? 'text-danger' : 'text-success'">
                   {{ selectedInvoice.remainingBalance | currency }}
                 </span>
@@ -285,6 +286,18 @@ export class InvoiceListComponent implements OnInit {
       'CANCELLED': 'badge badge-danger'
     };
     return classes[status || ''] || 'badge badge-secondary';
+  }
+
+  getStatusLabel(status?: string): string {
+    const labels: { [key: string]: string } = {
+      'DRAFT': 'invoices.draft',
+      'ISSUED': 'invoices.issued',
+      'SENT': 'invoices.issued',
+      'PARTIAL': 'invoices.partiallyPaid',
+      'PAID': 'invoices.paid',
+      'CANCELLED': 'invoices.cancelled'
+    };
+    return labels[status || ''] || 'invoices.draft';
   }
 
   viewDetails(invoice: Invoice) {

@@ -5,53 +5,71 @@
 <ng-template #mainLayout>
   <div class="app-container">
     <aside class="sidebar">
-      <div class="sidebar-header">Garage Management</div>
+      <div class="sidebar-header">{{ 'app.name' | translate }}</div>
       <nav class="sidebar-nav">
-        <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">Dashboard</a>
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">{{ 'menu.dashboard' | translate }}</a>
         
         <ng-container *ngIf="hasModule('CUSTOMERS')">
-          <div class="nav-section">Customers</div>
-          <a routerLink="/companies" routerLinkActive="active" class="nav-item">Companies</a>
-          <a routerLink="/clients" routerLinkActive="active" class="nav-item">Clients</a>
-          <a routerLink="/vehicles" routerLinkActive="active" class="nav-item">Vehicles</a>
+          <div class="nav-section">{{ 'menu.customers' | translate }}</div>
+          <a routerLink="/companies" routerLinkActive="active" class="nav-item">{{ 'menu.companies' | translate }}</a>
+          <a routerLink="/clients" routerLinkActive="active" class="nav-item">{{ 'menu.clients' | translate }}</a>
+          <a routerLink="/vehicles" routerLinkActive="active" class="nav-item">{{ 'menu.vehicles' | translate }}</a>
         </ng-container>
         
         <ng-container *ngIf="hasModule('INVENTORY')">
-          <div class="nav-section">Inventory</div>
-          <a routerLink="/suppliers" routerLinkActive="active" class="nav-item">Suppliers</a>
-          <a routerLink="/categories" routerLinkActive="active" class="nav-item">Categories</a>
-          <a routerLink="/products" routerLinkActive="active" class="nav-item">Products</a>
-          <a routerLink="/services" routerLinkActive="active" class="nav-item">Services</a>
+          <div class="nav-section">{{ 'menu.inventory' | translate }}</div>
+          <a routerLink="/suppliers" routerLinkActive="active" class="nav-item">{{ 'menu.suppliers' | translate }}</a>
+          <a routerLink="/categories" routerLinkActive="active" class="nav-item">{{ 'menu.categories' | translate }}</a>
+          <a routerLink="/products" routerLinkActive="active" class="nav-item">{{ 'menu.products' | translate }}</a>
+          <a routerLink="/services" routerLinkActive="active" class="nav-item">{{ 'menu.services' | translate }}</a>
         </ng-container>
         
         <ng-container *ngIf="hasModule('OPERATIONS')">
-          <div class="nav-section">Operations</div>
-          <a routerLink="/supplier-orders" routerLinkActive="active" class="nav-item">Supplier Orders</a>
-          <a routerLink="/inventory" routerLinkActive="active" class="nav-item">Stock Management</a>
-          <a routerLink="/work-orders" routerLinkActive="active" class="nav-item">Work Orders</a>
+          <div class="nav-section">{{ 'menu.operations' | translate }}</div>
+          <a routerLink="/supplier-orders" routerLinkActive="active" class="nav-item">{{ 'menu.supplierOrders' | translate }}</a>
+          <a routerLink="/inventory" routerLinkActive="active" class="nav-item">{{ 'menu.stockManagement' | translate }}</a>
+          <a routerLink="/work-orders" routerLinkActive="active" class="nav-item">{{ 'menu.workOrders' | translate }}</a>
         </ng-container>
         
         <ng-container *ngIf="hasModule('FINANCE')">
-          <div class="nav-section">Finance</div>
-          <a routerLink="/invoices" routerLinkActive="active" class="nav-item">Invoices</a>
-          <a routerLink="/payments" routerLinkActive="active" class="nav-item">Payments</a>
-          <a routerLink="/expense-categories" routerLinkActive="active" class="nav-item">Expense Categories</a>
-          <a routerLink="/expenses" routerLinkActive="active" class="nav-item">Expenses</a>
+          <div class="nav-section">{{ 'menu.finance' | translate }}</div>
+          <a routerLink="/invoices" routerLinkActive="active" class="nav-item">{{ 'menu.invoices' | translate }}</a>
+          <a routerLink="/payments" routerLinkActive="active" class="nav-item">{{ 'menu.payments' | translate }}</a>
+          <a routerLink="/expense-categories" routerLinkActive="active" class="nav-item">{{ 'menu.expenseCategories' | translate }}</a>
+          <a routerLink="/expenses" routerLinkActive="active" class="nav-item">{{ 'menu.expenses' | translate }}</a>
         </ng-container>
         
         <ng-container *ngIf="isAdmin()">
-          <div class="nav-section">Settings</div>
-          <a routerLink="/users" routerLinkActive="active" class="nav-item">Users</a>
+          <div class="nav-section">{{ 'menu.settings' | translate }}</div>
+          <a routerLink="/users" routerLinkActive="active" class="nav-item">{{ 'menu.users' | translate }}</a>
         </ng-container>
       </nav>
     </aside>
     
     <main class="main-content">
       <header class="top-bar">
-        <h1 class="page-title">Garage Management System</h1>
-        <div class="user-menu" *ngIf="currentUser">
-          <span class="username">{{ currentUser.username }}</span>
-          <button class="btn-logout" (click)="logout()">Logout</button>
+        <h1 class="page-title">{{ 'app.title' | translate }}</h1>
+        <div class="top-bar-actions">
+          <div class="language-selector">
+            <button class="lang-btn" (click)="toggleLangMenu()">
+              <span class="lang-icon">🌐</span>
+              <span class="lang-code">{{ getCurrentLangInfo().nativeName }}</span>
+              <span class="lang-arrow">▼</span>
+            </button>
+            <div class="lang-menu" *ngIf="showLangMenu">
+              <button 
+                *ngFor="let lang of supportedLanguages" 
+                class="lang-option"
+                [class.active]="lang.code === currentLang"
+                (click)="setLanguage(lang.code)">
+                {{ lang.nativeName }}
+              </button>
+            </div>
+          </div>
+          <div class="user-menu" *ngIf="currentUser">
+            <span class="username">{{ currentUser.username }}</span>
+            <button class="btn-logout" (click)="logout()">{{ 'auth.logout' | translate }}</button>
+          </div>
         </div>
       </header>
       <div class="content-area">

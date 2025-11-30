@@ -1,17 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { ExpenseCategory } from '../../models/models';
 
 @Component({
   selector: 'app-expense-category-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">Expense Categories</h2>
-      <a routerLink="/expense-categories/new" class="btn btn-primary">New Category</a>
+      <h2 class="page-title">{{ 'expenseCategories.title' | translate }}</h2>
+      <a routerLink="/expense-categories/new" class="btn btn-primary">{{ 'expenseCategories.newCategory' | translate }}</a>
     </div>
 
     <div class="card">
@@ -19,10 +20,10 @@ import { ExpenseCategory } from '../../models/models';
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{{ 'common.name' | translate }}</th>
+              <th>{{ 'common.description' | translate }}</th>
+              <th>{{ 'common.status' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -32,17 +33,17 @@ import { ExpenseCategory } from '../../models/models';
                 <td>{{ category.description || '-' }}</td>
                 <td>
                   <span [class]="category.active ? 'badge badge-success' : 'badge badge-danger'">
-                    {{ category.active ? 'Active' : 'Inactive' }}
+                    {{ (category.active ? 'common.active' : 'common.inactive') | translate }}
                   </span>
                 </td>
                 <td class="actions">
-                  <a [routerLink]="['/expense-categories', category.id]" class="btn btn-sm btn-secondary">Edit</a>
-                  <button class="btn btn-sm btn-danger" (click)="delete(category)">Delete</button>
+                  <a [routerLink]="['/expense-categories', category.id]" class="btn btn-sm btn-secondary">{{ 'common.edit' | translate }}</a>
+                  <button class="btn btn-sm btn-danger" (click)="delete(category)">{{ 'common.delete' | translate }}</button>
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="4" class="empty-state">No expense categories found</td>
+                <td colspan="4" class="empty-state">{{ 'expenseCategories.noCategories' | translate }}</td>
               </tr>
             }
           </tbody>

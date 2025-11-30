@@ -1,17 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { ServiceItem } from '../../models/models';
 
 @Component({
   selector: 'app-service-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">Services</h2>
-      <a routerLink="/services/new" class="btn btn-primary">New Service</a>
+      <h2 class="page-title">{{ 'services.title' | translate }}</h2>
+      <a routerLink="/services/new" class="btn btn-primary">{{ 'services.newService' | translate }}</a>
     </div>
 
     <div class="card">
@@ -19,12 +20,12 @@ import { ServiceItem } from '../../models/models';
         <table>
           <thead>
             <tr>
-              <th>Code</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{{ 'products.sku' | translate }}</th>
+              <th>{{ 'common.name' | translate }}</th>
+              <th>{{ 'common.category' | translate }}</th>
+              <th>{{ 'common.price' | translate }}</th>
+              <th>{{ 'common.status' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -36,17 +37,17 @@ import { ServiceItem } from '../../models/models';
                 <td>{{ service.sellingPrice | currency }}</td>
                 <td>
                   <span [class]="service.active ? 'badge badge-success' : 'badge badge-danger'">
-                    {{ service.active ? 'Active' : 'Inactive' }}
+                    {{ (service.active ? 'common.active' : 'common.inactive') | translate }}
                   </span>
                 </td>
                 <td class="actions">
-                  <a [routerLink]="['/services', service.id]" class="btn btn-sm btn-secondary">Edit</a>
-                  <button class="btn btn-sm btn-danger" (click)="delete(service)">Delete</button>
+                  <a [routerLink]="['/services', service.id]" class="btn btn-sm btn-secondary">{{ 'common.edit' | translate }}</a>
+                  <button class="btn btn-sm btn-danger" (click)="delete(service)">{{ 'common.delete' | translate }}</button>
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="6" class="empty-state">No services found</td>
+                <td colspan="6" class="empty-state">{{ 'services.noServices' | translate }}</td>
               </tr>
             }
           </tbody>

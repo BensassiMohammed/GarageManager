@@ -2,27 +2,28 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Category } from '../../models/models';
 
 @Component({
   selector: 'app-category-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">{{ isEdit ? 'Edit Category' : 'New Category' }}</h2>
+      <h2 class="page-title">{{ (isEdit ? 'categories.editCategory' : 'categories.newCategory') | translate }}</h2>
     </div>
 
     <div class="card">
       <form [formGroup]="form" (ngSubmit)="save()">
         <div class="form-row">
           <div class="form-group">
-            <label class="required">Name</label>
+            <label class="required">{{ 'common.name' | translate }}</label>
             <input type="text" formControlName="name" class="form-control">
           </div>
           <div class="form-group">
-            <label class="required">Type</label>
+            <label class="required">{{ 'common.type' | translate }}</label>
             <select formControlName="type" class="form-control">
               <option value="PRODUCT">Product</option>
               <option value="SERVICE">Service</option>
@@ -31,9 +32,9 @@ import { Category } from '../../models/models';
         </div>
 
         <div class="form-group">
-          <label>Parent Category</label>
+          <label>{{ 'categories.parentCategory' | translate }}</label>
           <select formControlName="parentId" class="form-control">
-            <option [ngValue]="null">-- No Parent --</option>
+            <option [ngValue]="null">-- {{ 'categories.selectParent' | translate }} --</option>
             @for (cat of categories; track cat.id) {
               @if (cat.id !== id) {
                 <option [ngValue]="cat.id">{{ cat.name }} ({{ cat.type }})</option>
@@ -44,13 +45,13 @@ import { Category } from '../../models/models';
 
         <div class="form-group">
           <label>
-            <input type="checkbox" formControlName="active"> Active
+            <input type="checkbox" formControlName="active"> {{ 'common.active' | translate }}
           </label>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
-          <a routerLink="/categories" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">{{ 'common.save' | translate }}</button>
+          <a routerLink="/categories" class="btn btn-secondary">{{ 'common.cancel' | translate }}</a>
         </div>
       </form>
     </div>

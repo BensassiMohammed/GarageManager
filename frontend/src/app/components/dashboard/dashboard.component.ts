@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { DashboardStats, WorkOrder, Invoice, Product } from '../../models/models';
 import { forkJoin } from 'rxjs';
@@ -8,10 +9,10 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">Dashboard</h2>
+      <h2 class="page-title">{{ 'dashboard.title' | translate }}</h2>
     </div>
     
     <div class="kpi-grid">
@@ -23,7 +24,7 @@ import { forkJoin } from 'rxjs';
         </div>
         <div class="kpi-content">
           <div class="kpi-value">{{ stats.openWorkOrders }}</div>
-          <div class="kpi-label">Open Work Orders</div>
+          <div class="kpi-label">{{ 'dashboard.openWorkOrders' | translate }}</div>
         </div>
       </div>
 
@@ -36,7 +37,7 @@ import { forkJoin } from 'rxjs';
         </div>
         <div class="kpi-content">
           <div class="kpi-value">{{ stats.outstandingAmount | currency }}</div>
-          <div class="kpi-label">Outstanding Balance</div>
+          <div class="kpi-label">{{ 'dashboard.outstandingBalance' | translate }}</div>
         </div>
       </div>
 
@@ -50,7 +51,7 @@ import { forkJoin } from 'rxjs';
         </div>
         <div class="kpi-content">
           <div class="kpi-value">{{ stats.lowStockProducts }}</div>
-          <div class="kpi-label">Low Stock Products</div>
+          <div class="kpi-label">{{ 'dashboard.lowStockProducts' | translate }}</div>
         </div>
       </div>
 
@@ -63,7 +64,7 @@ import { forkJoin } from 'rxjs';
         </div>
         <div class="kpi-content">
           <div class="kpi-value">{{ stats.monthlyExpenses | currency }}</div>
-          <div class="kpi-label">Monthly Expenses</div>
+          <div class="kpi-label">{{ 'dashboard.monthlyExpenses' | translate }}</div>
         </div>
       </div>
     </div>
@@ -71,39 +72,39 @@ import { forkJoin } from 'rxjs';
     <div class="stats-grid">
       <div class="stat-card" routerLink="/companies" style="cursor: pointer">
         <div class="stat-value">{{ stats.totalCompanies }}</div>
-        <div class="stat-label">Companies</div>
+        <div class="stat-label">{{ 'menu.companies' | translate }}</div>
       </div>
       <div class="stat-card" routerLink="/clients" style="cursor: pointer">
         <div class="stat-value">{{ stats.totalClients }}</div>
-        <div class="stat-label">Clients</div>
+        <div class="stat-label">{{ 'menu.clients' | translate }}</div>
       </div>
       <div class="stat-card" routerLink="/vehicles" style="cursor: pointer">
         <div class="stat-value">{{ stats.totalVehicles }}</div>
-        <div class="stat-label">Vehicles</div>
+        <div class="stat-label">{{ 'menu.vehicles' | translate }}</div>
       </div>
       <div class="stat-card" routerLink="/products" style="cursor: pointer">
         <div class="stat-value">{{ stats.totalProducts }}</div>
-        <div class="stat-label">Products</div>
+        <div class="stat-label">{{ 'menu.products' | translate }}</div>
       </div>
       <div class="stat-card" routerLink="/services" style="cursor: pointer">
         <div class="stat-value">{{ stats.totalServices }}</div>
-        <div class="stat-label">Services</div>
+        <div class="stat-label">{{ 'menu.services' | translate }}</div>
       </div>
       <div class="stat-card" routerLink="/suppliers" style="cursor: pointer">
         <div class="stat-value">{{ stats.totalSuppliers }}</div>
-        <div class="stat-label">Suppliers</div>
+        <div class="stat-label">{{ 'menu.suppliers' | translate }}</div>
       </div>
     </div>
 
     <div class="dashboard-panels">
       <div class="panel">
         <div class="panel-header">
-          <h3>Recent Open Work Orders</h3>
-          <a routerLink="/work-orders" class="btn btn-sm btn-secondary">View All</a>
+          <h3>{{ 'dashboard.recentOpenWorkOrders' | translate }}</h3>
+          <a routerLink="/work-orders" class="btn btn-sm btn-secondary">{{ 'dashboard.viewAll' | translate }}</a>
         </div>
         <div class="panel-content">
           @if (recentWorkOrders.length === 0) {
-            <p class="empty-message">No open work orders</p>
+            <p class="empty-message">{{ 'dashboard.noRecentWorkOrders' | translate }}</p>
           } @else {
             <ul class="item-list">
               @for (wo of recentWorkOrders; track wo.id) {
@@ -125,12 +126,12 @@ import { forkJoin } from 'rxjs';
 
       <div class="panel">
         <div class="panel-header">
-          <h3>Unpaid Invoices</h3>
-          <a routerLink="/invoices" class="btn btn-sm btn-secondary">View All</a>
+          <h3>{{ 'dashboard.unpaidInvoices' | translate }}</h3>
+          <a routerLink="/invoices" class="btn btn-sm btn-secondary">{{ 'dashboard.viewAll' | translate }}</a>
         </div>
         <div class="panel-content">
           @if (unpaidInvoices.length === 0) {
-            <p class="empty-message">No unpaid invoices</p>
+            <p class="empty-message">{{ 'dashboard.noUnpaidInvoices' | translate }}</p>
           } @else {
             <ul class="item-list">
               @for (inv of unpaidInvoices; track inv.id) {
@@ -152,12 +153,12 @@ import { forkJoin } from 'rxjs';
 
       <div class="panel">
         <div class="panel-header">
-          <h3>Low Stock Products</h3>
-          <a routerLink="/products" class="btn btn-sm btn-secondary">View All</a>
+          <h3>{{ 'dashboard.lowStockProducts' | translate }}</h3>
+          <a routerLink="/products" class="btn btn-sm btn-secondary">{{ 'dashboard.viewAll' | translate }}</a>
         </div>
         <div class="panel-content">
           @if (lowStockProducts.length === 0) {
-            <p class="empty-message">All products are well stocked</p>
+            <p class="empty-message">{{ 'dashboard.allProductsWellStocked' | translate }}</p>
           } @else {
             <ul class="item-list">
               @for (prod of lowStockProducts; track prod.id) {
@@ -167,8 +168,8 @@ import { forkJoin } from 'rxjs';
                     <span class="item-subtitle">{{ prod.code }}</span>
                   </div>
                   <div class="item-meta">
-                    <span class="badge badge-danger">{{ prod.currentStock || 0 }} in stock</span>
-                    <span class="item-min">Min: {{ prod.minStock }}</span>
+                    <span class="badge badge-danger">{{ prod.currentStock || 0 }} {{ 'dashboard.inStock' | translate }}</span>
+                    <span class="item-min">{{ 'stockManagement.minStock' | translate }}: {{ prod.minStock }}</span>
                   </div>
                 </li>
               }

@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { WorkOrder, WorkOrderProductLine, WorkOrderServiceLine, WorkOrderTotals, Client, Vehicle, Company, ServiceItem, Product } from '../../models/models';
 
@@ -26,21 +27,21 @@ interface DraftProductLine {
 @Component({
   selector: 'app-work-order-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">Work Orders</h2>
-      <a routerLink="/work-orders/new" class="btn btn-primary">New Work Order</a>
+      <h2 class="page-title">{{ 'workOrders.title' | translate }}</h2>
+      <a routerLink="/work-orders/new" class="btn btn-primary">{{ 'workOrders.newWorkOrder' | translate }}</a>
     </div>
 
     <div class="filter-bar">
       <select [(ngModel)]="statusFilter" (change)="filterOrders()" class="form-control">
-        <option value="">All Status</option>
-        <option value="DRAFT">Draft</option>
-        <option value="OPEN">Open</option>
-        <option value="IN_PROGRESS">In Progress</option>
-        <option value="COMPLETED">Completed</option>
-        <option value="INVOICED">Invoiced</option>
+        <option value="">{{ 'common.all' | translate }} {{ 'common.status' | translate }}</option>
+        <option value="DRAFT">{{ 'invoices.draft' | translate }}</option>
+        <option value="OPEN">{{ 'workOrders.open' | translate }}</option>
+        <option value="IN_PROGRESS">{{ 'workOrders.inProgress' | translate }}</option>
+        <option value="COMPLETED">{{ 'workOrders.completed' | translate }}</option>
+        <option value="INVOICED">{{ 'workOrders.invoiced' | translate }}</option>
       </select>
     </div>
 
@@ -49,13 +50,13 @@ interface DraftProductLine {
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Client</th>
-              <th>Vehicle</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Total</th>
-              <th>Actions</th>
+              <th>{{ 'workOrders.orderNumber' | translate }}</th>
+              <th>{{ 'workOrders.client' | translate }}</th>
+              <th>{{ 'workOrders.vehicle' | translate }}</th>
+              <th>{{ 'common.date' | translate }}</th>
+              <th>{{ 'common.status' | translate }}</th>
+              <th>{{ 'common.total' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -66,20 +67,20 @@ interface DraftProductLine {
                 <td>{{ order.vehicle?.registrationNumber || '-' }}</td>
                 <td>{{ order.date }}</td>
                 <td>
-                  <span [class]="getStatusClass(order.status)">{{ order.status }}</span>
+                  <span [class]="getStatusClass(order.status)">{{ getStatusLabel(order.status) | translate }}</span>
                 </td>
                 <td>{{ order.totalAmount | currency }}</td>
                 <td class="actions">
-                  <a [routerLink]="['/work-orders', order.id]" class="btn btn-sm btn-secondary" (click)="$event.stopPropagation()">Edit</a>
-                  <button class="btn btn-sm btn-info" (click)="viewDetails(order); $event.stopPropagation()">Details</button>
+                  <a [routerLink]="['/work-orders', order.id]" class="btn btn-sm btn-secondary" (click)="$event.stopPropagation()">{{ 'common.edit' | translate }}</a>
+                  <button class="btn btn-sm btn-info" (click)="viewDetails(order); $event.stopPropagation()">{{ 'common.details' | translate }}</button>
                   @if (order.status === 'COMPLETED') {
-                    <button class="btn btn-sm btn-primary" (click)="generateInvoice(order); $event.stopPropagation()">Invoice</button>
+                    <button class="btn btn-sm btn-primary" (click)="generateInvoice(order); $event.stopPropagation()">{{ 'workOrders.generateInvoice' | translate }}</button>
                   }
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="empty-state">No work orders found</td>
+                <td colspan="7" class="empty-state">{{ 'workOrders.noWorkOrders' | translate }}</td>
               </tr>
             }
           </tbody>
@@ -91,34 +92,34 @@ interface DraftProductLine {
       <div class="modal-overlay" (click)="showDetails = false">
         <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3>Work Order #{{ selectedOrder.id }} Details</h3>
+            <h3>{{ 'workOrders.title' | translate }} #{{ selectedOrder.id }} {{ 'common.details' | translate }}</h3>
             <button class="btn-close" (click)="showDetails = false">&times;</button>
           </div>
           <div class="modal-body">
             <div class="order-info">
               <div class="info-group">
-                <label>Client:</label>
+                <label>{{ 'workOrders.client' | translate }}:</label>
                 <span>{{ selectedOrder.client?.firstName }} {{ selectedOrder.client?.lastName }}</span>
               </div>
               <div class="info-group">
-                <label>Vehicle:</label>
+                <label>{{ 'workOrders.vehicle' | translate }}:</label>
                 <span>{{ selectedOrder.vehicle?.registrationNumber }} - {{ selectedOrder.vehicle?.brand }} {{ selectedOrder.vehicle?.model }}</span>
               </div>
               <div class="info-group">
-                <label>Status:</label>
-                <span [class]="getStatusClass(selectedOrder.status)">{{ selectedOrder.status }}</span>
+                <label>{{ 'common.status' | translate }}:</label>
+                <span [class]="getStatusClass(selectedOrder.status)">{{ getStatusLabel(selectedOrder.status) | translate }}</span>
               </div>
             </div>
 
-            <h4>Services</h4>
+            <h4>{{ 'workOrders.servicesSection' | translate }}</h4>
             <div class="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th>Service</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Line Total</th>
+                    <th>{{ 'workOrders.service' | translate }}</th>
+                    <th>{{ 'common.quantity' | translate }}</th>
+                    <th>{{ 'common.price' | translate }}</th>
+                    <th>{{ 'workOrders.lineTotal' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -130,23 +131,23 @@ interface DraftProductLine {
                       <td>{{ line.lineTotal | currency }}</td>
                     </tr>
                   } @empty {
-                    <tr><td colspan="4" class="empty-state">No services</td></tr>
+                    <tr><td colspan="4" class="empty-state">{{ 'workOrders.noWorkOrders' | translate }}</td></tr>
                   }
                 </tbody>
               </table>
             </div>
 
-            <h4>Products</h4>
+            <h4>{{ 'workOrders.partsSection' | translate }}</h4>
             <div class="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Qty</th>
-                    <th>Standard Price</th>
-                    <th>Discount %</th>
-                    <th>Final Price</th>
-                    <th>Line Total</th>
+                    <th>{{ 'workOrders.product' | translate }}</th>
+                    <th>{{ 'common.quantity' | translate }}</th>
+                    <th>{{ 'workOrders.stdPrice' | translate }}</th>
+                    <th>{{ 'workOrders.discount' | translate }}</th>
+                    <th>{{ 'workOrders.finalPrice' | translate }}</th>
+                    <th>{{ 'workOrders.lineTotal' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -166,7 +167,7 @@ interface DraftProductLine {
                       <td>{{ line.lineTotal | currency }}</td>
                     </tr>
                   } @empty {
-                    <tr><td colspan="6" class="empty-state">No products</td></tr>
+                    <tr><td colspan="6" class="empty-state">{{ 'workOrders.noWorkOrders' | translate }}</td></tr>
                   }
                 </tbody>
               </table>
@@ -175,25 +176,25 @@ interface DraftProductLine {
             @if (orderTotals) {
               <div class="totals-section">
                 <div class="totals-row">
-                  <span>Services Subtotal:</span>
+                  <span>{{ 'workOrders.servicesSubtotal' | translate }}:</span>
                   <span>{{ orderTotals.servicesSubtotal | currency }}</span>
                 </div>
                 <div class="totals-row">
-                  <span>Products (Before Discount):</span>
+                  <span>{{ 'workOrders.partsSubtotal' | translate }}:</span>
                   <span>{{ orderTotals.productsBeforeDiscount | currency }}</span>
                 </div>
                 @if (orderTotals.productsDiscountTotal > 0) {
                   <div class="totals-row discount">
-                    <span>Products Discount:</span>
+                    <span>{{ 'workOrders.partsDiscount' | translate }}:</span>
                     <span>-{{ orderTotals.productsDiscountTotal | currency }}</span>
                   </div>
                 }
                 <div class="totals-row">
-                  <span>Products (After Discount):</span>
+                  <span>{{ 'workOrders.partsSection' | translate }}:</span>
                   <span>{{ orderTotals.productsAfterDiscount | currency }}</span>
                 </div>
                 <div class="totals-row grand-total">
-                  <span>Grand Total:</span>
+                  <span>{{ 'workOrders.grandTotal' | translate }}:</span>
                   <span>{{ orderTotals.grandTotal | currency }}</span>
                 </div>
               </div>
@@ -207,24 +208,24 @@ interface DraftProductLine {
       <div class="modal-overlay" (click)="showCreateModal = false">
         <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3>Create Work Order</h3>
+            <h3>{{ 'workOrders.newWorkOrder' | translate }}</h3>
             <button class="btn-close" (click)="showCreateModal = false">&times;</button>
           </div>
           <div class="modal-body">
             <div class="form-row">
               <div class="form-group">
-                <label class="required">Client</label>
+                <label class="required">{{ 'workOrders.client' | translate }}</label>
                 <select [(ngModel)]="newOrder.clientId" class="form-control">
-                  <option [ngValue]="null">-- Select Client --</option>
+                  <option [ngValue]="null">{{ 'common.select' | translate }}</option>
                   @for (client of clients; track client.id) {
                     <option [ngValue]="client.id">{{ client.firstName }} {{ client.lastName }}</option>
                   }
                 </select>
               </div>
               <div class="form-group">
-                <label>Vehicle</label>
+                <label>{{ 'workOrders.vehicle' | translate }}</label>
                 <select [(ngModel)]="newOrder.vehicleId" class="form-control">
-                  <option [ngValue]="null">-- Select Vehicle --</option>
+                  <option [ngValue]="null">{{ 'workOrders.selectVehicle' | translate }}</option>
                   @for (vehicle of vehicles; track vehicle.id) {
                     <option [ngValue]="vehicle.id">{{ vehicle.registrationNumber }} - {{ vehicle.brand }} {{ vehicle.model }}</option>
                   }
@@ -233,37 +234,37 @@ interface DraftProductLine {
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label class="required">Date</label>
+                <label class="required">{{ 'common.date' | translate }}</label>
                 <input type="date" [(ngModel)]="newOrder.date" class="form-control">
               </div>
               <div class="form-group">
-                <label>Description</label>
+                <label>{{ 'common.description' | translate }}</label>
                 <textarea [(ngModel)]="newOrder.description" class="form-control" rows="2"></textarea>
               </div>
             </div>
 
             <div class="section-divider">
-              <h4>Add Services</h4>
+              <h4>{{ 'workOrders.addService' | translate }}</h4>
             </div>
             <div class="add-line-row">
               <select [(ngModel)]="newServiceLine.serviceId" (change)="onServiceSelect()" class="form-control">
-                <option [ngValue]="null">-- Select Service --</option>
+                <option [ngValue]="null">{{ 'common.select' | translate }}</option>
                 @for (svc of availableServices; track svc.id) {
                   <option [ngValue]="svc.id">{{ svc.name }} ({{ svc.sellingPrice | currency }})</option>
                 }
               </select>
-              <input type="number" [(ngModel)]="newServiceLine.quantity" min="1" class="form-control qty-input" placeholder="Qty">
-              <button class="btn btn-success btn-sm" (click)="addServiceLine()" [disabled]="!newServiceLine.serviceId || newServiceLine.quantity < 1">Add</button>
+              <input type="number" [(ngModel)]="newServiceLine.quantity" min="1" class="form-control qty-input" [placeholder]="'common.quantity' | translate">
+              <button class="btn btn-success btn-sm" (click)="addServiceLine()" [disabled]="!newServiceLine.serviceId || newServiceLine.quantity < 1">{{ 'common.add' | translate }}</button>
             </div>
             @if (draftServiceLines.length > 0) {
               <div class="table-container lines-table">
                 <table>
                   <thead>
                     <tr>
-                      <th>Service</th>
-                      <th>Qty</th>
-                      <th>Unit Price</th>
-                      <th>Total</th>
+                      <th>{{ 'workOrders.service' | translate }}</th>
+                      <th>{{ 'common.quantity' | translate }}</th>
+                      <th>{{ 'common.price' | translate }}</th>
+                      <th>{{ 'common.total' | translate }}</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -283,30 +284,30 @@ interface DraftProductLine {
             }
 
             <div class="section-divider">
-              <h4>Add Products</h4>
+              <h4>{{ 'workOrders.addProduct' | translate }}</h4>
             </div>
             <div class="add-line-row">
               <select [(ngModel)]="newProductLine.productId" (change)="onProductSelect()" class="form-control">
-                <option [ngValue]="null">-- Select Product --</option>
+                <option [ngValue]="null">{{ 'common.select' | translate }}</option>
                 @for (prod of availableProducts; track prod.id) {
                   <option [ngValue]="prod.id">{{ prod.name }} ({{ prod.sellingPrice | currency }})</option>
                 }
               </select>
-              <input type="number" [(ngModel)]="newProductLine.quantity" min="1" class="form-control qty-input" placeholder="Qty">
-              <input type="number" [(ngModel)]="newProductLine.discountPercent" min="0" max="100" class="form-control discount-input" placeholder="Discount %">
-              <button class="btn btn-success btn-sm" (click)="addProductLine()" [disabled]="!newProductLine.productId || newProductLine.quantity < 1">Add</button>
+              <input type="number" [(ngModel)]="newProductLine.quantity" min="1" class="form-control qty-input" [placeholder]="'common.quantity' | translate">
+              <input type="number" [(ngModel)]="newProductLine.discountPercent" min="0" max="100" class="form-control discount-input" [placeholder]="'workOrders.discount' | translate">
+              <button class="btn btn-success btn-sm" (click)="addProductLine()" [disabled]="!newProductLine.productId || newProductLine.quantity < 1">{{ 'common.add' | translate }}</button>
             </div>
             @if (draftProductLines.length > 0) {
               <div class="table-container lines-table">
                 <table>
                   <thead>
                     <tr>
-                      <th>Product</th>
-                      <th>Qty</th>
-                      <th>Price</th>
-                      <th>Discount</th>
-                      <th>Final</th>
-                      <th>Total</th>
+                      <th>{{ 'workOrders.product' | translate }}</th>
+                      <th>{{ 'common.quantity' | translate }}</th>
+                      <th>{{ 'common.price' | translate }}</th>
+                      <th>{{ 'workOrders.discount' | translate }}</th>
+                      <th>{{ 'workOrders.finalPrice' | translate }}</th>
+                      <th>{{ 'common.total' | translate }}</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -336,33 +337,33 @@ interface DraftProductLine {
             @if (draftServiceLines.length > 0 || draftProductLines.length > 0) {
               <div class="totals-section">
                 <div class="totals-row">
-                  <span>Services Subtotal:</span>
+                  <span>{{ 'workOrders.servicesSubtotal' | translate }}:</span>
                   <span>{{ getDraftServicesTotal() | currency }}</span>
                 </div>
                 <div class="totals-row">
-                  <span>Products (Before Discount):</span>
+                  <span>{{ 'workOrders.partsSubtotal' | translate }}:</span>
                   <span>{{ getDraftProductsBeforeDiscount() | currency }}</span>
                 </div>
                 @if (getDraftProductsDiscount() > 0) {
                   <div class="totals-row discount">
-                    <span>Products Discount:</span>
+                    <span>{{ 'workOrders.partsDiscount' | translate }}:</span>
                     <span>-{{ getDraftProductsDiscount() | currency }}</span>
                   </div>
                 }
                 <div class="totals-row">
-                  <span>Products (After Discount):</span>
+                  <span>{{ 'workOrders.partsSection' | translate }}:</span>
                   <span>{{ getDraftProductsAfterDiscount() | currency }}</span>
                 </div>
                 <div class="totals-row grand-total">
-                  <span>Grand Total:</span>
+                  <span>{{ 'workOrders.grandTotal' | translate }}:</span>
                   <span>{{ getDraftGrandTotal() | currency }}</span>
                 </div>
               </div>
             }
 
             <div class="form-actions">
-              <button class="btn btn-primary" (click)="createWorkOrder()" [disabled]="!newOrder.clientId || !newOrder.date">Create Work Order</button>
-              <button class="btn btn-secondary" (click)="showCreateModal = false">Cancel</button>
+              <button class="btn btn-primary" (click)="createWorkOrder()" [disabled]="!newOrder.clientId || !newOrder.date">{{ 'workOrders.newWorkOrder' | translate }}</button>
+              <button class="btn btn-secondary" (click)="showCreateModal = false">{{ 'common.cancel' | translate }}</button>
             </div>
           </div>
         </div>
@@ -373,23 +374,23 @@ interface DraftProductLine {
       <div class="modal-overlay" (click)="showInvoiceModal = false">
         <div class="modal-content" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3>Generate Invoice</h3>
+            <h3>{{ 'workOrders.generateInvoice' | translate }}</h3>
             <button class="btn-close" (click)="showInvoiceModal = false">&times;</button>
           </div>
           <div class="modal-body">
-            <p>Generate invoice for Work Order #{{ selectedOrder.id }}?</p>
+            <p>{{ 'workOrders.generateInvoice' | translate }} {{ 'workOrders.title' | translate }} #{{ selectedOrder.id }}?</p>
             <div class="form-group">
-              <label>Bill to Company (optional)</label>
+              <label>{{ 'companies.title' | translate }}</label>
               <select [(ngModel)]="invoiceCompanyId" class="form-control">
-                <option [ngValue]="null">-- Bill to Client --</option>
+                <option [ngValue]="null">{{ 'clients.title' | translate }}</option>
                 @for (company of companies; track company.id) {
                   <option [ngValue]="company.id">{{ company.name }}</option>
                 }
               </select>
             </div>
             <div class="form-actions">
-              <button class="btn btn-primary" (click)="confirmGenerateInvoice()">Generate Invoice</button>
-              <button class="btn btn-secondary" (click)="showInvoiceModal = false">Cancel</button>
+              <button class="btn btn-primary" (click)="confirmGenerateInvoice()">{{ 'workOrders.generateInvoice' | translate }}</button>
+              <button class="btn btn-secondary" (click)="showInvoiceModal = false">{{ 'common.cancel' | translate }}</button>
             </div>
           </div>
         </div>
@@ -615,6 +616,18 @@ export class WorkOrderListComponent implements OnInit {
     return classes[status || ''] || 'badge badge-secondary';
   }
 
+  getStatusLabel(status?: string): string {
+    const labels: { [key: string]: string } = {
+      'DRAFT': 'invoices.draft',
+      'OPEN': 'workOrders.open',
+      'IN_PROGRESS': 'workOrders.inProgress',
+      'COMPLETED': 'workOrders.completed',
+      'INVOICED': 'workOrders.invoiced',
+      'CANCELLED': 'workOrders.cancelled'
+    };
+    return labels[status || ''] || 'invoices.draft';
+  }
+
   selectOrder(order: WorkOrder) {
     this.selectedOrder = order;
   }
@@ -646,46 +659,38 @@ export class WorkOrderListComponent implements OnInit {
   }
 
   confirmGenerateInvoice() {
-    if (this.selectedOrder?.id) {
-      this.api.generateInvoiceFromWorkOrder(this.selectedOrder.id, this.invoiceCompanyId || undefined)
-        .subscribe({
-          next: () => {
-            this.showInvoiceModal = false;
-            this.loadData();
-            alert('Invoice generated successfully!');
-          },
-          error: (err) => {
-            alert('Error generating invoice: ' + (err.error?.message || err.message));
-          }
-        });
-    }
+    if (!this.selectedOrder?.id) return;
+    
+    this.api.generateInvoiceFromWorkOrder(this.selectedOrder.id, this.invoiceCompanyId || undefined).subscribe({
+      next: () => {
+        this.showInvoiceModal = false;
+        this.loadData();
+        alert('Invoice generated successfully!');
+      },
+      error: (err: any) => {
+        alert('Error generating invoice: ' + (err.error?.message || err.message));
+      }
+    });
   }
 
   onServiceSelect() {
-    const service = this.availableServices.find(s => s.id === this.newServiceLine.serviceId);
-    if (service) {
-      this.newServiceLine.quantity = 1;
-    }
+    this.newServiceLine.quantity = 1;
   }
 
   onProductSelect() {
-    const product = this.availableProducts.find(p => p.id === this.newProductLine.productId);
-    if (product) {
-      this.newProductLine.quantity = 1;
-      this.newProductLine.discountPercent = 0;
-    }
+    this.newProductLine.quantity = 1;
+    this.newProductLine.discountPercent = 0;
   }
 
   addServiceLine() {
     const service = this.availableServices.find(s => s.id === this.newServiceLine.serviceId);
     if (service && this.newServiceLine.quantity > 0) {
-      const unitPrice = service.sellingPrice || 0;
       this.draftServiceLines.push({
         serviceId: service.id!,
         serviceName: service.name,
         quantity: this.newServiceLine.quantity,
-        unitPrice: unitPrice,
-        lineTotal: unitPrice * this.newServiceLine.quantity
+        unitPrice: service.sellingPrice || 0,
+        lineTotal: (service.sellingPrice || 0) * this.newServiceLine.quantity
       });
       this.newServiceLine = { serviceId: null, quantity: 1 };
     }
@@ -705,9 +710,9 @@ export class WorkOrderListComponent implements OnInit {
         productId: product.id!,
         productName: product.name,
         quantity: this.newProductLine.quantity,
-        standardPrice: standardPrice,
-        discountPercent: discountPercent,
-        finalUnitPrice: finalUnitPrice,
+        standardPrice,
+        discountPercent,
+        finalUnitPrice,
         lineTotal: finalUnitPrice * this.newProductLine.quantity
       });
       this.newProductLine = { productId: null, quantity: 1, discountPercent: 0 };
@@ -757,40 +762,12 @@ export class WorkOrderListComponent implements OnInit {
     
     this.api.createWorkOrder(data).subscribe({
       next: (createdOrder) => {
-        const workOrderId = createdOrder.id;
-        if (workOrderId && (this.draftServiceLines.length > 0 || this.draftProductLines.length > 0)) {
-          this.addLinesToWorkOrder(workOrderId);
-        } else {
-          this.finishCreateWorkOrder();
-        }
+        this.showCreateModal = false;
+        this.loadData();
       },
       error: (err) => {
         alert('Error creating work order: ' + (err.error?.message || err.message));
       }
     });
-  }
-
-  addLinesToWorkOrder(workOrderId: number) {
-    const servicePromises = this.draftServiceLines.map(line =>
-      this.api.addWorkOrderServiceLine(workOrderId, line.serviceId!, line.quantity).toPromise()
-    );
-    const productPromises = this.draftProductLines.map(line =>
-      this.api.addWorkOrderProductLine(workOrderId, line.productId!, line.quantity, line.discountPercent).toPromise()
-    );
-
-    Promise.all([...servicePromises, ...productPromises])
-      .then(() => {
-        this.finishCreateWorkOrder();
-      })
-      .catch(err => {
-        alert('Work order created but some lines failed: ' + (err.message || err));
-        this.finishCreateWorkOrder();
-      });
-  }
-
-  finishCreateWorkOrder() {
-    this.showCreateModal = false;
-    this.resetNewOrder();
-    this.loadData();
   }
 }

@@ -1,17 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Product } from '../../models/models';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">Products</h2>
-      <a routerLink="/products/new" class="btn btn-primary">New Product</a>
+      <h2 class="page-title">{{ 'products.title' | translate }}</h2>
+      <a routerLink="/products/new" class="btn btn-primary">{{ 'products.newProduct' | translate }}</a>
     </div>
 
     <div class="card">
@@ -19,13 +20,13 @@ import { Product } from '../../models/models';
         <table>
           <thead>
             <tr>
-              <th>Code</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{{ 'products.sku' | translate }}</th>
+              <th>{{ 'common.name' | translate }}</th>
+              <th>{{ 'common.category' | translate }}</th>
+              <th>{{ 'common.price' | translate }}</th>
+              <th>{{ 'products.currentStock' | translate }}</th>
+              <th>{{ 'common.status' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -42,17 +43,17 @@ import { Product } from '../../models/models';
                 </td>
                 <td>
                   <span [class]="product.active ? 'badge badge-success' : 'badge badge-danger'">
-                    {{ product.active ? 'Active' : 'Inactive' }}
+                    {{ (product.active ? 'common.active' : 'common.inactive') | translate }}
                   </span>
                 </td>
                 <td class="actions">
-                  <a [routerLink]="['/products', product.id]" class="btn btn-sm btn-secondary">Edit</a>
-                  <button class="btn btn-sm btn-danger" (click)="delete(product)">Delete</button>
+                  <a [routerLink]="['/products', product.id]" class="btn btn-sm btn-secondary">{{ 'common.edit' | translate }}</a>
+                  <button class="btn btn-sm btn-danger" (click)="delete(product)">{{ 'common.delete' | translate }}</button>
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="empty-state">No products found</td>
+                <td colspan="7" class="empty-state">{{ 'products.noProducts' | translate }}</td>
               </tr>
             }
           </tbody>

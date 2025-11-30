@@ -2,51 +2,52 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Client } from '../../models/models';
 
 @Component({
   selector: 'app-vehicle-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">{{ isEdit ? 'Edit Vehicle' : 'New Vehicle' }}</h2>
+      <h2 class="page-title">{{ (isEdit ? 'vehicles.editVehicle' : 'vehicles.newVehicle') | translate }}</h2>
     </div>
 
     <div class="card">
       <form [formGroup]="form" (ngSubmit)="save()">
         <div class="form-row">
           <div class="form-group">
-            <label class="required">Registration Number</label>
+            <label class="required">{{ 'vehicles.licensePlate' | translate }}</label>
             <input type="text" formControlName="registrationNumber" class="form-control">
           </div>
           <div class="form-group">
-            <label>Brand</label>
+            <label>{{ 'vehicles.make' | translate }}</label>
             <input type="text" formControlName="brand" class="form-control">
           </div>
         </div>
         
         <div class="form-row">
           <div class="form-group">
-            <label>Model</label>
+            <label>{{ 'vehicles.model' | translate }}</label>
             <input type="text" formControlName="model" class="form-control">
           </div>
           <div class="form-group">
-            <label>Type</label>
+            <label>{{ 'common.type' | translate }}</label>
             <input type="text" formControlName="type" class="form-control" placeholder="e.g. SUV, Sedan">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Year</label>
+            <label>{{ 'vehicles.year' | translate }}</label>
             <input type="number" formControlName="year" class="form-control">
           </div>
           <div class="form-group">
-            <label>Status</label>
+            <label>{{ 'common.status' | translate }}</label>
             <select formControlName="status" class="form-control">
-              <option value="ACTIVE">Active</option>
+              <option value="ACTIVE">{{ 'common.active' | translate }}</option>
               <option value="IN_SERVICE">In Service</option>
               <option value="SOLD">Sold</option>
               <option value="SCRAPPED">Scrapped</option>
@@ -55,9 +56,9 @@ import { Client } from '../../models/models';
         </div>
 
         <div class="form-group">
-          <label>Owner</label>
+          <label>{{ 'vehicles.owner' | translate }}</label>
           <select formControlName="ownerId" class="form-control">
-            <option [ngValue]="null">-- No Owner --</option>
+            <option [ngValue]="null">-- {{ 'vehicles.selectClient' | translate }} --</option>
             @for (client of clients; track client.id) {
               <option [ngValue]="client.id">{{ client.firstName }} {{ client.lastName }}</option>
             }
@@ -65,8 +66,8 @@ import { Client } from '../../models/models';
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
-          <a routerLink="/vehicles" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">{{ 'common.save' | translate }}</button>
+          <a routerLink="/vehicles" class="btn btn-secondary">{{ 'common.cancel' | translate }}</a>
         </div>
       </form>
     </div>

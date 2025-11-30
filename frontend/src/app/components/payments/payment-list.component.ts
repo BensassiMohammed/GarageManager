@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Payment, PaymentAllocation, Client, Company, Invoice, ApplyPaymentRequest } from '../../models/models';
 import { forkJoin } from 'rxjs';
@@ -8,11 +9,11 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-payment-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">Payments</h2>
-      <button class="btn btn-primary" (click)="openRecordPayment()">Record Payment</button>
+      <h2 class="page-title">{{ 'payments.title' | translate }}</h2>
+      <button class="btn btn-primary" (click)="openRecordPayment()">{{ 'payments.recordPayment' | translate }}</button>
     </div>
 
     <div class="card">
@@ -21,11 +22,11 @@ import { forkJoin } from 'rxjs';
           <thead>
             <tr>
               <th>ID</th>
-              <th>Payer</th>
-              <th>Date</th>
-              <th>Method</th>
-              <th>Amount</th>
-              <th>Actions</th>
+              <th>{{ 'payments.client' | translate }}</th>
+              <th>{{ 'payments.paymentDate' | translate }}</th>
+              <th>{{ 'payments.paymentMethod' | translate }}</th>
+              <th>{{ 'common.amount' | translate }}</th>
+              <th>{{ 'common.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -36,15 +37,15 @@ import { forkJoin } from 'rxjs';
                   {{ payment.payerType }}: {{ getPayerName(payment) }}
                 </td>
                 <td>{{ payment.date }}</td>
-                <td>{{ payment.method || '-' }}</td>
+                <td>{{ getPaymentMethodLabel(payment.method) | translate }}</td>
                 <td>{{ payment.totalAmount | currency }}</td>
                 <td class="actions">
-                  <button class="btn btn-sm btn-secondary" (click)="viewAllocations(payment)">Allocations</button>
+                  <button class="btn btn-sm btn-secondary" (click)="viewAllocations(payment)">{{ 'payments.allocations' | translate }}</button>
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="6" class="empty-state">No payments found</td>
+                <td colspan="6" class="empty-state">{{ 'payments.noPayments' | translate }}</td>
               </tr>
             }
           </tbody>
@@ -56,22 +57,22 @@ import { forkJoin } from 'rxjs';
       <div class="modal-overlay" (click)="showRecordPayment = false">
         <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3>Record Payment</h3>
+            <h3>{{ 'payments.recordPayment' | translate }}</h3>
             <button class="btn-close" (click)="showRecordPayment = false">&times;</button>
           </div>
           <div class="modal-body">
             <div class="form-row">
               <div class="form-group">
-                <label class="required">Payer Type</label>
+                <label class="required">{{ 'common.type' | translate }}</label>
                 <select [(ngModel)]="newPayment.payerType" (change)="onPayerTypeChange()" class="form-control">
-                  <option value="CLIENT">Client</option>
-                  <option value="COMPANY">Company</option>
+                  <option value="CLIENT">{{ 'clients.title' | translate }}</option>
+                  <option value="COMPANY">{{ 'companies.title' | translate }}</option>
                 </select>
               </div>
               <div class="form-group">
-                <label class="required">Payer</label>
+                <label class="required">{{ 'payments.client' | translate }}</label>
                 <select [(ngModel)]="newPayment.payerId" (change)="loadPayerInvoices()" class="form-control">
-                  <option [ngValue]="null">-- Select --</option>
+                  <option [ngValue]="null">{{ 'common.select' | translate }}</option>
                   @if (newPayment.payerType === 'CLIENT') {
                     @for (client of clients; track client.id) {
                       <option [ngValue]="client.id">{{ client.firstName }} {{ client.lastName }}</option>
@@ -87,42 +88,42 @@ import { forkJoin } from 'rxjs';
 
             <div class="form-row">
               <div class="form-group">
-                <label class="required">Amount</label>
+                <label class="required">{{ 'common.amount' | translate }}</label>
                 <input type="number" step="0.01" [(ngModel)]="newPayment.totalAmount" class="form-control">
               </div>
               <div class="form-group">
-                <label>Method</label>
+                <label>{{ 'payments.paymentMethod' | translate }}</label>
                 <select [(ngModel)]="newPayment.method" class="form-control">
-                  <option value="">-- Select --</option>
-                  <option value="CASH">Cash</option>
-                  <option value="CARD">Card</option>
-                  <option value="TRANSFER">Bank Transfer</option>
-                  <option value="CHECK">Check</option>
+                  <option value="">{{ 'common.select' | translate }}</option>
+                  <option value="CASH">{{ 'payments.cash' | translate }}</option>
+                  <option value="CARD">{{ 'payments.card' | translate }}</option>
+                  <option value="TRANSFER">{{ 'payments.bankTransfer' | translate }}</option>
+                  <option value="CHECK">{{ 'payments.check' | translate }}</option>
                 </select>
               </div>
               <div class="form-group">
-                <label class="required">Date</label>
+                <label class="required">{{ 'payments.paymentDate' | translate }}</label>
                 <input type="date" [(ngModel)]="newPayment.date" class="form-control">
               </div>
             </div>
 
             <div class="form-group">
-              <label>Notes</label>
+              <label>{{ 'common.notes' | translate }}</label>
               <textarea [(ngModel)]="newPayment.notes" class="form-control" rows="2"></textarea>
             </div>
 
             @if (payerInvoices.length > 0) {
-              <h4>Allocate to Invoices (Optional)</h4>
-              <p class="help-text">Leave empty to auto-allocate to oldest invoices first</p>
+              <h4>{{ 'payments.allocations' | translate }}</h4>
+              <p class="help-text">{{ 'payments.autoAllocate' | translate }}</p>
               <div class="table-container">
                 <table>
                   <thead>
                     <tr>
-                      <th>Invoice</th>
-                      <th>Date</th>
-                      <th>Total</th>
-                      <th>Outstanding</th>
-                      <th>Allocate</th>
+                      <th>{{ 'invoices.invoiceNumber' | translate }}</th>
+                      <th>{{ 'common.date' | translate }}</th>
+                      <th>{{ 'common.total' | translate }}</th>
+                      <th>{{ 'invoices.remainingBalance' | translate }}</th>
+                      <th>{{ 'payments.allocatedAmount' | translate }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -142,17 +143,17 @@ import { forkJoin } from 'rxjs';
                 </table>
               </div>
               <div class="allocation-summary">
-                <span>Total Allocated: {{ getTotalAllocated() | currency }}</span>
-                <span>Unallocated: {{ newPayment.totalAmount - getTotalAllocated() | currency }}</span>
+                <span>{{ 'payments.allocatedAmount' | translate }}: {{ getTotalAllocated() | currency }}</span>
+                <span>{{ 'payments.unallocated' | translate }}: {{ newPayment.totalAmount - getTotalAllocated() | currency }}</span>
               </div>
             }
 
             <div class="form-actions">
               <button class="btn btn-primary" (click)="submitPayment()" 
                 [disabled]="!newPayment.payerId || !newPayment.totalAmount || !newPayment.date">
-                Record Payment
+                {{ 'payments.recordPayment' | translate }}
               </button>
-              <button class="btn btn-secondary" (click)="showRecordPayment = false">Cancel</button>
+              <button class="btn btn-secondary" (click)="showRecordPayment = false">{{ 'common.cancel' | translate }}</button>
             </div>
           </div>
         </div>
@@ -163,42 +164,42 @@ import { forkJoin } from 'rxjs';
       <div class="modal-overlay" (click)="showAllocations = false">
         <div class="modal-content" (click)="$event.stopPropagation()">
           <div class="modal-header">
-            <h3>Payment #{{ selectedPayment.id }} Allocations</h3>
+            <h3>{{ 'payments.title' | translate }} #{{ selectedPayment.id }} {{ 'payments.allocations' | translate }}</h3>
             <button class="btn-close" (click)="showAllocations = false">&times;</button>
           </div>
           <div class="modal-body">
             <div class="payment-info">
               <div class="info-group">
-                <label>Total Amount:</label>
+                <label>{{ 'invoices.totalAmount' | translate }}:</label>
                 <span>{{ selectedPayment.totalAmount | currency }}</span>
               </div>
               <div class="info-group">
-                <label>Date:</label>
+                <label>{{ 'payments.paymentDate' | translate }}:</label>
                 <span>{{ selectedPayment.date }}</span>
               </div>
               <div class="info-group">
-                <label>Method:</label>
-                <span>{{ selectedPayment.method || '-' }}</span>
+                <label>{{ 'payments.paymentMethod' | translate }}:</label>
+                <span>{{ getPaymentMethodLabel(selectedPayment.method) | translate }}</span>
               </div>
             </div>
 
-            <h4>Allocated to Invoices</h4>
+            <h4>{{ 'payments.allocations' | translate }}</h4>
             <div class="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th>Invoice</th>
-                    <th>Amount</th>
+                    <th>{{ 'invoices.invoiceNumber' | translate }}</th>
+                    <th>{{ 'common.amount' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
                   @for (alloc of paymentAllocations; track alloc.id) {
                     <tr>
-                      <td>Invoice #{{ alloc.invoice?.id }}</td>
+                      <td>{{ 'invoices.invoiceNumber' | translate }} #{{ alloc.invoice?.id }}</td>
                       <td>{{ alloc.allocatedAmount | currency }}</td>
                     </tr>
                   } @empty {
-                    <tr><td colspan="2" class="empty-state">No allocations</td></tr>
+                    <tr><td colspan="2" class="empty-state">{{ 'payments.noPayments' | translate }}</td></tr>
                   }
                 </tbody>
               </table>
@@ -304,6 +305,16 @@ export class PaymentListComponent implements OnInit {
       const company = this.companies.find(c => c.id === payment.payerId);
       return company ? company.name : `Company #${payment.payerId}`;
     }
+  }
+
+  getPaymentMethodLabel(method?: string): string {
+    const labels: { [key: string]: string } = {
+      'CASH': 'payments.cash',
+      'CARD': 'payments.card',
+      'TRANSFER': 'payments.bankTransfer',
+      'CHECK': 'payments.check'
+    };
+    return labels[method || ''] || 'payments.other';
   }
 
   openRecordPayment() {

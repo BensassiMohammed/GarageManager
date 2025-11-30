@@ -2,38 +2,39 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-expense-category-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">{{ isEdit ? 'Edit Expense Category' : 'New Expense Category' }}</h2>
+      <h2 class="page-title">{{ (isEdit ? 'expenseCategories.editCategory' : 'expenseCategories.newCategory') | translate }}</h2>
     </div>
 
     <div class="card">
       <form [formGroup]="form" (ngSubmit)="save()">
         <div class="form-group">
-          <label class="required">Name</label>
+          <label class="required">{{ 'common.name' | translate }}</label>
           <input type="text" formControlName="name" class="form-control">
         </div>
 
         <div class="form-group">
-          <label>Description</label>
+          <label>{{ 'common.description' | translate }}</label>
           <textarea formControlName="description" class="form-control" rows="3"></textarea>
         </div>
 
         <div class="form-group">
           <label>
-            <input type="checkbox" formControlName="active"> Active
+            <input type="checkbox" formControlName="active"> {{ 'common.active' | translate }}
           </label>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
-          <a routerLink="/expense-categories" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">{{ 'common.save' | translate }}</button>
+          <a routerLink="/expense-categories" class="btn btn-secondary">{{ 'common.cancel' | translate }}</a>
         </div>
       </form>
     </div>

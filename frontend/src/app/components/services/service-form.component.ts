@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Category, ServicePriceHistory } from '../../models/models';
 import { forkJoin } from 'rxjs';
@@ -9,17 +10,17 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-service-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
   template: `
     <div class="page-header">
-      <h2 class="page-title">{{ isEdit ? 'Edit Service' : 'New Service' }}</h2>
+      <h2 class="page-title">{{ (isEdit ? 'services.editService' : 'services.newService') | translate }}</h2>
     </div>
 
     <div class="card">
       @if (isEdit) {
         <div class="tabs">
-          <button [class.active]="activeTab === 'details'" (click)="activeTab = 'details'">Details</button>
-          <button [class.active]="activeTab === 'pricing'" (click)="activeTab = 'pricing'">Price History</button>
+          <button [class.active]="activeTab === 'details'" (click)="activeTab = 'details'">{{ 'common.details' | translate }}</button>
+          <button [class.active]="activeTab === 'pricing'" (click)="activeTab = 'pricing'">{{ 'services.priceHistory' | translate }}</button>
         </div>
       }
 
@@ -27,20 +28,20 @@ import { forkJoin } from 'rxjs';
         <form [formGroup]="form" (ngSubmit)="save()">
           <div class="form-row">
             <div class="form-group">
-              <label class="required">Code</label>
+              <label class="required">{{ 'products.sku' | translate }}</label>
               <input type="text" formControlName="code" class="form-control">
             </div>
             <div class="form-group">
-              <label class="required">Name</label>
+              <label class="required">{{ 'common.name' | translate }}</label>
               <input type="text" formControlName="name" class="form-control">
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
-              <label>Category</label>
+              <label>{{ 'common.category' | translate }}</label>
               <select formControlName="categoryId" class="form-control">
-                <option [ngValue]="null">-- No Category --</option>
+                <option [ngValue]="null">-- {{ 'common.select' | translate }} --</option>
                 @for (cat of categories; track cat.id) {
                   <option [ngValue]="cat.id">{{ cat.name }}</option>
                 }
@@ -48,7 +49,7 @@ import { forkJoin } from 'rxjs';
             </div>
             @if (!isEdit) {
               <div class="form-group">
-                <label class="required">Price</label>
+                <label class="required">{{ 'common.price' | translate }}</label>
                 <input type="number" step="0.01" formControlName="sellingPrice" class="form-control" placeholder="0.00">
               </div>
             }
@@ -56,13 +57,13 @@ import { forkJoin } from 'rxjs';
 
           <div class="form-group">
             <label>
-              <input type="checkbox" formControlName="active"> Active
+              <input type="checkbox" formControlName="active"> {{ 'common.active' | translate }}
             </label>
           </div>
 
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
-            <a routerLink="/services" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary" [disabled]="form.invalid">{{ 'common.save' | translate }}</button>
+            <a routerLink="/services" class="btn btn-secondary">{{ 'common.cancel' | translate }}</a>
           </div>
         </form>
       }
@@ -70,38 +71,38 @@ import { forkJoin } from 'rxjs';
       @if (activeTab === 'pricing') {
         <div class="price-section">
           <div class="current-price-card">
-            <h4>Current Price</h4>
+            <h4>{{ 'common.price' | translate }}</h4>
             <div class="price-display">{{ currentPrice | currency }}</div>
           </div>
 
           <div class="change-price-form">
-            <h4>Set New Price</h4>
+            <h4>{{ 'services.addPrice' | translate }}</h4>
             <form [formGroup]="priceForm" (ngSubmit)="addNewPrice()">
               <div class="form-row">
                 <div class="form-group">
-                  <label class="required">New Price</label>
+                  <label class="required">{{ 'common.price' | translate }}</label>
                   <input type="number" step="0.01" formControlName="price" class="form-control">
                 </div>
                 <div class="form-group">
-                  <label>Effective From</label>
+                  <label>{{ 'products.effectiveDate' | translate }}</label>
                   <input type="date" formControlName="startDate" class="form-control">
                 </div>
                 <div class="form-group">
-                  <button type="submit" class="btn btn-primary" [disabled]="priceForm.invalid">Apply Price</button>
+                  <button type="submit" class="btn btn-primary" [disabled]="priceForm.invalid">{{ 'common.save' | translate }}</button>
                 </div>
               </div>
             </form>
           </div>
 
-          <h4>Price History</h4>
+          <h4>{{ 'services.priceHistory' | translate }}</h4>
           <div class="table-container">
             <table>
               <thead>
                 <tr>
-                  <th>Price</th>
-                  <th>Start Date</th>
-                  <th>End Date</th>
-                  <th>Status</th>
+                  <th>{{ 'common.price' | translate }}</th>
+                  <th>{{ 'common.date' | translate }}</th>
+                  <th>{{ 'common.date' | translate }}</th>
+                  <th>{{ 'common.status' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -118,7 +119,7 @@ import { forkJoin } from 'rxjs';
                   </tr>
                 } @empty {
                   <tr>
-                    <td colspan="4" class="empty-state">No price history available</td>
+                    <td colspan="4" class="empty-state">{{ 'services.noPriceHistory' | translate }}</td>
                   </tr>
                 }
               </tbody>
