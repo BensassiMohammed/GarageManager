@@ -190,7 +190,7 @@ import { WorkOrder, WorkOrderProductLine, WorkOrderServiceLine, WorkOrderTotals,
             <h3>Create Work Order</h3>
             <button class="btn-close" (click)="showCreateModal = false">&times;</button>
           </div>
-          <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+          <div class="modal-body modal-scrollable">
             <div class="form-group">
               <label class="required">Client</label>
               <select [(ngModel)]="newOrder.clientId" class="form-control">
@@ -438,24 +438,33 @@ import { WorkOrder, WorkOrderProductLine, WorkOrderServiceLine, WorkOrderTotals,
     .form-group input,
     .form-group select,
     .form-group textarea {
-      padding: 0.75rem;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      font-size: 1rem;
-      font-family: inherit;
-      background-color: var(--surface);
-      color: var(--text);
+      padding: 0.75rem !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 4px !important;
+      font-size: 1rem !important;
+      font-family: inherit !important;
+      background-color: var(--surface) !important;
+      color: var(--text) !important;
+      width: 100%;
+      box-sizing: border-box;
     }
     .form-group input:focus,
     .form-group select:focus,
     .form-group textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      background-color: var(--surface);
-      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+      outline: none !important;
+      border-color: var(--primary) !important;
+      background-color: var(--surface) !important;
+      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1) !important;
     }
     .modal-body {
+      padding: 1.5rem !important;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-scrollable {
       padding: 1.5rem;
+      max-height: 80vh;
+      overflow-y: auto;
     }
     .modal-body h4 {
       font-size: 1.125rem;
