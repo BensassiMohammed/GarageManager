@@ -17,7 +17,7 @@ public class ExpenseCategoryController {
 
     @GetMapping
     public List<ExpenseCategory> getAll() {
-        return expenseCategoryRepository.findAll();
+        return expenseCategoryRepository.findByActiveTrue();
     }
 
     @GetMapping("/{id}")

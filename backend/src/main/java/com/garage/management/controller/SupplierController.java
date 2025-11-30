@@ -17,7 +17,7 @@ public class SupplierController {
 
     @GetMapping
     public List<Supplier> getAll() {
-        return supplierRepository.findAll();
+        return supplierRepository.findByActiveTrue();
     }
 
     @GetMapping("/{id}")

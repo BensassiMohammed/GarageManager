@@ -22,7 +22,7 @@ public class ClientController {
 
     @GetMapping
     public List<Client> getAll() {
-        return clientRepository.findAll();
+        return clientRepository.findByActiveTrue();
     }
 
     @GetMapping("/{id}")

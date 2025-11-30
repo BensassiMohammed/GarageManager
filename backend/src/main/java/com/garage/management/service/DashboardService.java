@@ -58,12 +58,12 @@ public class DashboardService {
         stats.monthlyExpenses = expenseRepository.getTotalExpensesBetween(monthStart, monthEnd);
         if (stats.monthlyExpenses == null) stats.monthlyExpenses = BigDecimal.ZERO;
         
-        stats.totalCompanies = companyRepository.count();
-        stats.totalClients = clientRepository.count();
+        stats.totalCompanies = companyRepository.countByActiveTrue();
+        stats.totalClients = clientRepository.countByActiveTrue();
         stats.totalVehicles = vehicleRepository.count();
-        stats.totalProducts = productRepository.count();
-        stats.totalServices = serviceRepository.count();
-        stats.totalSuppliers = supplierRepository.count();
+        stats.totalProducts = productRepository.countByActiveTrue();
+        stats.totalServices = serviceRepository.countByActiveTrue();
+        stats.totalSuppliers = supplierRepository.countByActiveTrue();
         
         return stats;
     }

@@ -25,7 +25,7 @@ public class ServiceController {
 
     @GetMapping
     public List<ServiceEntity> getAll() {
-        return serviceRepository.findAll();
+        return serviceRepository.findByActiveTrue();
     }
 
     @GetMapping("/{id}")

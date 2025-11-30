@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByActiveTrue();
+    Long countByActiveTrue();
     Optional<Product> findByCode(String code);
     List<Product> findByCategoryId(Long categoryId);
     

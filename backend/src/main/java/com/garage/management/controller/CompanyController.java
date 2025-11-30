@@ -17,7 +17,7 @@ public class CompanyController {
 
     @GetMapping
     public List<Company> getAll() {
-        return companyRepository.findAll();
+        return companyRepository.findByActiveTrue();
     }
 
     @GetMapping("/{id}")
