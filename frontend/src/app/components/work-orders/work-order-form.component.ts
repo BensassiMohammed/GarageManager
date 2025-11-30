@@ -11,6 +11,8 @@ interface DraftServiceLine {
   serviceName: string;
   quantity: number;
   unitPrice: number;
+  discountPercent: number;
+  finalUnitPrice: number;
   lineTotal: number;
 }
 
@@ -87,7 +89,9 @@ interface DraftProductLine {
             <tr>
               <th>Service</th>
               <th class="col-qty">Qty</th>
-              <th class="col-price">Unit Price</th>
+              <th class="col-price">Std Price</th>
+              <th class="col-discount">Discount %</th>
+              <th class="col-price">Final Price</th>
               <th class="col-total">Total</th>
               <th class="col-action"></th>
             </tr>
@@ -98,6 +102,14 @@ interface DraftProductLine {
                 <td>{{ line.serviceName }}</td>
                 <td class="col-qty">{{ line.quantity }}</td>
                 <td class="col-price">{{ line.unitPrice | currency }}</td>
+                <td class="col-discount">
+                  @if (line.discountPercent > 0) {
+                    <span class="discount-badge">{{ line.discountPercent }}%</span>
+                  } @else {
+                    -
+                  }
+                </td>
+                <td class="col-price">{{ line.finalUnitPrice | currency }}</td>
                 <td class="col-total">{{ line.lineTotal | currency }}</td>
                 <td class="col-action">
                   <button class="btn btn-danger btn-sm" (click)="removeServiceLine(i)" title="Remove">&times;</button>
@@ -105,7 +117,7 @@ interface DraftProductLine {
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="empty-row">No services added yet</td>
+                <td colspan="7" class="empty-row">No services added yet</td>
               </tr>
             }
           </tbody>
@@ -161,7 +173,11 @@ interface DraftProductLine {
       <div class="totals-section">
         <div class="totals-row">
           <span>Services Subtotal:</span>
-          <span>{{ getServicesTotal() | currency }}</span>
+          <span>{{ getServicesBeforeDiscount() | currency }}</span>
+        </div>
+        <div class="totals-row discount-row">
+          <span>Services Discount Total:</span>
+          <span>-{{ getServicesDiscount() | currency }}</span>
         </div>
         <div class="totals-row">
           <span>Parts Subtotal:</span>
@@ -205,14 +221,21 @@ interface DraftProductLine {
                 }
               </select>
             </div>
-            <div class="form-group">
-              <label class="required">Quantity</label>
-              <input type="number" [(ngModel)]="newServiceLine.quantity" min="1" class="form-control">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="required">Quantity</label>
+                <input type="number" [(ngModel)]="newServiceLine.quantity" min="1" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Discount %</label>
+                <input type="number" [(ngModel)]="newServiceLine.discountPercent" min="0" max="100" class="form-control">
+              </div>
             </div>
             @if (newServiceLine.serviceId) {
               <div class="line-preview">
-                <span>Unit Price: {{ getSelectedServicePrice() | currency }}</span>
-                <span>Line Total: {{ getSelectedServicePrice() * newServiceLine.quantity | currency }}</span>
+                <span>Std Price: {{ getSelectedServicePrice() | currency }}</span>
+                <span>Final Price: {{ getSelectedServiceFinalPrice() | currency }}</span>
+                <span>Line Total: {{ getSelectedServiceLineTotal() | currency }}</span>
               </div>
             }
             <div class="form-actions">
@@ -412,7 +435,8 @@ export class WorkOrderFormComponent implements OnInit {
 
   newServiceLine = {
     serviceId: null as number | null,
-    quantity: 1
+    quantity: 1,
+    discountPercent: 0
   };
 
   newProductLine = {
@@ -477,6 +501,8 @@ export class WorkOrderFormComponent implements OnInit {
         serviceName: line.service?.name || '',
         quantity: line.quantity,
         unitPrice: line.unitPrice || 0,
+        discountPercent: (line as any).discountPercent || 0,
+        finalUnitPrice: (line as any).finalUnitPrice || line.unitPrice || 0,
         lineTotal: line.lineTotal || 0
       }));
       
@@ -507,6 +533,7 @@ export class WorkOrderFormComponent implements OnInit {
 
   onServiceSelect() {
     this.newServiceLine.quantity = 1;
+    this.newServiceLine.discountPercent = 0;
   }
 
   onProductSelect() {
@@ -517,6 +544,16 @@ export class WorkOrderFormComponent implements OnInit {
   getSelectedServicePrice(): number {
     const service = this.availableServices.find(s => s.id === this.newServiceLine.serviceId);
     return service?.sellingPrice || 0;
+  }
+
+  getSelectedServiceFinalPrice(): number {
+    const stdPrice = this.getSelectedServicePrice();
+    const discount = this.newServiceLine.discountPercent || 0;
+    return stdPrice * (1 - discount / 100);
+  }
+
+  getSelectedServiceLineTotal(): number {
+    return this.getSelectedServiceFinalPrice() * this.newServiceLine.quantity;
   }
 
   getSelectedProductPrice(): number {
@@ -538,14 +575,18 @@ export class WorkOrderFormComponent implements OnInit {
     const service = this.availableServices.find(s => s.id === this.newServiceLine.serviceId);
     if (service && this.newServiceLine.quantity > 0) {
       const unitPrice = service.sellingPrice || 0;
+      const discountPercent = this.newServiceLine.discountPercent || 0;
+      const finalUnitPrice = unitPrice * (1 - discountPercent / 100);
       this.draftServiceLines.push({
         serviceId: service.id!,
         serviceName: service.name,
         quantity: this.newServiceLine.quantity,
         unitPrice: unitPrice,
-        lineTotal: unitPrice * this.newServiceLine.quantity
+        discountPercent: discountPercent,
+        finalUnitPrice: finalUnitPrice,
+        lineTotal: finalUnitPrice * this.newServiceLine.quantity
       });
-      this.newServiceLine = { serviceId: null, quantity: 1 };
+      this.newServiceLine = { serviceId: null, quantity: 1, discountPercent: 0 };
       this.showAddServiceModal = false;
     }
   }
@@ -578,7 +619,18 @@ export class WorkOrderFormComponent implements OnInit {
     this.draftProductLines.splice(index, 1);
   }
 
-  getServicesTotal(): number {
+  getServicesBeforeDiscount(): number {
+    return this.draftServiceLines.reduce((sum, line) => sum + (line.unitPrice * line.quantity), 0);
+  }
+
+  getServicesDiscount(): number {
+    return this.draftServiceLines.reduce((sum, line) => {
+      const beforeDiscount = line.unitPrice * line.quantity;
+      return sum + (beforeDiscount - line.lineTotal);
+    }, 0);
+  }
+
+  getServicesAfterDiscount(): number {
     return this.draftServiceLines.reduce((sum, line) => sum + line.lineTotal, 0);
   }
 
@@ -598,7 +650,7 @@ export class WorkOrderFormComponent implements OnInit {
   }
 
   getGrandTotal(): number {
-    return this.getServicesTotal() + this.getProductsAfterDiscount();
+    return this.getServicesAfterDiscount() + this.getProductsAfterDiscount();
   }
 
   canSave(): boolean {
@@ -641,7 +693,7 @@ export class WorkOrderFormComponent implements OnInit {
 
   addLinesToWorkOrder(workOrderId: number) {
     const servicePromises = this.draftServiceLines.map(line =>
-      this.api.addWorkOrderServiceLine(workOrderId, line.serviceId!, line.quantity).toPromise()
+      this.api.addWorkOrderServiceLine(workOrderId, line.serviceId!, line.quantity, line.discountPercent).toPromise()
     );
     const productPromises = this.draftProductLines.map(line =>
       this.api.addWorkOrderProductLine(workOrderId, line.productId!, line.quantity, line.discountPercent).toPromise()

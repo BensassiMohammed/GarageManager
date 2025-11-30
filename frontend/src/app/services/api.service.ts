@@ -338,8 +338,12 @@ export class ApiService {
     return this.http.get<WorkOrderServiceLine[]>(`${this.baseUrl}/work-orders/${workOrderId}/service-lines`);
   }
 
-  addWorkOrderServiceLine(workOrderId: number, serviceId: number, quantity: number): Observable<WorkOrderServiceLine> {
-    return this.http.post<WorkOrderServiceLine>(`${this.baseUrl}/work-orders/${workOrderId}/service-lines`, { serviceId, quantity });
+  addWorkOrderServiceLine(workOrderId: number, serviceId: number, quantity: number, discountPercent?: number): Observable<WorkOrderServiceLine> {
+    const body: any = { serviceId, quantity };
+    if (discountPercent !== undefined) {
+      body.discountPercent = discountPercent;
+    }
+    return this.http.post<WorkOrderServiceLine>(`${this.baseUrl}/work-orders/${workOrderId}/service-lines`, body);
   }
 
   getWorkOrderTotals(workOrderId: number): Observable<WorkOrderTotals> {

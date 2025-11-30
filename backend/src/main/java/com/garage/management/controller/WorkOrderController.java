@@ -104,7 +104,7 @@ public class WorkOrderController {
     @PostMapping("/{id}/service-lines")
     public ResponseEntity<WorkOrderServiceLine> addServiceLine(@PathVariable Long id, @RequestBody AddServiceLineRequest request) {
         try {
-            WorkOrderServiceLine line = workOrderService.addServiceLine(id, request.serviceId, request.quantity);
+            WorkOrderServiceLine line = workOrderService.addServiceLine(id, request.serviceId, request.quantity, request.discountPercent);
             return ResponseEntity.ok(line);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -148,6 +148,7 @@ public class WorkOrderController {
     public static class AddServiceLineRequest {
         public Long serviceId;
         public Integer quantity;
+        public BigDecimal discountPercent;
     }
 
     public static class AddProductLineRequest {

@@ -82,7 +82,7 @@ public class WorkOrderService {
     
     @Transactional
     public WorkOrderServiceLine addServiceLine(Long workOrderId, Long serviceId, 
-                                                Integer quantity) {
+                                                Integer quantity, BigDecimal discountPercent) {
         WorkOrder workOrder = workOrderRepository.findById(workOrderId)
                 .orElseThrow(() -> new RuntimeException("Work order not found"));
         
@@ -94,13 +94,24 @@ public class WorkOrderService {
                 .map(sph -> sph.getPrice())
                 .orElse(service.getSellingPrice() != null ? service.getSellingPrice() : BigDecimal.ZERO);
         
-        BigDecimal lineTotal = unitPrice.multiply(new BigDecimal(quantity)).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal finalUnitPrice;
+        if (discountPercent != null && discountPercent.compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal discountFactor = BigDecimal.ONE.subtract(discountPercent.divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP));
+            finalUnitPrice = unitPrice.multiply(discountFactor).setScale(2, RoundingMode.HALF_UP);
+        } else {
+            finalUnitPrice = unitPrice;
+            discountPercent = BigDecimal.ZERO;
+        }
+        
+        BigDecimal lineTotal = finalUnitPrice.multiply(new BigDecimal(quantity)).setScale(2, RoundingMode.HALF_UP);
         
         WorkOrderServiceLine line = new WorkOrderServiceLine();
         line.setWorkOrder(workOrder);
         line.setService(service);
         line.setQuantity(quantity);
         line.setUnitPrice(unitPrice);
+        line.setDiscountPercent(discountPercent);
+        line.setFinalUnitPrice(finalUnitPrice);
         line.setLineTotal(lineTotal);
         
         WorkOrderServiceLine saved = serviceLineRepository.save(line);

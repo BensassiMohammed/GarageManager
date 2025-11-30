@@ -102,12 +102,18 @@ Backend service layer implementing complex business logic:
 - **DashboardService**: Aggregate KPIs (open orders, outstanding balance, low stock, monthly expenses)
 
 ## Recent Changes
+- 2025-11-30: Added discount support to Services in Work Orders
+  - Services now have Std Price, Discount %, Final Price, and Total columns (same as Products)
+  - Add Service modal includes optional Discount % field
+  - Backend WorkOrderServiceLine entity extended with discountPercent and finalUnitPrice fields
+  - Totals section shows Services Subtotal, Services Discount Total, Parts Subtotal, Parts Discount Total, and Grand Total
+
 - 2025-11-30: Rebuilt Work Order form to match reference design
   - Created dedicated work-order-form.component with full page layout
   - Header section: Client, Vehicle, Date, Status, Description fields
-  - Services section: Table with Service, Qty, Unit Price, Total columns + Add Service modal
+  - Services section: Table with Service, Qty, Std Price, Discount %, Final Price, Total + Add Service modal
   - Parts section: Table with Product, Qty, Std Price, Discount %, Final Price, Total + Add Product modal
-  - Totals section: Services Subtotal, Parts Subtotal, Parts Discount Total, Grand Total
+  - Totals section: Services Subtotal, Services Discount, Parts Subtotal, Parts Discount Total, Grand Total
   - Notes textarea at bottom
   - Save persists work order then adds all service/product lines to backend
   - Added routes: /work-orders/new and /work-orders/:id for create/edit

@@ -24,6 +24,12 @@ public class WorkOrderServiceLine {
     @Column(precision = 10, scale = 2)
     private BigDecimal unitPrice;
 
+    @Column(precision = 5, scale = 2)
+    private BigDecimal discountPercent = BigDecimal.ZERO;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal finalUnitPrice;
+
     @Column(precision = 10, scale = 2)
     private BigDecimal lineTotal;
 
@@ -37,6 +43,10 @@ public class WorkOrderServiceLine {
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
     public BigDecimal getUnitPrice() { return unitPrice; }
     public void setUnitPrice(BigDecimal unitPrice) { this.unitPrice = unitPrice; }
+    public BigDecimal getDiscountPercent() { return discountPercent; }
+    public void setDiscountPercent(BigDecimal discountPercent) { this.discountPercent = discountPercent; }
+    public BigDecimal getFinalUnitPrice() { return finalUnitPrice; }
+    public void setFinalUnitPrice(BigDecimal finalUnitPrice) { this.finalUnitPrice = finalUnitPrice; }
     public BigDecimal getLineTotal() { return lineTotal; }
     public void setLineTotal(BigDecimal lineTotal) { this.lineTotal = lineTotal; }
 }
