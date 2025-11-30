@@ -32,6 +32,8 @@ export const routes: Routes = [
   { path: 'expenses/:id', loadComponent: () => import('./components/expenses/expense-form.component').then(m => m.ExpenseFormComponent) },
   { path: 'supplier-orders', loadComponent: () => import('./components/supplier-orders/supplier-order-list.component').then(m => m.SupplierOrderListComponent) },
   { path: 'work-orders', loadComponent: () => import('./components/work-orders/work-order-list.component').then(m => m.WorkOrderListComponent) },
+  { path: 'work-orders/new', loadComponent: () => import('./components/work-orders/work-order-form.component').then(m => m.WorkOrderFormComponent) },
+  { path: 'work-orders/:id', loadComponent: () => import('./components/work-orders/work-order-form.component').then(m => m.WorkOrderFormComponent) },
   { path: 'invoices', loadComponent: () => import('./components/invoices/invoice-list.component').then(m => m.InvoiceListComponent) },
   { path: 'payments', loadComponent: () => import('./components/payments/payment-list.component').then(m => m.PaymentListComponent) },
   { path: 'inventory', loadComponent: () => import('./components/inventory/inventory-list.component').then(m => m.InventoryListComponent) }

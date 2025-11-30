@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { WorkOrder, WorkOrderProductLine, WorkOrderServiceLine, WorkOrderTotals, Client, Vehicle, Company, ServiceItem, Product } from '../../models/models';
 
@@ -25,11 +26,11 @@ interface DraftProductLine {
 @Component({
   selector: 'app-work-order-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
     <div class="page-header">
       <h2 class="page-title">Work Orders</h2>
-      <button class="btn btn-primary" (click)="openCreateModal()">New Work Order</button>
+      <a routerLink="/work-orders/new" class="btn btn-primary">New Work Order</a>
     </div>
 
     <div class="filter-bar">
@@ -69,7 +70,8 @@ interface DraftProductLine {
                 </td>
                 <td>{{ order.totalAmount | currency }}</td>
                 <td class="actions">
-                  <button class="btn btn-sm btn-secondary" (click)="viewDetails(order); $event.stopPropagation()">Details</button>
+                  <a [routerLink]="['/work-orders', order.id]" class="btn btn-sm btn-secondary" (click)="$event.stopPropagation()">Edit</a>
+                  <button class="btn btn-sm btn-info" (click)="viewDetails(order); $event.stopPropagation()">Details</button>
                   @if (order.status === 'COMPLETED') {
                     <button class="btn btn-sm btn-primary" (click)="generateInvoice(order); $event.stopPropagation()">Invoice</button>
                   }
