@@ -18,6 +18,7 @@ com/garage/management/repository/CategoryRepository.class
 com/garage/management/controller/ServiceController$PriceRequest.class
 com/garage/management/repository/ProductPriceHistoryRepository.class
 com/garage/management/enums/WorkOrderStatus.class
+com/garage/management/service/StockMovementService.class
 com/garage/management/repository/PaymentAllocationRepository.class
 com/garage/management/repository/WorkOrderRepository.class
 com/garage/management/repository/StockMovementRepository.class
