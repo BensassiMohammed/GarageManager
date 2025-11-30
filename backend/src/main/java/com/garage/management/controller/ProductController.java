@@ -82,7 +82,6 @@ public class ProductController {
                     existing.setCategory(product.getCategory());
                     existing.setSellingPrice(product.getSellingPrice());
                     existing.setMinStock(product.getMinStock());
-                    existing.setCurrentStock(product.getCurrentStock());
                     existing.setActive(product.getActive());
                     return ResponseEntity.ok(productRepository.save(existing));
                 })
