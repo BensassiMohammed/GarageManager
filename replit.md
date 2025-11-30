@@ -106,6 +106,10 @@ Backend service layer implementing complex business logic:
 - **DashboardService**: Aggregate KPIs (open orders, outstanding balance, low stock, monthly expenses)
 
 ## Recent Changes
+- 2025-11-30: Fixed product edit resetting currentStock to 0
+  - Removed currentStock from ProductController.update() so it can only be modified through stock movements
+  - Product view and Inventory view now show consistent stock values
+
 - 2025-11-30: Fixed stock adjustment not updating Product.currentStock
   - Created StockMovementService with createMovement() method that atomically updates product stock
   - When stock adjustments are recorded, Product.currentStock is now correctly updated
