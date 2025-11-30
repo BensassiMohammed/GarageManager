@@ -151,7 +151,33 @@ Backend service layer implementing complex business logic:
 - **DashboardService**: Aggregate KPIs (open orders, outstanding balance, low stock, monthly expenses)
 - **CustomUserDetailsService**: Load user details for Spring Security authentication
 
+## Internationalization (i18n)
+The application supports multi-language interfaces with the following languages:
+- **English (en)**: Default language, LTR layout
+- **French (fr)**: Full translation, LTR layout
+- **Arabic (ar)**: Full translation with RTL (right-to-left) layout support
+
+### i18n Implementation
+- **Library**: ngx-translate v17 with standalone Angular configuration
+- **Translation Files**: Located in `frontend/src/assets/i18n/` (en.json, fr.json, ar.json)
+- **LanguageService**: Manages language selection, localStorage persistence, and RTL handling
+- **Language Switcher**: Dropdown in the header for switching languages on the fly
+- **RTL Support**: Arabic language triggers RTL layout via document dir attribute and CSS overrides
+
+### Adding New Translations
+1. Add new keys to all three translation files (en.json, fr.json, ar.json)
+2. Use the translate pipe in templates: `{{ 'KEY.PATH' | translate }}`
+3. For RTL components, use `[dir="rtl"]` CSS selectors for layout adjustments
+
 ## Recent Changes
+- 2025-11-30: Added complete multi-language support (i18n) with English, French, and Arabic
+  - Installed ngx-translate v17 with provideTranslateService API
+  - Created comprehensive translation files covering all UI text
+  - Built LanguageService for language switching and localStorage persistence
+  - Added language switcher dropdown in header
+  - Implemented RTL support for Arabic with CSS overrides
+  - Converted all 24+ components to use translate pipe
+
 - 2025-11-30: Fixed change-password form getting stuck with JSON parsing error
   - Backend change-password endpoint now returns proper JSON response instead of plain text
   - Response includes message, accessToken, and expiresInSeconds
