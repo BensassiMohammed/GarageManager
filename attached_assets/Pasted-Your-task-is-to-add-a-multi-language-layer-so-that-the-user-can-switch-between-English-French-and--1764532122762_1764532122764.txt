@@ -1,0 +1,89 @@
+Your task is to add a multi-language layer so that the user can switch between English, French, and Arabic.
+
+Requirements
+
+Global i18n architecture
+
+Implement a clean internationalization (i18n) system for the whole app.
+
+Do not hard-code any visible text in the UI anymore.
+
+All labels, field placeholders, button texts, menu items, tooltips, and error/success messages must come from translation files or a translation dictionary.
+
+Supported languages
+
+Languages:
+
+en = English (default)
+
+fr = French
+
+ar = Arabic
+
+Create separate, well-structured translation files (or objects) for each language, with clear keys (for example: common.save, common.cancel, menu.inventory, form.productName, etc.).
+
+Language switcher in the UI
+
+Add a language selector (for example in the top bar / header).
+
+The user must be able to choose between English, French, and Arabic.
+
+When the user changes the language:
+
+All visible text in the UI must instantly switch to the selected language.
+
+Make sure this works across all pages/views of the app.
+
+Persist user choice
+
+Remember the selected language (for example using localStorage or equivalent) so that:
+
+When the user refreshes the page, the app still uses their last chosen language.
+
+If no language was chosen before, use English as the default.
+
+Arabic specifics
+
+For Arabic:
+
+Use right-to-left (RTL) layout where needed (text alignment, direction).
+
+Make sure the UI does not break when switching from LTR (English/French) to RTL (Arabic).
+
+You can update the global dir attribute or apply a proper CSS/layout approach for RTL.
+
+Coverage
+
+Go through the existing UI and:
+
+Move every visible text (buttons, labels, table headers, placeholders, messages, etc.) into the translation system.
+
+Ensure there are no remaining hard-coded visible strings.
+
+This includes:
+
+Forms and dialogs
+
+Menus and navigation
+
+Tables and lists
+
+Validation messages and error/success notifications
+
+Code quality
+
+Keep the implementation clean and easy to extend if we add more languages later.
+
+Add comments where needed to explain how to:
+
+Add a new language
+
+Add a new translation key
+
+Please:
+
+Implement all necessary code changes.
+
+Show me where the translation files are located.
+
+Show me where the language selector is implemented and how the language is stored and loaded.
