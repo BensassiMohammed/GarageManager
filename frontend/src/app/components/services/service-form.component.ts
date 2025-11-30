@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
-import { Category } from '../../models/models';
+import { Category, ServicePriceHistory } from '../../models/models';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-service-form',
@@ -15,53 +16,166 @@ import { Category } from '../../models/models';
     </div>
 
     <div class="card">
-      <form [formGroup]="form" (ngSubmit)="save()">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="required">Code</label>
-            <input type="text" formControlName="code" class="form-control">
-          </div>
-          <div class="form-group">
-            <label class="required">Name</label>
-            <input type="text" formControlName="name" class="form-control">
-          </div>
+      @if (isEdit) {
+        <div class="tabs">
+          <button [class.active]="activeTab === 'details'" (click)="activeTab = 'details'">Details</button>
+          <button [class.active]="activeTab === 'pricing'" (click)="activeTab = 'pricing'">Price History</button>
         </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label>Category</label>
-            <select formControlName="categoryId" class="form-control">
-              <option [ngValue]="null">-- No Category --</option>
-              @for (cat of categories; track cat.id) {
-                <option [ngValue]="cat.id">{{ cat.name }}</option>
-              }
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Selling Price</label>
-            <input type="number" step="0.01" formControlName="sellingPrice" class="form-control">
-          </div>
-        </div>
+      }
 
-        <div class="form-group">
-          <label>
-            <input type="checkbox" formControlName="active"> Active
-          </label>
-        </div>
+      @if (activeTab === 'details') {
+        <form [formGroup]="form" (ngSubmit)="save()">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="required">Code</label>
+              <input type="text" formControlName="code" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="required">Name</label>
+              <input type="text" formControlName="name" class="form-control">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category</label>
+              <select formControlName="categoryId" class="form-control">
+                <option [ngValue]="null">-- No Category --</option>
+                @for (cat of categories; track cat.id) {
+                  <option [ngValue]="cat.id">{{ cat.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
 
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
-          <a routerLink="/services" class="btn btn-secondary">Cancel</a>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" formControlName="active"> Active
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
+            <a routerLink="/services" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+      }
+
+      @if (activeTab === 'pricing') {
+        <div class="price-section">
+          <div class="current-price-card">
+            <h4>Current Price</h4>
+            <div class="price-display">{{ currentPrice | currency }}</div>
+          </div>
+
+          <div class="change-price-form">
+            <h4>Set New Price</h4>
+            <form [formGroup]="priceForm" (ngSubmit)="addNewPrice()">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="required">New Price</label>
+                  <input type="number" step="0.01" formControlName="price" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label>Effective From</label>
+                  <input type="date" formControlName="startDate" class="form-control">
+                </div>
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary" [disabled]="priceForm.invalid">Apply Price</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <h4>Price History</h4>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Price</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (history of priceHistory; track history.id) {
+                  <tr>
+                    <td>{{ history.price | currency }}</td>
+                    <td>{{ history.startDate }}</td>
+                    <td>{{ history.endDate || '-' }}</td>
+                    <td>
+                      <span [class]="history.endDate ? 'badge badge-secondary' : 'badge badge-success'">
+                        {{ history.endDate ? 'Historical' : 'Current' }}
+                      </span>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="4" class="empty-state">No price history available</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
-      </form>
+      }
     </div>
-  `
+  `,
+  styles: [`
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    .tabs button {
+      padding: 0.5rem 1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      color: var(--text-muted);
+    }
+    .tabs button.active {
+      background: var(--primary);
+      color: white;
+    }
+    .tabs button:hover:not(.active) {
+      background: var(--surface-hover);
+    }
+    .current-price-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .price-display {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    .change-price-form {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+  `]
 })
 export class ServiceFormComponent implements OnInit {
   form: FormGroup;
+  priceForm: FormGroup;
   isEdit = false;
   id?: number;
   categories: Category[] = [];
+  activeTab = 'details';
+  priceHistory: ServicePriceHistory[] = [];
+  currentPrice = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -73,8 +187,12 @@ export class ServiceFormComponent implements OnInit {
       code: ['', Validators.required],
       name: ['', Validators.required],
       categoryId: [null],
-      sellingPrice: [0],
       active: [true]
+    });
+
+    this.priceForm = this.fb.group({
+      price: [0, [Validators.required, Validators.min(0)]],
+      startDate: [new Date().toISOString().split('T')[0]]
     });
   }
 
@@ -87,13 +205,26 @@ export class ServiceFormComponent implements OnInit {
     if (id) {
       this.isEdit = true;
       this.id = +id;
-      this.api.getService(this.id).subscribe(service => {
-        this.form.patchValue({
-          ...service,
-          categoryId: service.category?.id || null
-        });
-      });
+      this.loadService();
     }
+  }
+
+  loadService() {
+    if (!this.id) return;
+    
+    forkJoin({
+      service: this.api.getService(this.id),
+      priceHistory: this.api.getServicePriceHistory(this.id)
+    }).subscribe(({ service, priceHistory }) => {
+      this.form.patchValue({
+        code: service.code,
+        name: service.name,
+        categoryId: service.category?.id || null,
+        active: service.active
+      });
+      this.priceHistory = priceHistory;
+      this.currentPrice = service.sellingPrice || 0;
+    });
   }
 
   save() {
@@ -102,7 +233,6 @@ export class ServiceFormComponent implements OnInit {
       const data: any = {
         code: formData.code,
         name: formData.name,
-        sellingPrice: formData.sellingPrice,
         active: formData.active
       };
       
@@ -115,6 +245,16 @@ export class ServiceFormComponent implements OnInit {
         : this.api.createService(data);
       
       request.subscribe(() => this.router.navigate(['/services']));
+    }
+  }
+
+  addNewPrice() {
+    if (this.priceForm.valid && this.id) {
+      const { price, startDate } = this.priceForm.value;
+      this.api.addServicePrice(this.id, price, startDate).subscribe(() => {
+        this.loadService();
+        this.priceForm.patchValue({ price: 0 });
+      });
     }
   }
 }

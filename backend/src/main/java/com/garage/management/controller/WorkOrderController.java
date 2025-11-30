@@ -3,17 +3,21 @@ package com.garage.management.controller;
 import com.garage.management.entity.WorkOrder;
 import com.garage.management.entity.WorkOrderProductLine;
 import com.garage.management.entity.WorkOrderServiceLine;
+import com.garage.management.enums.WorkOrderStatus;
 import com.garage.management.repository.WorkOrderProductLineRepository;
 import com.garage.management.repository.WorkOrderRepository;
 import com.garage.management.repository.WorkOrderServiceLineRepository;
+import com.garage.management.service.WorkOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/work-orders")
+@CrossOrigin(origins = "*")
 public class WorkOrderController {
 
     @Autowired
@@ -25,9 +29,19 @@ public class WorkOrderController {
     @Autowired
     private WorkOrderProductLineRepository productLineRepository;
 
+    @Autowired
+    private WorkOrderService workOrderService;
+
     @GetMapping
     public List<WorkOrder> getAll() {
         return workOrderRepository.findAll();
+    }
+
+    @GetMapping("/open")
+    public List<WorkOrder> getOpen() {
+        List<WorkOrder> openOrders = workOrderRepository.findByStatus(WorkOrderStatus.OPEN);
+        openOrders.addAll(workOrderRepository.findByStatus(WorkOrderStatus.IN_PROGRESS));
+        return openOrders;
     }
 
     @GetMapping("/{id}")
@@ -45,6 +59,16 @@ public class WorkOrderController {
     @GetMapping("/{id}/product-lines")
     public List<WorkOrderProductLine> getProductLines(@PathVariable Long id) {
         return productLineRepository.findByWorkOrderId(id);
+    }
+
+    @GetMapping("/{id}/totals")
+    public ResponseEntity<WorkOrderService.WorkOrderTotals> getTotals(@PathVariable Long id) {
+        try {
+            WorkOrderService.WorkOrderTotals totals = workOrderService.getWorkOrderTotals(id);
+            return ResponseEntity.ok(totals);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
@@ -78,30 +102,32 @@ public class WorkOrderController {
     }
 
     @PostMapping("/{id}/service-lines")
-    public WorkOrderServiceLine addServiceLine(@PathVariable Long id, @RequestBody WorkOrderServiceLine line) {
-        return workOrderRepository.findById(id)
-                .map(order -> {
-                    line.setWorkOrder(order);
-                    return serviceLineRepository.save(line);
-                })
-                .orElseThrow(() -> new RuntimeException("Work order not found"));
+    public ResponseEntity<WorkOrderServiceLine> addServiceLine(@PathVariable Long id, @RequestBody AddServiceLineRequest request) {
+        try {
+            WorkOrderServiceLine line = workOrderService.addServiceLine(id, request.serviceId, request.quantity);
+            return ResponseEntity.ok(line);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/{id}/product-lines")
-    public WorkOrderProductLine addProductLine(@PathVariable Long id, @RequestBody WorkOrderProductLine line) {
-        return workOrderRepository.findById(id)
-                .map(order -> {
-                    line.setWorkOrder(order);
-                    return productLineRepository.save(line);
-                })
-                .orElseThrow(() -> new RuntimeException("Work order not found"));
+    public ResponseEntity<WorkOrderProductLine> addProductLine(@PathVariable Long id, @RequestBody AddProductLineRequest request) {
+        try {
+            WorkOrderProductLine line = workOrderService.addProductLine(id, request.productId, request.quantity, request.discountPercent);
+            return ResponseEntity.ok(line);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/service-lines/{lineId}")
     public ResponseEntity<Void> deleteServiceLine(@PathVariable Long lineId) {
         return serviceLineRepository.findById(lineId)
                 .map(line -> {
+                    Long workOrderId = line.getWorkOrder().getId();
                     serviceLineRepository.delete(line);
+                    workOrderService.recalculateWorkOrderTotal(workOrderId);
                     return ResponseEntity.ok().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -111,9 +137,22 @@ public class WorkOrderController {
     public ResponseEntity<Void> deleteProductLine(@PathVariable Long lineId) {
         return productLineRepository.findById(lineId)
                 .map(line -> {
+                    Long workOrderId = line.getWorkOrder().getId();
                     productLineRepository.delete(line);
+                    workOrderService.recalculateWorkOrderTotal(workOrderId);
                     return ResponseEntity.ok().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    public static class AddServiceLineRequest {
+        public Long serviceId;
+        public Integer quantity;
+    }
+
+    public static class AddProductLineRequest {
+        public Long productId;
+        public Integer quantity;
+        public BigDecimal discountPercent;
     }
 }

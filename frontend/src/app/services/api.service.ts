@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { 
   Company, Client, Vehicle, Supplier, Category, 
   Product, ServiceItem, ExpenseCategory, Expense,
-  SupplierOrder, WorkOrder, Invoice, Payment, StockMovement 
+  SupplierOrder, WorkOrder, Invoice, Payment, StockMovement,
+  ProductPriceHistory, ServicePriceHistory, WorkOrderProductLine,
+  WorkOrderServiceLine, WorkOrderTotals, SupplierOrderLine, InvoiceLine,
+  PaymentAllocation, DashboardStats, ApplyPaymentRequest
 } from '../models/models';
 
 @Injectable({
@@ -277,5 +280,126 @@ export class ApiService {
 
   getStockMovements(): Observable<StockMovement[]> {
     return this.http.get<StockMovement[]>(`${this.baseUrl}/stock-movements`);
+  }
+
+  getProductPriceHistory(productId: number): Observable<ProductPriceHistory[]> {
+    return this.http.get<ProductPriceHistory[]>(`${this.baseUrl}/products/${productId}/price-history`);
+  }
+
+  addProductPrice(productId: number, price: number, startDate?: string): Observable<ProductPriceHistory> {
+    let params = new HttpParams().set('price', price.toString());
+    if (startDate) {
+      params = params.set('startDate', startDate);
+    }
+    return this.http.post<ProductPriceHistory>(`${this.baseUrl}/products/${productId}/price-history`, null, { params });
+  }
+
+  getProductCurrentPrice(productId: number): Observable<number> {
+    return this.http.get<number>(`${this.baseUrl}/products/${productId}/current-price`);
+  }
+
+  getProductComputedStock(productId: number): Observable<number> {
+    return this.http.get<number>(`${this.baseUrl}/products/${productId}/computed-stock`);
+  }
+
+  getServicePriceHistory(serviceId: number): Observable<ServicePriceHistory[]> {
+    return this.http.get<ServicePriceHistory[]>(`${this.baseUrl}/services/${serviceId}/price-history`);
+  }
+
+  addServicePrice(serviceId: number, price: number, startDate?: string): Observable<ServicePriceHistory> {
+    let params = new HttpParams().set('price', price.toString());
+    if (startDate) {
+      params = params.set('startDate', startDate);
+    }
+    return this.http.post<ServicePriceHistory>(`${this.baseUrl}/services/${serviceId}/price-history`, null, { params });
+  }
+
+  getServiceCurrentPrice(serviceId: number): Observable<number> {
+    return this.http.get<number>(`${this.baseUrl}/services/${serviceId}/current-price`);
+  }
+
+  getOpenWorkOrders(): Observable<WorkOrder[]> {
+    return this.http.get<WorkOrder[]>(`${this.baseUrl}/work-orders/open`);
+  }
+
+  getWorkOrderProductLines(workOrderId: number): Observable<WorkOrderProductLine[]> {
+    return this.http.get<WorkOrderProductLine[]>(`${this.baseUrl}/work-orders/${workOrderId}/product-lines`);
+  }
+
+  addWorkOrderProductLine(workOrderId: number, productId: number, quantity: number, discountPercent?: number): Observable<WorkOrderProductLine> {
+    let params = new HttpParams()
+      .set('productId', productId.toString())
+      .set('quantity', quantity.toString());
+    if (discountPercent !== undefined) {
+      params = params.set('discountPercent', discountPercent.toString());
+    }
+    return this.http.post<WorkOrderProductLine>(`${this.baseUrl}/work-orders/${workOrderId}/product-lines`, null, { params });
+  }
+
+  getWorkOrderServiceLines(workOrderId: number): Observable<WorkOrderServiceLine[]> {
+    return this.http.get<WorkOrderServiceLine[]>(`${this.baseUrl}/work-orders/${workOrderId}/service-lines`);
+  }
+
+  getWorkOrderTotals(workOrderId: number): Observable<WorkOrderTotals> {
+    return this.http.get<WorkOrderTotals>(`${this.baseUrl}/work-orders/${workOrderId}/totals`);
+  }
+
+  generateInvoiceFromWorkOrder(workOrderId: number, companyId?: number): Observable<Invoice> {
+    let params = new HttpParams();
+    if (companyId !== undefined) {
+      params = params.set('companyId', companyId.toString());
+    }
+    return this.http.post<Invoice>(`${this.baseUrl}/work-orders/${workOrderId}/generate-invoice`, null, { params });
+  }
+
+  getSupplierOrderLines(orderId: number): Observable<SupplierOrderLine[]> {
+    return this.http.get<SupplierOrderLine[]>(`${this.baseUrl}/supplier-orders/${orderId}/lines`);
+  }
+
+  receiveSupplierOrder(orderId: number): Observable<SupplierOrder> {
+    return this.http.post<SupplierOrder>(`${this.baseUrl}/supplier-orders/${orderId}/receive`, null);
+  }
+
+  getUnpaidInvoices(): Observable<Invoice[]> {
+    return this.http.get<Invoice[]>(`${this.baseUrl}/invoices/unpaid`);
+  }
+
+  getInvoiceLines(invoiceId: number): Observable<InvoiceLine[]> {
+    return this.http.get<InvoiceLine[]>(`${this.baseUrl}/invoices/${invoiceId}/lines`);
+  }
+
+  addInvoiceLine(invoiceId: number, line: InvoiceLine): Observable<InvoiceLine> {
+    return this.http.post<InvoiceLine>(`${this.baseUrl}/invoices/${invoiceId}/lines`, line);
+  }
+
+  issueInvoice(invoiceId: number): Observable<Invoice> {
+    return this.http.post<Invoice>(`${this.baseUrl}/invoices/${invoiceId}/issue`, null);
+  }
+
+  applyPayment(request: ApplyPaymentRequest): Observable<Payment> {
+    return this.http.post<Payment>(`${this.baseUrl}/payments/apply`, request);
+  }
+
+  getPaymentAllocations(paymentId: number): Observable<PaymentAllocation[]> {
+    return this.http.get<PaymentAllocation[]>(`${this.baseUrl}/payments/${paymentId}/allocations`);
+  }
+
+  getExpensesByCategory(categoryId: number): Observable<Expense[]> {
+    return this.http.get<Expense[]>(`${this.baseUrl}/expenses/by-category/${categoryId}`);
+  }
+
+  getExpensesByDateRange(startDate: string, endDate: string): Observable<Expense[]> {
+    const params = new HttpParams()
+      .set('startDate', startDate)
+      .set('endDate', endDate);
+    return this.http.get<Expense[]>(`${this.baseUrl}/expenses/by-date-range`, { params });
+  }
+
+  getMonthlyExpenses(year: number, month: number): Observable<Expense[]> {
+    return this.http.get<Expense[]>(`${this.baseUrl}/expenses/monthly/${year}/${month}`);
+  }
+
+  getDashboardStats(): Observable<DashboardStats> {
+    return this.http.get<DashboardStats>(`${this.baseUrl}/dashboard/stats`);
   }
 }

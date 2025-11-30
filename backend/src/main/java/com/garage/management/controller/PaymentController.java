@@ -1,17 +1,24 @@
 package com.garage.management.controller;
 
+import com.garage.management.entity.Invoice;
 import com.garage.management.entity.Payment;
 import com.garage.management.entity.PaymentAllocation;
+import com.garage.management.enums.PayerType;
+import com.garage.management.enums.PaymentMethod;
 import com.garage.management.repository.PaymentAllocationRepository;
 import com.garage.management.repository.PaymentRepository;
+import com.garage.management.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/payments")
+@CrossOrigin(origins = "*")
 public class PaymentController {
 
     @Autowired
@@ -19,6 +26,9 @@ public class PaymentController {
 
     @Autowired
     private PaymentAllocationRepository paymentAllocationRepository;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @GetMapping
     public List<Payment> getAll() {
@@ -37,9 +47,32 @@ public class PaymentController {
         return paymentAllocationRepository.findByPaymentId(id);
     }
 
+    @GetMapping("/unpaid-invoices")
+    public List<Invoice> getUnpaidInvoices(@RequestParam PayerType payerType, @RequestParam Long payerId) {
+        return paymentService.getUnpaidInvoicesForPayer(payerType, payerId);
+    }
+
     @PostMapping
     public Payment create(@RequestBody Payment payment) {
         return paymentRepository.save(payment);
+    }
+
+    @PostMapping("/apply")
+    public ResponseEntity<Payment> applyPayment(@RequestBody ApplyPaymentRequest request) {
+        try {
+            Payment payment = paymentService.applyPayment(
+                request.payerType,
+                request.payerId,
+                request.totalAmount,
+                request.method,
+                request.date,
+                request.notes,
+                request.allocations
+            );
+            return ResponseEntity.ok(payment);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
@@ -85,5 +118,15 @@ public class PaymentController {
                     return ResponseEntity.ok().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    public static class ApplyPaymentRequest {
+        public PayerType payerType;
+        public Long payerId;
+        public BigDecimal totalAmount;
+        public PaymentMethod method;
+        public LocalDate date;
+        public String notes;
+        public List<PaymentService.AllocationRequest> allocations;
     }
 }

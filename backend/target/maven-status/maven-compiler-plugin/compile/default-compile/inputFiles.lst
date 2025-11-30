@@ -1,3 +1,4 @@
+/home/runner/workspace/backend/src/main/java/com/garage/management/service/ProductPriceService.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/VehicleController.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/WorkOrderProductLine.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/InvoiceController.java
@@ -11,9 +12,12 @@
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/PaymentAllocationRepository.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/enums/StockMovementType.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/SupplierOrderController.java
+/home/runner/workspace/backend/src/main/java/com/garage/management/entity/ProductPriceHistory.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/ServiceController.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/WorkOrderController.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/ExpenseCategory.java
+/home/runner/workspace/backend/src/main/java/com/garage/management/service/WorkOrderService.java
+/home/runner/workspace/backend/src/main/java/com/garage/management/entity/ServicePriceHistory.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/ExpenseCategoryRepository.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/CategoryRepository.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/WorkOrderRepository.java
@@ -26,8 +30,10 @@
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/ServiceRepository.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/SupplierOrderRepository.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/enums/VehicleStatus.java
+/home/runner/workspace/backend/src/main/java/com/garage/management/controller/DashboardController.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/Invoice.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/WorkOrderServiceLine.java
+/home/runner/workspace/backend/src/main/java/com/garage/management/service/PaymentService.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/PaymentController.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/SupplierOrderLine.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/InvoiceLineRepository.java
@@ -35,7 +41,10 @@
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/ClientController.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/ExpenseCategoryController.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/Payment.java
+/home/runner/workspace/backend/src/main/java/com/garage/management/service/DashboardService.java
+/home/runner/workspace/backend/src/main/java/com/garage/management/service/ServicePriceService.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/CompanyRepository.java
+/home/runner/workspace/backend/src/main/java/com/garage/management/service/StockService.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/Client.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/enums/PaymentMethod.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/Company.java
@@ -43,6 +52,7 @@
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/ProductController.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/SupplierOrder.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/SupplierOrderLineRepository.java
+/home/runner/workspace/backend/src/main/java/com/garage/management/repository/ProductPriceHistoryRepository.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/enums/PayerType.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/ServiceEntity.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/InvoiceLine.java
@@ -51,6 +61,7 @@
 /home/runner/workspace/backend/src/main/java/com/garage/management/enums/CategoryType.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/SupplierController.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/SupplierRepository.java
+/home/runner/workspace/backend/src/main/java/com/garage/management/repository/ServicePriceHistoryRepository.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/enums/WorkOrderStatus.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/StockMovement.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/CompanyController.java

@@ -30,6 +30,9 @@ public class Invoice {
     @Column(precision = 10, scale = 2)
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
+    @Column(precision = 10, scale = 2)
+    private BigDecimal remainingBalance = BigDecimal.ZERO;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -56,6 +59,8 @@ public class Invoice {
     public void setStatus(InvoiceStatus status) { this.status = status; }
     public BigDecimal getTotalAmount() { return totalAmount; }
     public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
+    public BigDecimal getRemainingBalance() { return remainingBalance; }
+    public void setRemainingBalance(BigDecimal remainingBalance) { this.remainingBalance = remainingBalance; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

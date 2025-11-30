@@ -1,19 +1,27 @@
 package com.garage.management.controller;
 
 import com.garage.management.entity.ServiceEntity;
+import com.garage.management.entity.ServicePriceHistory;
 import com.garage.management.repository.ServiceRepository;
+import com.garage.management.service.ServicePriceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/services")
+@CrossOrigin(origins = "*")
 public class ServiceController {
 
     @Autowired
     private ServiceRepository serviceRepository;
+
+    @Autowired
+    private ServicePriceService servicePriceService;
 
     @GetMapping
     public List<ServiceEntity> getAll() {
@@ -25,6 +33,24 @@ public class ServiceController {
         return serviceRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/prices")
+    public List<ServicePriceHistory> getPriceHistory(@PathVariable Long id) {
+        return servicePriceService.getPriceHistory(id);
+    }
+
+    @GetMapping("/{id}/current-price")
+    public ResponseEntity<BigDecimal> getCurrentPrice(@PathVariable Long id) {
+        return servicePriceService.getCurrentPrice(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/prices")
+    public ResponseEntity<ServicePriceHistory> addPrice(@PathVariable Long id, @RequestBody PriceRequest request) {
+        ServicePriceHistory history = servicePriceService.addNewPrice(id, request.price, request.startDate);
+        return ResponseEntity.ok(history);
     }
 
     @PostMapping
@@ -55,5 +81,10 @@ public class ServiceController {
                     return ResponseEntity.ok().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    public static class PriceRequest {
+        public BigDecimal price;
+        public LocalDate startDate;
     }
 }

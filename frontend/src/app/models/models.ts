@@ -129,9 +129,12 @@ export interface Invoice {
   id?: number;
   client?: Client;
   company?: Company;
+  workOrder?: WorkOrder;
   date: string;
   status?: string;
   totalAmount?: number;
+  remainingBalance?: number;
+  lines?: InvoiceLine[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -158,4 +161,102 @@ export interface StockMovement {
   sourceType?: string;
   sourceId?: number;
   createdAt?: string;
+}
+
+export interface ProductPriceHistory {
+  id?: number;
+  product?: Product;
+  startDate: string;
+  endDate?: string;
+  price: number;
+  createdAt?: string;
+}
+
+export interface ServicePriceHistory {
+  id?: number;
+  service?: ServiceItem;
+  startDate: string;
+  endDate?: string;
+  price: number;
+  createdAt?: string;
+}
+
+export interface WorkOrderProductLine {
+  id?: number;
+  workOrder?: WorkOrder;
+  product?: Product;
+  quantity: number;
+  standardPrice?: number;
+  discountPercent?: number;
+  finalUnitPrice?: number;
+  lineTotal?: number;
+}
+
+export interface WorkOrderServiceLine {
+  id?: number;
+  workOrder?: WorkOrder;
+  service?: ServiceItem;
+  quantity: number;
+  unitPrice?: number;
+  lineTotal?: number;
+}
+
+export interface WorkOrderTotals {
+  servicesSubtotal: number;
+  productsBeforeDiscount: number;
+  productsDiscountTotal: number;
+  productsAfterDiscount: number;
+  grandTotal: number;
+}
+
+export interface SupplierOrderLine {
+  id?: number;
+  supplierOrder?: SupplierOrder;
+  product?: Product;
+  quantity: number;
+  unitPrice?: number;
+  lineTotal?: number;
+}
+
+export interface InvoiceLine {
+  id?: number;
+  invoice?: Invoice;
+  product?: Product;
+  service?: ServiceItem;
+  description?: string;
+  quantity: number;
+  standardPrice?: number;
+  discountPercent?: number;
+  finalUnitPrice?: number;
+  lineTotal?: number;
+}
+
+export interface PaymentAllocation {
+  id?: number;
+  payment?: Payment;
+  invoice?: Invoice;
+  allocatedAmount: number;
+}
+
+export interface DashboardStats {
+  openWorkOrders: number;
+  outstandingAmount: number;
+  lowStockProducts: number;
+  monthlyExpenses: number;
+  totalCompanies: number;
+  totalClients: number;
+  totalVehicles: number;
+  totalProducts: number;
+  totalServices: number;
+  totalSuppliers: number;
+}
+
+export interface ApplyPaymentRequest {
+  payerType: 'CLIENT' | 'COMPANY';
+  payerId: number;
+  totalAmount: number;
+  method?: string;
+  date?: string;
+  notes?: string;
+  allocations?: { invoiceId: number; amount: number }[];
 }

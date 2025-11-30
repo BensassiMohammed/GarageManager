@@ -1,0 +1,286 @@
+You are continuing work on the existing Garage Management project (Angular + Spring Boot + SQLite) you just generated.
+Do NOT start a new project. Modify the current codebase instead.
+
+I want you to refine the business rules and UI as follows.
+
+1. Product & Service price history
+
+Goal: Each Product and Service has one global selling price at a time, independent of supplier cost, with historical tracking.
+
+Backend – Products
+
+Create an entity/table ProductPriceHistory:
+
+Fields: id, product (ManyToOne), startDate, endDate (nullable), price.
+
+Logic:
+
+The current price is the latest history record where:
+
+startDate <= today, and
+
+endDate is null or in the future.
+
+When adding a new price:
+
+Automatically set endDate of the previous “current” record.
+
+Update Product APIs:
+
+Keep a nullable currentPrice field in Product for convenience, but the source of truth is the history table.
+
+Add endpoints to:
+
+GET /api/products/{id}/prices → list price history.
+
+POST /api/products/{id}/prices → create a new price entry, close the previous one and update product.currentPrice.
+
+Backend – Services
+
+Create ServicePriceHistory with similar structure:
+
+id, service (ManyToOne), startDate, endDate (nullable), price.
+
+Add endpoints:
+
+GET /api/services/{id}/prices
+
+POST /api/services/{id}/prices
+
+Angular – Product & Service detail
+
+In Product Detail:
+
+Show current price (read-only).
+
+Add a “Price History” tab with a table: Start Date, End Date, Price.
+
+Add a “Change Price” form/button to create a new price entry.
+
+In Service Detail:
+
+Do the same with a “Price History” tab and “Change Price” action.
+
+2. StockMovements and supplier orders
+
+Backend
+
+Ensure StockMovement has:
+
+product, date, quantityDelta, type (PURCHASE, ADJUSTMENT, CONSUMPTION), optional reason, sourceType, sourceId.
+
+Implement a service method to compute current stock per product from StockMovement.
+
+When a SupplierOrder is marked as “RECEIVED”:
+
+For each line, create a StockMovement of type PURCHASE with quantityDelta = received quantity.
+
+Use sourceType = "SUPPLIER_ORDER" and sourceId = supplierOrderId.
+
+Angular
+
+In Product List:
+
+Display current stock (computed from backend).
+
+Highlight low stock where currentStock < minStock.
+
+In Supplier Order Detail:
+
+Add ability to set order status to RECEIVED.
+
+On update to RECEIVED, call backend so it creates stock movements.
+
+3. Work Orders – discounts on parts
+
+Backend – WorkOrderProductLine
+
+Extend fields to:
+
+standardPrice (price from product current price at creation time),
+
+discountPercent (nullable),
+
+finalUnitPrice,
+
+lineTotal.
+
+Logic in service layer:
+
+When adding a product line:
+
+Look up current product price from product price history.
+
+Set standardPrice.
+
+If discountPercent is provided:
+
+finalUnitPrice = standardPrice * (1 - discountPercent/100).
+
+Else:
+
+finalUnitPrice = standardPrice.
+
+lineTotal = finalUnitPrice * quantity.
+
+Optionally, recalculate WorkOrder totals on change.
+
+Angular – Work Order detail
+
+In the Products (Parts) section:
+
+Columns: Product, Quantity, Standard Price (read-only), Discount %, Final Unit Price, Line Total.
+
+Behavior:
+
+When selecting a product, fetch standard price from backend.
+
+When user edits Discount %, recalculate Final Unit Price and Line Total.
+
+At the bottom of the Work Order detail:
+
+Show:
+
+Services subtotal,
+
+Products subtotal before discount,
+
+Products discount total,
+
+Products subtotal after discount,
+
+Grand total.
+
+4. Invoices & Payment allocation
+
+Invoices
+
+Add a status field to Invoice: DRAFT, ISSUED, PAID, CANCELLED.
+
+Ensure invoice lines store all value fields needed:
+
+For products: standardPrice, discountPercent, finalUnitPrice, lineTotal.
+
+For services: unitPrice, lineTotal.
+
+When an invoice is ISSUED:
+
+Do not allow editing lines or prices anymore.
+
+Payments & allocations
+
+Payment:
+
+Fields: id, payerType (CLIENT or COMPANY), payerId, date, method, totalAmount, notes.
+
+PaymentAllocation:
+
+Fields: id, payment, invoice, allocatedAmount.
+
+Add a backend endpoint:
+
+POST /api/payments/apply with payload:
+
+payerType, payerId,
+
+totalAmount, method, date,
+
+optional explicit allocations.
+
+If no manual allocations are provided:
+
+Fetch unpaid invoices for that payer ordered oldest → newest.
+
+Allocate the payment amount across invoices oldest-first.
+
+Create Payment, PaymentAllocation records.
+
+Update invoices’ remaining balance and status to PAID when fully covered.
+
+Angular – Record Payment UI
+
+Create a dedicated “Record Payment” screen/page:
+
+Select Payer Type (Client/Company).
+
+Select specific client/company.
+
+Enter payment amount, date, method.
+
+Show list of unpaid invoices: number, date, original total, remaining balance.
+
+Button “Auto-allocate oldest first” to simulate allocation.
+
+On Save, call the POST /api/payments/apply endpoint with the chosen options.
+
+5. Expenses module – simple & isolated
+
+Keep Expenses isolated from other modules (no link to Suppliers or Invoices).
+
+Backend
+
+Ensure ExpenseCategory and Expense entities and CRUD endpoints (/api/expense-categories, /api/expenses) are implemented.
+
+Angular – UI
+
+Expense Categories:
+
+List: table with Name, Active, buttons New/Edit/Delete.
+
+Detail: form with Name (required), Description, Active.
+
+Expenses:
+
+List:
+
+Filters: date range, category, min/max amount.
+
+Table columns: Date, Category, Label, Amount, Payment Method.
+
+Buttons: New, Edit, Delete, Export (CSV or JSON if easy).
+
+Detail:
+
+Fields: Date, Category (dropdown), Label, Amount, Payment Method (dropdown), Notes.
+
+6. Dashboard improvements
+
+Improve the Dashboard page to show basic KPIs:
+
+Number of Open Work Orders.
+
+Total outstanding invoice amount (sum of unpaid balances).
+
+Number of low stock products (current stock < minStock).
+
+Total Expenses for the current month.
+
+For each KPI card, clicking it should navigate to the relevant filtered list:
+
+Open Work Orders → Work Orders list with status = OPEN.
+
+Outstanding Invoices → Invoices list with unpaid filter.
+
+Low Stock Products → Products list filtered to low stock.
+
+Monthly Expenses → Expenses list filtered to current month.
+
+7. General expectations
+
+Do not break existing working CRUD; enhance them to support these rules.
+
+Use services in Spring Boot to keep business logic out of controllers.
+
+Reuse Angular patterns:
+
+Per-entity service for API calls.
+
+List + detail components.
+
+At the end, summarize:
+
+New tables/entities created,
+
+Key API endpoints added,
+
+New or updated Angular components.

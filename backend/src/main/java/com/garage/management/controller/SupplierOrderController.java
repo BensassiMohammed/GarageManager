@@ -4,6 +4,7 @@ import com.garage.management.entity.SupplierOrder;
 import com.garage.management.entity.SupplierOrderLine;
 import com.garage.management.repository.SupplierOrderLineRepository;
 import com.garage.management.repository.SupplierOrderRepository;
+import com.garage.management.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/supplier-orders")
+@CrossOrigin(origins = "*")
 public class SupplierOrderController {
 
     @Autowired
@@ -19,6 +21,9 @@ public class SupplierOrderController {
 
     @Autowired
     private SupplierOrderLineRepository supplierOrderLineRepository;
+
+    @Autowired
+    private StockService stockService;
 
     @GetMapping
     public List<SupplierOrder> getAll() {
@@ -53,6 +58,16 @@ public class SupplierOrderController {
                     return ResponseEntity.ok(supplierOrderRepository.save(existing));
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/receive")
+    public ResponseEntity<SupplierOrder> markAsReceived(@PathVariable Long id) {
+        try {
+            SupplierOrder order = stockService.markOrderAsReceived(id);
+            return ResponseEntity.ok(order);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/{id}")
