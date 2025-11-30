@@ -52,7 +52,10 @@ workspace/
 ### Operations
 - **Work Orders**: Full work order management with service/product lines, discounts, and invoice generation
 - **Supplier Orders**: Purchase orders from suppliers with RECEIVED status to update stock
-- **Inventory**: View computed stock levels from movements with low stock highlighting
+- **Stock Management**: Tabbed interface with Stock Overview, Movements History, and New Adjustment tabs
+  - Stock Overview: View all products with current stock, min stock, and low stock warnings
+  - Movements History: View all stock movements sorted by date with type badges
+  - New Adjustment: Record stock adjustments with product, movement type, quantity change, reason, and notes
 
 ### Finance
 - **Invoices**: Generated from work orders with remaining balance tracking and status management (DRAFT, ISSUED, PAID, PARTIALLY_PAID, CANCELLED)

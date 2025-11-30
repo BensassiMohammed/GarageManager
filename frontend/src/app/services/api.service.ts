@@ -282,6 +282,10 @@ export class ApiService {
     return this.http.get<StockMovement[]>(`${this.baseUrl}/stock-movements`);
   }
 
+  createStockMovement(movement: any): Observable<StockMovement> {
+    return this.http.post<StockMovement>(`${this.baseUrl}/stock-movements`, movement);
+  }
+
   getProductPriceHistory(productId: number): Observable<ProductPriceHistory[]> {
     return this.http.get<ProductPriceHistory[]>(`${this.baseUrl}/products/${productId}/prices`);
   }
