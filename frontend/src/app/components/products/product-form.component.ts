@@ -53,6 +53,15 @@ import { forkJoin } from 'rxjs';
             </div>
           </div>
 
+          @if (!isEdit) {
+            <div class="form-row">
+              <div class="form-group">
+                <label class="required">Price</label>
+                <input type="number" step="0.01" formControlName="sellingPrice" class="form-control" placeholder="0.00">
+              </div>
+            </div>
+          }
+
           <div class="form-group">
             <label>
               <input type="checkbox" formControlName="active"> Active
@@ -242,6 +251,7 @@ export class ProductFormComponent implements OnInit {
       name: ['', Validators.required],
       categoryId: [null],
       minStock: [0],
+      sellingPrice: [0, [Validators.required, Validators.min(0)]],
       active: [true]
     });
 
@@ -300,11 +310,24 @@ export class ProductFormComponent implements OnInit {
         data.category = { id: formData.categoryId };
       }
       
+      if (!this.isEdit) {
+        data.sellingPrice = formData.sellingPrice;
+      }
+      
       const request = this.isEdit 
         ? this.api.updateProduct(this.id!, data)
         : this.api.createProduct(data);
       
-      request.subscribe(() => this.router.navigate(['/products']));
+      request.subscribe((savedProduct) => {
+        if (!this.isEdit && formData.sellingPrice > 0) {
+          const today = new Date().toISOString().split('T')[0];
+          this.api.addProductPrice(savedProduct.id!, formData.sellingPrice, today).subscribe(() => {
+            this.router.navigate(['/products']);
+          });
+        } else {
+          this.router.navigate(['/products']);
+        }
+      });
     }
   }
 

@@ -72,8 +72,8 @@ All endpoints are prefixed with `/api`:
 - `/api/vehicles` - Vehicle management
 - `/api/suppliers` - Supplier management
 - `/api/categories` - Category management
-- `/api/products` - Product management with price history (`/api/products/{id}/price-history`)
-- `/api/services` - Service management with price history (`/api/services/{id}/price-history`)
+- `/api/products` - Product management with price history (`/api/products/{id}/prices`) and computed stock (`/api/products/{id}/computed-stock`)
+- `/api/services` - Service management with price history (`/api/services/{id}/prices`)
 - `/api/expense-categories` - Expense category management
 - `/api/expenses` - Expense management with filtering
 - `/api/work-orders` - Work order management with invoice generation (`POST /{id}/generate-invoice`)
@@ -102,6 +102,16 @@ Backend service layer implementing complex business logic:
 - **DashboardService**: Aggregate KPIs (open orders, outstanding balance, low stock, monthly expenses)
 
 ## Recent Changes
+- 2025-11-30: Added Price field to New Product and New Service forms
+  - Price is now required when creating new products/services
+  - Automatically creates initial price history entry with today's date
+  - Price field only shows on create (edit uses Price History tab)
+
+- 2025-11-30: Fixed API endpoint mismatches between frontend and backend
+  - Corrected price history endpoints from `/price-history` to `/prices`
+  - Fixed request format to use JSON body instead of query parameters
+  - Added missing `/computed-stock` endpoint to ProductController
+
 - 2025-11-30: Fixed Angular 21 lazy loading change detection issue
   - Added ChangeDetectorRef.detectChanges() to all list components after async data loads
   - Fixed "double-click to show data" bug caused by Angular 21 lazy loading timing

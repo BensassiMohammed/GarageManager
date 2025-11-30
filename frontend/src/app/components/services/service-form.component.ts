@@ -46,6 +46,12 @@ import { forkJoin } from 'rxjs';
                 }
               </select>
             </div>
+            @if (!isEdit) {
+              <div class="form-group">
+                <label class="required">Price</label>
+                <input type="number" step="0.01" formControlName="sellingPrice" class="form-control" placeholder="0.00">
+              </div>
+            }
           </div>
 
           <div class="form-group">
@@ -187,6 +193,7 @@ export class ServiceFormComponent implements OnInit {
       code: ['', Validators.required],
       name: ['', Validators.required],
       categoryId: [null],
+      sellingPrice: [0, [Validators.required, Validators.min(0)]],
       active: [true]
     });
 
@@ -240,11 +247,24 @@ export class ServiceFormComponent implements OnInit {
         data.category = { id: formData.categoryId };
       }
       
+      if (!this.isEdit) {
+        data.sellingPrice = formData.sellingPrice;
+      }
+      
       const request = this.isEdit 
         ? this.api.updateService(this.id!, data)
         : this.api.createService(data);
       
-      request.subscribe(() => this.router.navigate(['/services']));
+      request.subscribe((savedService) => {
+        if (!this.isEdit && formData.sellingPrice > 0) {
+          const today = new Date().toISOString().split('T')[0];
+          this.api.addServicePrice(savedService.id!, formData.sellingPrice, today).subscribe(() => {
+            this.router.navigate(['/services']);
+          });
+        } else {
+          this.router.navigate(['/services']);
+        }
+      });
     }
   }
 
