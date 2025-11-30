@@ -12,23 +12,11 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Spring Boot Backend"
+args = "Angular Frontend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Angular Frontend"
-
-[[workflows.workflow]]
-name = "Spring Boot Backend"
-author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd backend && ./mvnw spring-boot:run -q"
-waitForPort = 8080
+args = "Spring Boot Backend"
 
 [[workflows.workflow]]
 name = "Angular Frontend"
@@ -42,14 +30,25 @@ waitForPort = 5000
 [workflows.workflow.metadata]
 outputType = "webview"
 
+[[workflows.workflow]]
+name = "Spring Boot Backend"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend && ./mvnw spring-boot:run -q"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 8080
-externalPort = 8080
-
-[[ports]]
 localPort = 39231
 externalPort = 3000
+
+[[ports]]
+localPort = 8080
+externalPort = 8080

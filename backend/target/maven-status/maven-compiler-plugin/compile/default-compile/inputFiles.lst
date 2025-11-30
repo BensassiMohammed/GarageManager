@@ -64,7 +64,6 @@
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/ServicePriceHistoryRepository.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/enums/WorkOrderStatus.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/StockMovement.java
-/home/runner/workspace/backend/src/main/java/com/garage/management/controller/RootController.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/CompanyController.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/Expense.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/enums/OrderStatus.java

@@ -59,10 +59,8 @@ com/garage/management/service/DashboardService$DashboardStats.class
 com/garage/management/repository/ExpenseRepository.class
 com/garage/management/entity/Company.class
 com/garage/management/controller/StockMovementController.class
-com/garage/management/controller/RootController$ApiResponse.class
 com/garage/management/service/DashboardService.class
 com/garage/management/enums/InvoiceStatus.class
-com/garage/management/controller/RootController.class
 com/garage/management/repository/CompanyRepository.class
 com/garage/management/repository/SupplierOrderLineRepository.class
 com/garage/management/entity/InvoiceLine.class
