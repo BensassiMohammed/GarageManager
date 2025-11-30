@@ -1,12 +1,13 @@
 # Garage Management System
 
 ## Overview
-A complete full-stack web application for managing a small garage business. The application handles clients, vehicles, inventory (products and services) with price history, work orders with product discounts, invoicing with payment allocation, and expenses for a small garage business.
+A complete full-stack web application for managing a small garage business. The application handles clients, vehicles, inventory (products and services) with price history, work orders with product discounts, invoicing with payment allocation, and expenses. Now includes JWT-based authentication with role-based access control.
 
 ## Tech Stack
-- **Backend**: Spring Boot 3.2 with Java 17, Maven, SQLite database
+- **Backend**: Spring Boot 3.2 with Java 17, Maven, SQLite database, Spring Security + JWT
 - **Frontend**: Angular 21 with TypeScript
 - **Database**: SQLite (stored in `backend/garage.db`)
+- **Authentication**: JWT tokens with 15-minute expiration, sliding renewal
 
 ## Project Structure
 ```
@@ -14,10 +15,12 @@ workspace/
 ├── backend/                    # Spring Boot backend application
 │   ├── src/main/java/com/garage/management/
 │   │   ├── GarageManagementApplication.java
-│   │   ├── config/             # CORS configuration
-│   │   ├── entity/             # JPA entities (22 entities)
+│   │   ├── config/             # CORS, Security, DataInitializer
+│   │   ├── entity/             # JPA entities (25+ entities incl. auth)
 │   │   ├── repository/         # Spring Data JPA repositories
 │   │   ├── service/            # Business logic services
+│   │   ├── security/           # JWT utilities, filters, user details
+│   │   ├── dto/                # Data transfer objects
 │   │   └── controller/         # REST controllers
 │   ├── src/main/resources/
 │   │   └── application.properties
@@ -25,7 +28,11 @@ workspace/
 ├── frontend/                   # Angular frontend application
 │   ├── src/app/
 │   │   ├── components/         # Angular components (with tabs and modals)
-│   │   ├── services/           # API service
+│   │   │   ├── auth/           # Login, change-password components
+│   │   │   └── users/          # User management (admin-only)
+│   │   ├── services/           # API and Auth services
+│   │   ├── guards/             # Route guards (auth, admin, module)
+│   │   ├── interceptors/       # HTTP interceptor for JWT
 │   │   └── models/             # TypeScript interfaces
 │   ├── angular.json
 │   └── package.json
@@ -35,6 +42,33 @@ workspace/
 ## Running the Application
 - **Backend**: Runs on port 8080 (`./mvnw spring-boot:run`)
 - **Frontend**: Runs on port 5000 (`npm start`) with proxy to backend
+
+## Authentication System
+
+### Default Credentials
+- **Username**: admin
+- **Password**: 123456
+- **Note**: Must change password on first login
+
+### Roles
+- **ADMIN**: Full access to all modules including user management
+- **MANAGER**: Access to dashboard, customers, inventory, operations, finance
+- **STAFF**: Access to dashboard, customers, operations
+
+### Module Permissions
+- **dashboard**: Main dashboard with KPIs
+- **customers**: Companies, clients, vehicles
+- **inventory**: Products, services, categories, suppliers
+- **operations**: Work orders, supplier orders, stock management
+- **finance**: Invoices, payments, expenses
+- **users**: User administration (admin-only)
+
+### Authentication Flow
+1. User logs in at `/login` with username/password
+2. Backend validates credentials and returns JWT token
+3. Frontend stores token and attaches it to all API requests
+4. If `mustChangePassword=true`, user is redirected to `/change-password`
+5. Token auto-renews when less than 5 minutes remaining
 
 ## Features
 
@@ -69,7 +103,17 @@ workspace/
 - **Recent Activity**: Recent Open Work Orders and Unpaid Invoices with quick navigation
 
 ## API Endpoints
-All endpoints are prefixed with `/api`:
+
+### Authentication Endpoints (Public)
+- `POST /api/auth/login` - Authenticate and get JWT token
+- `GET /api/auth/me` - Get current user info (requires auth)
+- `POST /api/auth/change-password` - Change password (requires auth)
+
+### Admin-Only Endpoints
+- `/api/users` - User CRUD operations
+- `/api/roles` - List available roles
+
+### Protected Endpoints (require authentication)
 - `/api/companies` - Company management
 - `/api/clients` - Client management
 - `/api/vehicles` - Vehicle management
@@ -88,6 +132,7 @@ All endpoints are prefixed with `/api`:
 
 ## Database Schema
 The SQLite database contains the following main entities:
+- AppUser, Role, ModulePermission (authentication)
 - Company, Client, Vehicle (customer domain)
 - Supplier, Category, Product, ServiceEntity, ProductPriceHistory, ServicePriceHistory (inventory domain)
 - WorkOrder, WorkOrderServiceLine, WorkOrderProductLine (operations)
@@ -104,8 +149,20 @@ Backend service layer implementing complex business logic:
 - **WorkOrderService**: Generate invoices from completed work orders
 - **PaymentService**: Apply payments with auto-allocation to oldest unpaid invoices
 - **DashboardService**: Aggregate KPIs (open orders, outstanding balance, low stock, monthly expenses)
+- **CustomUserDetailsService**: Load user details for Spring Security authentication
 
 ## Recent Changes
+- 2025-11-30: Added JWT-based authentication with role-based access control
+  - Created AppUser, Role, ModulePermission entities with JPA relationships
+  - Implemented JwtUtil for token generation/validation with HS384 algorithm
+  - Added SecurityConfig with protected/public endpoints
+  - Created auth endpoints: login, me, change-password
+  - Added user management (CRUD) for admins
+  - Frontend auth service with token storage, interceptor, guards
+  - Login page with must-change-password flow
+  - Role-based menu visibility using allowedModules
+  - Default admin user created on first startup (admin/123456)
+
 - 2025-11-30: Fixed product price not persisting after edit
   - Removed sellingPrice from ProductController.update() so it can only be modified through price history
   - Product price set via Price History now persists correctly after product edits
@@ -126,48 +183,8 @@ Backend service layer implementing complex business logic:
   - Backend WorkOrderServiceLine entity extended with discountPercent and finalUnitPrice fields
   - Totals section shows Services Subtotal, Services Discount Total, Parts Subtotal, Parts Discount Total, and Grand Total
 
-- 2025-11-30: Rebuilt Work Order form to match reference design
-  - Created dedicated work-order-form.component with full page layout
-  - Header section: Client, Vehicle, Date, Status, Description fields
-  - Services section: Table with Service, Qty, Std Price, Discount %, Final Price, Total + Add Service modal
-  - Parts section: Table with Product, Qty, Std Price, Discount %, Final Price, Total + Add Product modal
-  - Totals section: Services Subtotal, Services Discount, Parts Subtotal, Parts Discount Total, Grand Total
-  - Notes textarea at bottom
-  - Save persists work order then adds all service/product lines to backend
-  - Added routes: /work-orders/new and /work-orders/:id for create/edit
-
-- 2025-11-30: Added Price field to New Product and New Service forms
-  - Price is now required when creating new products/services
-  - Automatically creates initial price history entry with today's date
-  - Price field only shows on create (edit uses Price History tab)
-
-- 2025-11-30: Fixed API endpoint mismatches between frontend and backend
-  - Corrected price history endpoints from `/price-history` to `/prices`
-  - Fixed request format to use JSON body instead of query parameters
-  - Added missing `/computed-stock` endpoint to ProductController
-
-- 2025-11-30: Fixed Angular 21 lazy loading change detection issue
-  - Added ChangeDetectorRef.detectChanges() to all list components after async data loads
-  - Fixed "double-click to show data" bug caused by Angular 21 lazy loading timing
-  - Added withFetch() to HttpClient configuration for better Fetch API timing
-  - Updated 15+ list components with explicit change detection after API calls
-  
-- 2025-11-30: Enhanced with complete feature set
-  - Added ProductPriceHistory and ServicePriceHistory entities for price tracking
-  - Implemented StockService for computing stock from movements
-  - Added WorkOrderService with invoice generation from work orders
-  - Implemented PaymentService with auto-allocation to invoices
-  - Added DashboardService for KPI aggregation
-  - Enhanced Product/Service forms with tabs for Details, Price History, and Stock Info
-  - Work Order UI with discount columns, subtotals, and invoice generation
-  - Invoice UI with remaining balance tracking and status management
-  - Payment UI with Record Payment modal and allocation to invoices
-  - Expense UI with category and date filters
-  - Supplier Order UI with Receive functionality for stock updates
-  - Dashboard with KPIs and quick navigation
-
 ## Recommended Next Steps
-1. Add unit/integration tests for PaymentService.applyPayment and WorkOrderService.generateInvoice
-2. Execute end-to-end UI smoke tests for price changes, work order invoicing, and payment allocation
-3. Monitor expense filtering performance for large datasets
+1. Add unit/integration tests for authentication flows
+2. Implement password reset via email
+3. Add audit logging for sensitive operations
 4. Add reports and analytics features
