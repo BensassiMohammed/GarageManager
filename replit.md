@@ -106,6 +106,10 @@ Backend service layer implementing complex business logic:
 - **DashboardService**: Aggregate KPIs (open orders, outstanding balance, low stock, monthly expenses)
 
 ## Recent Changes
+- 2025-11-30: Fixed product price not persisting after edit
+  - Removed sellingPrice from ProductController.update() so it can only be modified through price history
+  - Product price set via Price History now persists correctly after product edits
+
 - 2025-11-30: Fixed product edit resetting currentStock to 0
   - Removed currentStock from ProductController.update() so it can only be modified through stock movements
   - Product view and Inventory view now show consistent stock values
