@@ -327,17 +327,19 @@ export class ApiService {
   }
 
   addWorkOrderProductLine(workOrderId: number, productId: number, quantity: number, discountPercent?: number): Observable<WorkOrderProductLine> {
-    let params = new HttpParams()
-      .set('productId', productId.toString())
-      .set('quantity', quantity.toString());
+    const body: any = { productId, quantity };
     if (discountPercent !== undefined) {
-      params = params.set('discountPercent', discountPercent.toString());
+      body.discountPercent = discountPercent;
     }
-    return this.http.post<WorkOrderProductLine>(`${this.baseUrl}/work-orders/${workOrderId}/product-lines`, null, { params });
+    return this.http.post<WorkOrderProductLine>(`${this.baseUrl}/work-orders/${workOrderId}/product-lines`, body);
   }
 
   getWorkOrderServiceLines(workOrderId: number): Observable<WorkOrderServiceLine[]> {
     return this.http.get<WorkOrderServiceLine[]>(`${this.baseUrl}/work-orders/${workOrderId}/service-lines`);
+  }
+
+  addWorkOrderServiceLine(workOrderId: number, serviceId: number, quantity: number): Observable<WorkOrderServiceLine> {
+    return this.http.post<WorkOrderServiceLine>(`${this.baseUrl}/work-orders/${workOrderId}/service-lines`, { serviceId, quantity });
   }
 
   getWorkOrderTotals(workOrderId: number): Observable<WorkOrderTotals> {
