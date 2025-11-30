@@ -416,14 +416,97 @@ import { WorkOrder, WorkOrderProductLine, WorkOrderServiceLine, WorkOrderTotals,
     }
     .form-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
       gap: 1rem;
       align-items: flex-end;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .form-group label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .form-group label.required::after {
+      content: ' *';
+      color: var(--danger);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+      background-color: var(--surface);
+      color: var(--text);
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background-color: var(--surface);
+      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+    }
+    .modal-body {
+      padding: 1.5rem;
+    }
+    .modal-body h4 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem;
+      color: var(--text);
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .modal-body h4:first-child {
+      margin-top: 0;
+    }
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
     }
     .btn-xs {
-      padding: 0.25rem 0.5rem;
+      padding: 0.35rem 0.65rem;
       font-size: 0.75rem;
+    }
+    .table-container {
+      margin: 1rem 0;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .table-container table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .table-container th {
+      background-color: var(--surface);
+      padding: 0.75rem;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+    }
+    .table-container td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-container tbody tr:last-child td {
+      border-bottom: none;
     }
   `]
 })
