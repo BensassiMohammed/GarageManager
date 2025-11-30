@@ -1,7 +1,7 @@
 # Garage Management System
 
 ## Overview
-A complete full-stack web application for managing a small garage business. The application handles clients, vehicles, inventory (products and services), work orders, invoicing, payments, and expenses.
+A complete full-stack web application for managing a small garage business. The application handles clients, vehicles, inventory (products and services) with price history, work orders with product discounts, invoicing with payment allocation, and expenses for a small garage business.
 
 ## Tech Stack
 - **Backend**: Spring Boot 3.2 with Java 17, Maven, SQLite database
@@ -15,15 +15,16 @@ workspace/
 │   ├── src/main/java/com/garage/management/
 │   │   ├── GarageManagementApplication.java
 │   │   ├── config/             # CORS configuration
-│   │   ├── entity/             # JPA entities (20 entities)
+│   │   ├── entity/             # JPA entities (22 entities)
 │   │   ├── repository/         # Spring Data JPA repositories
+│   │   ├── service/            # Business logic services
 │   │   └── controller/         # REST controllers
 │   ├── src/main/resources/
 │   │   └── application.properties
 │   └── pom.xml
 ├── frontend/                   # Angular frontend application
 │   ├── src/app/
-│   │   ├── components/         # Angular components
+│   │   ├── components/         # Angular components (with tabs and modals)
 │   │   ├── services/           # API service
 │   │   └── models/             # TypeScript interfaces
 │   ├── angular.json
@@ -44,20 +45,25 @@ workspace/
 
 ### Inventory
 - **Categories**: Product and service categories with hierarchy support
-- **Products**: Inventory items with stock tracking and pricing
-- **Services**: Service items with pricing
+- **Products**: Inventory items with stock tracking, pricing, and price history
+- **Services**: Service items with pricing and price history
 - **Suppliers**: Manage supplier contacts
 
 ### Operations
-- **Work Orders**: Create work orders for clients/vehicles (placeholder)
-- **Supplier Orders**: Purchase orders from suppliers (placeholder)
-- **Inventory**: View stock levels and movements
+- **Work Orders**: Full work order management with service/product lines, discounts, and invoice generation
+- **Supplier Orders**: Purchase orders from suppliers with RECEIVED status to update stock
+- **Inventory**: View computed stock levels from movements with low stock highlighting
 
 ### Finance
-- **Invoices**: Client billing (placeholder)
-- **Payments**: Payment recording (placeholder)
+- **Invoices**: Generated from work orders with remaining balance tracking and status management (DRAFT, ISSUED, PAID, PARTIALLY_PAID, CANCELLED)
+- **Payments**: Payment recording with manual or auto-allocation to oldest unpaid invoices
 - **Expense Categories**: Categorize business expenses
-- **Expenses**: Track business expenses
+- **Expenses**: Track business expenses with date and category filtering
+
+### Dashboard
+- **KPIs**: Open Work Orders count, Outstanding Balance total, Low Stock Products count, Monthly Expenses total
+- **Quick Stats**: Companies, Clients, Vehicles, Products, Services, Suppliers counts
+- **Recent Activity**: Recent Open Work Orders and Unpaid Invoices with quick navigation
 
 ## API Endpoints
 All endpoints are prefixed with `/api`:
@@ -66,34 +72,52 @@ All endpoints are prefixed with `/api`:
 - `/api/vehicles` - Vehicle management
 - `/api/suppliers` - Supplier management
 - `/api/categories` - Category management
-- `/api/products` - Product management
-- `/api/services` - Service management
+- `/api/products` - Product management with price history (`/api/products/{id}/price-history`)
+- `/api/services` - Service management with price history (`/api/services/{id}/price-history`)
 - `/api/expense-categories` - Expense category management
-- `/api/expenses` - Expense management
-- `/api/work-orders` - Work order management
-- `/api/invoices` - Invoice management
-- `/api/payments` - Payment management
-- `/api/supplier-orders` - Supplier order management
+- `/api/expenses` - Expense management with filtering
+- `/api/work-orders` - Work order management with invoice generation (`POST /{id}/generate-invoice`)
+- `/api/invoices` - Invoice management with status updates
+- `/api/payments` - Payment management with auto-allocation (`POST /apply`)
+- `/api/supplier-orders` - Supplier order management with receive functionality (`POST /{id}/receive`)
 - `/api/stock-movements` - Stock movement tracking
+- `/api/dashboard/stats` - Dashboard KPI statistics
 
 ## Database Schema
 The SQLite database contains the following main entities:
 - Company, Client, Vehicle (customer domain)
-- Supplier, Category, Product, ServiceEntity (inventory domain)
+- Supplier, Category, Product, ServiceEntity, ProductPriceHistory, ServicePriceHistory (inventory domain)
 - WorkOrder, WorkOrderServiceLine, WorkOrderProductLine (operations)
 - Invoice, InvoiceLine, Payment, PaymentAllocation (finance)
 - SupplierOrder, SupplierOrderLine, StockMovement (purchasing)
 - ExpenseCategory, Expense (expense tracking)
 
-## Recent Changes
-- 2025-11-30: Initial implementation with complete backend and frontend
-- Full CRUD operations for core entities (Companies, Clients, Vehicles, Suppliers, Categories, Products, Services, Expense Categories, Expenses)
-- Dashboard with entity statistics
-- Placeholder pages for Work Orders, Invoices, Payments, and Supplier Orders
+## Services
+Backend service layer implementing complex business logic:
+- **ProductPriceService**: Manage product price history with effective date tracking
+- **ServicePriceService**: Manage service price history with effective date tracking
+- **StockService**: Compute current stock from movements, identify low stock products
+- **WorkOrderService**: Generate invoices from completed work orders
+- **PaymentService**: Apply payments with auto-allocation to oldest unpaid invoices
+- **DashboardService**: Aggregate KPIs (open orders, outstanding balance, low stock, monthly expenses)
 
-## Future Enhancements
-- Complete Work Order management with service and product lines
-- Full Invoice generation from work orders
-- Payment allocation system
-- Supplier order and stock management
-- Reports and analytics dashboard
+## Recent Changes
+- 2025-11-30: Enhanced with complete feature set
+  - Added ProductPriceHistory and ServicePriceHistory entities for price tracking
+  - Implemented StockService for computing stock from movements
+  - Added WorkOrderService with invoice generation from work orders
+  - Implemented PaymentService with auto-allocation to invoices
+  - Added DashboardService for KPI aggregation
+  - Enhanced Product/Service forms with tabs for Details, Price History, and Stock Info
+  - Work Order UI with discount columns, subtotals, and invoice generation
+  - Invoice UI with remaining balance tracking and status management
+  - Payment UI with Record Payment modal and allocation to invoices
+  - Expense UI with category and date filters
+  - Supplier Order UI with Receive functionality for stock updates
+  - Dashboard with KPIs and quick navigation
+
+## Recommended Next Steps
+1. Add unit/integration tests for PaymentService.applyPayment and WorkOrderService.generateInvoice
+2. Execute end-to-end UI smoke tests for price changes, work order invoicing, and payment allocation
+3. Monitor expense filtering performance for large datasets
+4. Add reports and analytics features
