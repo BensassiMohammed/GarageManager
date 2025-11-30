@@ -271,6 +271,7 @@ export class InvoiceListComponent implements OnInit {
     this.api.getUnpaidInvoices().subscribe(data => {
       this.filteredInvoices = data;
       this.statusFilter = '';
+      this.cdr.detectChanges();
     });
   }
 
@@ -291,7 +292,10 @@ export class InvoiceListComponent implements OnInit {
     this.showDetails = true;
     
     if (invoice.id) {
-      this.api.getInvoiceLines(invoice.id).subscribe(data => this.invoiceLines = data);
+      this.api.getInvoiceLines(invoice.id).subscribe(data => {
+        this.invoiceLines = data;
+        this.cdr.detectChanges();
+      });
     }
   }
 

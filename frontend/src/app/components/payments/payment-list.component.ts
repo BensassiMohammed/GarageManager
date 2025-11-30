@@ -346,6 +346,7 @@ export class PaymentListComponent implements OnInit {
         invoiceId: inv.id!,
         amount: 0
       }));
+      this.cdr.detectChanges();
     });
   }
 
@@ -376,7 +377,10 @@ export class PaymentListComponent implements OnInit {
     this.showAllocations = true;
     
     if (payment.id) {
-      this.api.getPaymentAllocations(payment.id).subscribe(data => this.paymentAllocations = data);
+      this.api.getPaymentAllocations(payment.id).subscribe(data => {
+        this.paymentAllocations = data;
+        this.cdr.detectChanges();
+      });
     }
   }
 }

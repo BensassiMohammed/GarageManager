@@ -572,8 +572,14 @@ export class WorkOrderListComponent implements OnInit {
   openCreateModal() {
     this.showCreateModal = true;
     this.resetNewOrder();
-    this.api.getServices().subscribe(data => this.availableServices = data.filter(s => s.active !== false));
-    this.api.getProducts().subscribe(data => this.availableProducts = data.filter(p => p.active !== false));
+    this.api.getServices().subscribe(data => {
+      this.availableServices = data.filter(s => s.active !== false);
+      this.cdr.detectChanges();
+    });
+    this.api.getProducts().subscribe(data => {
+      this.availableProducts = data.filter(p => p.active !== false);
+      this.cdr.detectChanges();
+    });
   }
 
   resetNewOrder() {
@@ -616,9 +622,18 @@ export class WorkOrderListComponent implements OnInit {
     this.showDetails = true;
     
     if (order.id) {
-      this.api.getWorkOrderProductLines(order.id).subscribe(data => this.productLines = data);
-      this.api.getWorkOrderServiceLines(order.id).subscribe(data => this.serviceLines = data);
-      this.api.getWorkOrderTotals(order.id).subscribe(data => this.orderTotals = data);
+      this.api.getWorkOrderProductLines(order.id).subscribe(data => {
+        this.productLines = data;
+        this.cdr.detectChanges();
+      });
+      this.api.getWorkOrderServiceLines(order.id).subscribe(data => {
+        this.serviceLines = data;
+        this.cdr.detectChanges();
+      });
+      this.api.getWorkOrderTotals(order.id).subscribe(data => {
+        this.orderTotals = data;
+        this.cdr.detectChanges();
+      });
     }
   }
 

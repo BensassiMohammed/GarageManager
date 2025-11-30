@@ -285,7 +285,10 @@ export class SupplierOrderListComponent implements OnInit {
     this.showDetails = true;
     
     if (order.id) {
-      this.api.getSupplierOrderLines(order.id).subscribe(data => this.orderLines = data);
+      this.api.getSupplierOrderLines(order.id).subscribe(data => {
+        this.orderLines = data;
+        this.cdr.detectChanges();
+      });
     }
   }
 
@@ -293,7 +296,10 @@ export class SupplierOrderListComponent implements OnInit {
     this.selectedOrder = order;
     this.showDetails = true;
     if (order.id) {
-      this.api.getSupplierOrderLines(order.id).subscribe(data => this.orderLines = data);
+      this.api.getSupplierOrderLines(order.id).subscribe(data => {
+        this.orderLines = data;
+        this.cdr.detectChanges();
+      });
     }
   }
 
