@@ -1,0 +1,331 @@
+I want you to build a complete full-stack Garage Management web app as a new project.
+
+0. Tech stack & project structure
+
+Backend
+
+Language: Java (use Java 17 if available, otherwise the latest LTS Java version supported by Replit).
+
+Framework: Spring Boot (Spring Web + Spring Data JPA).
+
+Build tool: Maven (preferred) or Gradle if really needed.
+
+Database: SQLite stored in a file (e.g. garage.db) in the backend folder.
+
+Use a proper SQLite JDBC driver and configure Hibernate dialect for SQLite.
+
+Frontend
+
+Framework: Angular (latest stable).
+
+Use Angular CLI structure and routing.
+
+Project structure
+
+backend/ → Spring Boot app with Maven.
+
+frontend/ → Angular app.
+
+Dev setup
+
+Configure CORS so Angular can call the Spring Boot backend.
+
+Backend base URL example: http://localhost:8080/api.
+
+1. Domain overview (first iteration)
+
+Build an initial but clean domain model for a small garage:
+
+Company: B2B customer.
+
+Client: person; can optionally be linked to a company.
+
+Vehicle: belongs to a client (current owner).
+
+Supplier: providers of mechanical parts.
+
+Category: hierarchical classification for products and services, with a type field: PRODUCT or SERVICE.
+
+Product: mechanical part that can be stocked and sold.
+
+For now: single sellingPrice field (we will add price history later).
+
+Service: labor service that can be sold.
+
+For now: single sellingPrice field.
+
+SupplierOrder and SupplierOrderLine: purchase orders to suppliers.
+
+StockMovement: records inventory changes.
+
+WorkOrder:
+
+Linked to a Client and a Vehicle.
+
+Has service lines and product lines.
+
+Invoice and InvoiceLine: invoices related to a Client/Company.
+
+Payment and PaymentAllocation: payments and how they are applied to invoices (basic version in this first step).
+
+ExpenseCategory and Expense: simple, isolated module for general expenses (rent, phone bill, etc.).
+
+Don’t overcomplicate business rules in this first pass; focus on a clean structure and working CRUD.
+
+2. Database & JPA entities
+
+Use Spring Data JPA with SQLite.
+
+Configure:
+
+SQLite JDBC dependency.
+
+A suitable Hibernate dialect for SQLite.
+
+application.properties to point to an SQLite file, e.g. jdbc:sqlite:garage.db.
+
+Create JPA entities and tables for at least:
+
+Company
+
+Client
+
+Vehicle
+
+Supplier
+
+Category
+
+Product
+
+Service
+
+SupplierOrder
+
+SupplierOrderLine
+
+StockMovement
+
+WorkOrder
+
+WorkOrderServiceLine
+
+WorkOrderProductLine
+
+Invoice
+
+InvoiceLine
+
+Payment
+
+PaymentAllocation
+
+ExpenseCategory
+
+Expense
+
+Minimum fields (you can add IDs, timestamps, etc. as needed):
+
+Company: id, name, address, phone, email, notes, active.
+
+Client: id, firstName, lastName, phone, email, optional company (ManyToOne), notes, active.
+
+Vehicle: id, registrationNumber, brand, model, type, year, currentOwner (Client), status.
+
+Supplier: id, name, address, phone, email, notes, active.
+
+Category: id, name, type (PRODUCT or SERVICE), parentCategory (self reference), active.
+
+Product: id, code, name, category, sellingPrice (BigDecimal), minStock, active.
+
+Service: id, code, name, category, sellingPrice (BigDecimal), active.
+
+SupplierOrder: id, supplier, orderDate, status, totalAmount.
+
+SupplierOrderLine: id, supplierOrder, product, quantity, unitCost, lineTotal.
+
+StockMovement: id, product, date, quantityDelta, type (PURCHASE, ADJUSTMENT, CONSUMPTION), reason, sourceType, sourceId.
+
+WorkOrder: id, client, vehicle, date, status, totalAmount.
+
+WorkOrderServiceLine: id, workOrder, service, quantity, unitPrice, lineTotal.
+
+WorkOrderProductLine: id, workOrder, product, quantity, unitPrice, lineTotal.
+
+Invoice: id, client, company (optional), date, status, totalAmount.
+
+InvoiceLine: id, invoice, product or service info (you can use two relations or simple fields), quantity, unitPrice, lineTotal.
+
+Payment: id, payerType (CLIENT or COMPANY), payerId, date, method, totalAmount, notes.
+
+PaymentAllocation: id, payment, invoice, allocatedAmount.
+
+ExpenseCategory: id, name, description, active.
+
+Expense: id, date, expenseCategory, label, amount, paymentMethod, notes.
+
+Keep relations simple and avoid bidirectional relationships where not necessary (to reduce JSON recursion issues).
+
+3. Spring Boot REST API
+
+Create REST controllers using Spring Web, with base path /api/....
+Use DTOs where needed to avoid infinite recursion; you can keep them simple.
+
+Implement basic CRUD endpoints for:
+
+/api/companies
+
+/api/clients
+
+/api/vehicles
+
+/api/suppliers
+
+/api/categories
+
+/api/products
+
+/api/services
+
+/api/supplier-orders (and nested lines)
+
+/api/stock-movements
+
+/api/work-orders (and their service/product lines)
+
+/api/invoices (and lines)
+
+/api/payments
+
+/api/expense-categories
+
+/api/expenses
+
+For each resource, provide:
+
+GET /api/... → list (with basic pagination optional).
+
+GET /api/.../{id} → get by ID.
+
+POST /api/... → create.
+
+PUT /api/.../{id} → update.
+
+DELETE /api/.../{id} → delete (soft delete with active where appropriate).
+
+Keep business logic minimal in this first iteration:
+
+No automatic stock update yet when supplier orders are received.
+
+No automatic payment allocation logic yet.
+
+No advanced invoice/work order status workflow yet.
+
+4. Angular frontend
+
+In frontend/, generate an Angular application with routing.
+
+Layout:
+
+Left sidebar navigation with links for:
+
+Dashboard
+
+Companies
+
+Clients
+
+Vehicles
+
+Suppliers
+
+Categories
+
+Products
+
+Services
+
+Supplier Orders
+
+Inventory (read-only view for now)
+
+Work Orders
+
+Invoices
+
+Payments
+
+Expenses
+
+Top bar (simple header is enough).
+
+Main content area with Angular router outlet.
+
+Per module (for now focus on core CRUD):
+For entities like Company, Client, Vehicle, Supplier, Product, Service, ExpenseCategory, Expense:
+
+Create a list component:
+
+Shows a table with key columns.
+
+Buttons: New, Edit, Delete.
+
+Create a detail form component (create/edit):
+
+Use Reactive Forms.
+
+Basic validation (required fields).
+
+Create at least:
+
+Company list + detail.
+
+Client list + detail.
+
+Vehicle list + detail.
+
+Supplier list + detail.
+
+Category list + detail.
+
+Product list + detail.
+
+Service list + detail.
+
+ExpenseCategory list + detail.
+
+Expense list + detail.
+
+Implement Angular services for HTTP calls:
+
+E.g. company.service.ts, client.service.ts, etc.
+
+Base URL: e.g. http://localhost:8080/api.
+
+You can leave Work Orders, Invoices, Payments, Inventory, Supplier Orders with very basic list/detail placeholder components in this first iteration.
+
+5. CORS & communication
+
+Configure Spring Boot CORS to allow the Angular dev origin.
+
+Make sure the Angular services can successfully call the Spring Boot endpoints with JSON.
+
+6. Running instructions
+
+Add a README.md at root explaining:
+
+How to build and run the backend (cd backend && mvn spring-boot:run).
+
+How to install and run the frontend (cd frontend && npm install && npm start or ng serve).
+
+Which ports the backend and frontend use.
+
+At the end, show me:
+
+The generated folder structure.
+
+Example code for:
+
+One JPA entity + repository + controller.
+
+One Angular list component and service.
