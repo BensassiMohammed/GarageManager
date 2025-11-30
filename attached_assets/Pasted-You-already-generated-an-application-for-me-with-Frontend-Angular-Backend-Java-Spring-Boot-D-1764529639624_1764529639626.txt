@@ -1,0 +1,276 @@
+You already generated an application for me with:
+
+Frontend: Angular
+
+Backend: Java (Spring Boot)
+
+Database: SQLite
+
+Now, update this existing project (do NOT recreate it from scratch) to add a complete authentication + user management system based on a short-lived access token only.
+
+Global rules
+
+Keep all existing business features and endpoints working.
+
+Reuse the same tech stack (Angular + Spring Boot + SQLite).
+
+Write clean, well-structured, and commented code.
+
+1. Authentication – Backend (Spring Boot)
+
+Implement an authentication module using Spring Security + JWT (access token only):
+
+Login endpoint
+
+Create /api/auth/login that accepts username + password.
+
+On successful authentication:
+
+Generate a JWT access token signed with a secret key (HS256 or similar).
+
+The token must include:
+
+sub (username),
+
+user id,
+
+user roles,
+
+and an exp claim.
+
+Token lifetime: 15 minutes.
+
+Return a JSON response like:
+
+{
+  "accessToken": "<JWT>",
+  "tokenType": "Bearer",
+  "expiresInSeconds": 900
+}
+
+
+Access token only, with sliding expiration
+
+We ONLY use an access token, no refresh token.
+
+Implement a “sliding expiration” behavior:
+
+Every time a request with a valid token is received on a protected endpoint:
+
+Check how much time is left before exp.
+
+If there is less than 5 minutes left, automatically generate a new access token with a fresh 15-minute expiration.
+
+Return this new token in the response, e.g.:
+
+In a response header X-New-Access-Token, or
+
+In a JSON field newAccessToken when the response body is JSON.
+
+If the token is expired, respond with HTTP 401 Unauthorized.
+
+Security configuration
+
+Protect all existing API endpoints that should require authentication.
+
+Allow only:
+
+/api/auth/login
+
+(optionally) /api/auth/me
+
+static frontend resources
+
+Use Spring Security filters to:
+
+Extract the JWT from the Authorization: Bearer <token> header.
+
+Validate the token.
+
+Load user details and roles.
+
+Enforce role checks on backend methods, e.g. with @PreAuthorize("hasRole('ADMIN')") for admin APIs.
+
+/api/auth/me endpoint
+
+Add /api/auth/me that returns the current logged-in user info:
+
+{
+  "id": 1,
+  "username": "admin",
+  "roles": ["ADMIN"],
+  "allowedModules": ["users", "inventory", "sales", "reports"]
+}
+
+
+This endpoint is protected and uses the current access token.
+
+2. Users, Roles & Modules – Backend
+
+Extend the backend to support user management and role-based access to modules:
+
+Entities and tables
+
+Create or update entities/tables for:
+
+User (id, username, password (BCrypt), active flag, etc.)
+
+Role (e.g. ADMIN, MANAGER, STAFF)
+
+ModulePermission or similar to represent which modules (menu items) are allowed (e.g. users, inventory, sales, reports, etc.).
+
+Relationship:
+
+A User has one or more Roles.
+
+A Role is linked to one or more allowed modules.
+
+Default admin user
+
+On application startup, if no users exist:
+
+Create a default admin user:
+
+username: admin
+
+password: 123456 (store it BCrypt-hashed)
+
+role: ADMIN
+
+Set a flag like mustChangePassword = true for this default admin.
+
+User management API (admin only)
+
+Under /api/users, create endpoints (all protected and only accessible to ADMIN):
+
+GET /api/users → list users.
+
+POST /api/users → create a new user (username, password, roles, allowed modules).
+
+PUT /api/users/{id} → edit user data, roles, allowed modules, reset password.
+
+DELETE /api/users/{id} → delete user.
+
+Ensure passwords are always stored hashed (BCrypt).
+
+Validate that:
+
+Only admins can manage users.
+
+Admin can define which modules each user (or role) can access.
+
+Change password
+
+Create an endpoint for current user to change their own password:
+
+POST /api/auth/change-password
+
+Input: old password, new password.
+
+Validate old password, update new (BCrypt).
+
+If mustChangePassword was true, set it to false.
+
+Enforce that the default admin can change their initial password via this endpoint.
+
+3. Frontend – Angular Integration
+
+Integrate the authentication and user management behaviors into the existing Angular frontend:
+
+AuthService
+
+Create an AuthService that:
+
+Calls /api/auth/login with username & password.
+
+Stores the access token (for example in localStorage).
+
+Decodes the token to read its expiration time (exp) and roles.
+
+Provides helpers:
+
+isAuthenticated()
+
+getToken()
+
+getUserRoles()
+
+logout()
+
+On logout, clear the token and navigate to the login page.
+
+HTTP interceptor
+
+Add an Angular HTTP interceptor that:
+
+Automatically attaches Authorization: Bearer <token> to all API requests (when logged in).
+
+When receiving a response, check if a header X-New-Access-Token or body field newAccessToken is present:
+
+If yes, update the stored token with this new one (implement sliding expiration).
+
+If the backend returns 401 Unauthorized:
+
+Log the user out and redirect to the login page.
+
+Token validity check based on user actions
+
+The main check is done on each API call:
+
+Before calling a protected endpoint, AuthService checks if the token is expired.
+
+If it is expired, logout and redirect to login.
+
+Use Angular route guards (CanActivate) to prevent navigation to protected areas if the token is invalid or expired.
+
+Login page
+
+Add a login component:
+
+Fields: username, password.
+
+On submit, call /api/auth/login.
+
+On success:
+
+Store token.
+
+Get user info from /api/auth/me.
+
+Save roles & allowed modules.
+
+Redirect to the main home/dashboard.
+
+User Management UI (menu + pages)
+
+Add a “User Management” menu entry visible only to users with role ADMIN.
+
+Under this section, add pages to:
+
+List all users (table with username, roles, active status).
+
+Create a new user.
+
+Edit an existing user (including roles and allowed modules).
+
+Delete a user (with confirmation).
+
+Add a “Change Password” option for the currently logged-in user (admin or normal user) that uses /api/auth/change-password.
+
+Role-based menu visibility
+
+After login (or app reload), call /api/auth/me and store:
+
+roles
+
+allowedModules
+
+Use allowedModules to build the menu dynamically:
+
+If allowedModules contains "users", show the User Management menu.
+
+If it contains "inventory", show the inventory module.
+
+If it contains "sales", show the sales module, etc.
+
+Make sure the routing and UI both use this list so that a user only sees the modules they have access to.
