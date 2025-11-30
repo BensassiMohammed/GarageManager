@@ -1,3 +1,28 @@
 :host {
   display: block;
 }
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.username {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.btn-logout {
+  padding: 0.4rem 0.8rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-logout:hover {
+  background: #c0392b;
+}

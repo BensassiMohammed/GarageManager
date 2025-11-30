@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService, UserInfo } from './services/auth.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -8,22 +10,40 @@ import { CommonModule } from '@angular/common';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
-  navItems = [
-    { path: '/dashboard', label: 'Dashboard', section: 'main' },
-    { path: '/companies', label: 'Companies', section: 'customers' },
-    { path: '/clients', label: 'Clients', section: 'customers' },
-    { path: '/vehicles', label: 'Vehicles', section: 'customers' },
-    { path: '/suppliers', label: 'Suppliers', section: 'inventory' },
-    { path: '/categories', label: 'Categories', section: 'inventory' },
-    { path: '/products', label: 'Products', section: 'inventory' },
-    { path: '/services', label: 'Services', section: 'inventory' },
-    { path: '/supplier-orders', label: 'Supplier Orders', section: 'operations' },
-    { path: '/inventory', label: 'Inventory', section: 'operations' },
-    { path: '/work-orders', label: 'Work Orders', section: 'operations' },
-    { path: '/invoices', label: 'Invoices', section: 'finance' },
-    { path: '/payments', label: 'Payments', section: 'finance' },
-    { path: '/expense-categories', label: 'Expense Categories', section: 'finance' },
-    { path: '/expenses', label: 'Expenses', section: 'finance' }
-  ];
+export class App implements OnInit {
+  currentUser: UserInfo | null = null;
+  isAuthPage = false;
+
+  constructor(
+    public authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.isAuthPage = event.url === '/login' || event.url === '/change-password';
+    });
+
+    if (this.authService.isAuthenticated() && !this.currentUser) {
+      this.authService.getCurrentUser().subscribe();
+    }
+  }
+
+  hasModule(module: string): boolean {
+    return this.authService.hasModule(module);
+  }
+
+  isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
+
+  logout(): void {
+    this.authService.logout();
+  }
 }
