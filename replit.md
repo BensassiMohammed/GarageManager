@@ -152,6 +152,11 @@ Backend service layer implementing complex business logic:
 - **CustomUserDetailsService**: Load user details for Spring Security authentication
 
 ## Recent Changes
+- 2025-11-30: Fixed change-password form getting stuck with JSON parsing error
+  - Backend change-password endpoint now returns proper JSON response instead of plain text
+  - Response includes message, accessToken, and expiresInSeconds
+  - Frontend properly handles response, updates token, and redirects to dashboard
+
 - 2025-11-30: Added JWT-based authentication with role-based access control
   - Created AppUser, Role, ModulePermission entities with JPA relationships
   - Implemented JwtUtil for token generation/validation with HS384 algorithm
