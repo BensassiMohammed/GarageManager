@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
@@ -543,7 +543,7 @@ export class WorkOrderListComponent implements OnInit {
     discountPercent: 0
   };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.loadData();
@@ -553,10 +553,20 @@ export class WorkOrderListComponent implements OnInit {
     this.api.getWorkOrders().subscribe(data => {
       this.orders = data;
       this.filterOrders();
+      this.cdr.detectChanges();
     });
-    this.api.getClients().subscribe(data => this.clients = data);
-    this.api.getVehicles().subscribe(data => this.vehicles = data);
-    this.api.getCompanies().subscribe(data => this.companies = data);
+    this.api.getClients().subscribe(data => {
+      this.clients = data;
+      this.cdr.detectChanges();
+    });
+    this.api.getVehicles().subscribe(data => {
+      this.vehicles = data;
+      this.cdr.detectChanges();
+    });
+    this.api.getCompanies().subscribe(data => {
+      this.companies = data;
+      this.cdr.detectChanges();
+    });
   }
 
   openCreateModal() {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -308,7 +308,7 @@ export class DashboardComponent implements OnInit {
   unpaidInvoices: Invoice[] = [];
   lowStockProducts: Product[] = [];
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.loadDashboard();
@@ -318,6 +318,7 @@ export class DashboardComponent implements OnInit {
     this.api.getDashboardStats().subscribe({
       next: (stats) => {
         this.stats = stats;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.loadStatsManually();
@@ -325,12 +326,18 @@ export class DashboardComponent implements OnInit {
     });
 
     this.api.getOpenWorkOrders().subscribe({
-      next: (data) => this.recentWorkOrders = data.slice(0, 5),
+      next: (data) => {
+        this.recentWorkOrders = data.slice(0, 5);
+        this.cdr.detectChanges();
+      },
       error: () => this.recentWorkOrders = []
     });
 
     this.api.getUnpaidInvoices().subscribe({
-      next: (data) => this.unpaidInvoices = data.slice(0, 5),
+      next: (data) => {
+        this.unpaidInvoices = data.slice(0, 5);
+        this.cdr.detectChanges();
+      },
       error: () => this.unpaidInvoices = []
     });
 
@@ -339,6 +346,7 @@ export class DashboardComponent implements OnInit {
         this.lowStockProducts = data
           .filter(p => (p.currentStock || 0) <= (p.minStock || 0))
           .slice(0, 5);
+        this.cdr.detectChanges();
       },
       error: () => this.lowStockProducts = []
     });
@@ -363,6 +371,7 @@ export class DashboardComponent implements OnInit {
         this.stats.lowStockProducts = data.products?.filter(
           p => (p.currentStock || 0) <= (p.minStock || 0)
         ).length || 0;
+        this.cdr.detectChanges();
       },
       error: () => {}
     });

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
@@ -247,7 +247,7 @@ export class InvoiceListComponent implements OnInit {
   statusFilter = '';
   showDetails = false;
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.loadInvoices();
@@ -257,6 +257,7 @@ export class InvoiceListComponent implements OnInit {
     this.api.getInvoices().subscribe(data => {
       this.invoices = data;
       this.filterInvoices();
+      this.cdr.detectChanges();
     });
   }
 

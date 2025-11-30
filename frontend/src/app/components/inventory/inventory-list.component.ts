@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { Product, StockMovement } from '../../models/models';
@@ -91,15 +91,21 @@ export class InventoryListComponent implements OnInit {
   products: Product[] = [];
   movements: StockMovement[] = [];
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.api.getProducts().subscribe({
-      next: data => this.products = data || [],
+      next: data => {
+        this.products = data || [];
+        this.cdr.detectChanges();
+      },
       error: () => this.products = []
     });
     this.api.getStockMovements().subscribe({
-      next: data => this.movements = data || [],
+      next: data => {
+        this.movements = data || [];
+        this.cdr.detectChanges();
+      },
       error: () => this.movements = []
     });
   }

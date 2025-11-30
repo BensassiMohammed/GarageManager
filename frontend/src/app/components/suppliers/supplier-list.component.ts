@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -56,14 +56,17 @@ import { Supplier } from '../../models/models';
 export class SupplierListComponent implements OnInit {
   suppliers: Supplier[] = [];
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.load();
   }
 
   load() {
-    this.api.getSuppliers().subscribe(data => this.suppliers = data);
+    this.api.getSuppliers().subscribe(data => {
+      this.suppliers = data;
+      this.cdr.detectChanges();
+    });
   }
 
   delete(supplier: Supplier) {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -58,14 +58,17 @@ import { Vehicle } from '../../models/models';
 export class VehicleListComponent implements OnInit {
   vehicles: Vehicle[] = [];
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.load();
   }
 
   load() {
-    this.api.getVehicles().subscribe(data => this.vehicles = data);
+    this.api.getVehicles().subscribe(data => {
+      this.vehicles = data;
+      this.cdr.detectChanges();
+    });
   }
 
   delete(vehicle: Vehicle) {

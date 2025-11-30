@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
@@ -275,16 +275,25 @@ export class PaymentListComponent implements OnInit {
     notes: ''
   };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.loadData();
   }
 
   loadData() {
-    this.api.getPayments().subscribe(data => this.payments = data);
-    this.api.getClients().subscribe(data => this.clients = data);
-    this.api.getCompanies().subscribe(data => this.companies = data);
+    this.api.getPayments().subscribe(data => {
+      this.payments = data;
+      this.cdr.detectChanges();
+    });
+    this.api.getClients().subscribe(data => {
+      this.clients = data;
+      this.cdr.detectChanges();
+    });
+    this.api.getCompanies().subscribe(data => {
+      this.companies = data;
+      this.cdr.detectChanges();
+    });
   }
 
   getPayerName(payment: Payment): string {

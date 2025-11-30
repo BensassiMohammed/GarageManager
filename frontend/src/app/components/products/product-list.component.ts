@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -64,14 +64,17 @@ import { Product } from '../../models/models';
 export class ProductListComponent implements OnInit {
   products: Product[] = [];
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.load();
   }
 
   load() {
-    this.api.getProducts().subscribe(data => this.products = data);
+    this.api.getProducts().subscribe(data => {
+      this.products = data;
+      this.cdr.detectChanges();
+    });
   }
 
   delete(product: Product) {

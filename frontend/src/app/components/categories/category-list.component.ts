@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -60,14 +60,17 @@ import { Category } from '../../models/models';
 export class CategoryListComponent implements OnInit {
   categories: Category[] = [];
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.load();
   }
 
   load() {
-    this.api.getCategories().subscribe(data => this.categories = data);
+    this.api.getCategories().subscribe(data => {
+      this.categories = data;
+      this.cdr.detectChanges();
+    });
   }
 
   delete(category: Category) {

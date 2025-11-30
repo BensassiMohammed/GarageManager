@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -157,17 +157,21 @@ export class ExpenseListComponent implements OnInit {
   endDate: string = '';
   quickFilter: string = '';
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.load();
-    this.api.getExpenseCategories().subscribe(data => this.categories = data);
+    this.api.getExpenseCategories().subscribe(data => {
+      this.categories = data;
+      this.cdr.detectChanges();
+    });
   }
 
   load() {
     this.api.getExpenses().subscribe(data => {
       this.expenses = data;
       this.applyFilters();
+      this.cdr.detectChanges();
     });
   }
 

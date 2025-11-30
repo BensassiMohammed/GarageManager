@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
@@ -242,7 +242,7 @@ export class SupplierOrderListComponent implements OnInit {
     orderDate: new Date().toISOString().split('T')[0]
   };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.loadData();
@@ -252,9 +252,16 @@ export class SupplierOrderListComponent implements OnInit {
     this.api.getSupplierOrders().subscribe(data => {
       this.orders = data;
       this.filterOrders();
+      this.cdr.detectChanges();
     });
-    this.api.getSuppliers().subscribe(data => this.suppliers = data);
-    this.api.getProducts().subscribe(data => this.products = data);
+    this.api.getSuppliers().subscribe(data => {
+      this.suppliers = data;
+      this.cdr.detectChanges();
+    });
+    this.api.getProducts().subscribe(data => {
+      this.products = data;
+      this.cdr.detectChanges();
+    });
   }
 
   filterOrders() {
