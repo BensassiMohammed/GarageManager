@@ -100,11 +100,18 @@ Backend service layer implementing complex business logic:
 - **ProductPriceService**: Manage product price history with effective date tracking
 - **ServicePriceService**: Manage service price history with effective date tracking
 - **StockService**: Compute current stock from movements, identify low stock products
+- **StockMovementService**: Create and delete stock movements with atomic product stock updates
 - **WorkOrderService**: Generate invoices from completed work orders
 - **PaymentService**: Apply payments with auto-allocation to oldest unpaid invoices
 - **DashboardService**: Aggregate KPIs (open orders, outstanding balance, low stock, monthly expenses)
 
 ## Recent Changes
+- 2025-11-30: Fixed stock adjustment not updating Product.currentStock
+  - Created StockMovementService with createMovement() method that atomically updates product stock
+  - When stock adjustments are recorded, Product.currentStock is now correctly updated
+  - Delete operations properly reverse the stock delta
+  - StockMovementController now delegates to the service layer instead of direct repository calls
+
 - 2025-11-30: Added discount support to Services in Work Orders
   - Services now have Std Price, Discount %, Final Price, and Total columns (same as Products)
   - Add Service modal includes optional Discount % field
