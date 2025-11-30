@@ -145,6 +145,17 @@ public class WorkOrderController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/recalculate-all")
+    public ResponseEntity<String> recalculateAllTotals() {
+        List<WorkOrder> allOrders = workOrderRepository.findAll();
+        int count = 0;
+        for (WorkOrder order : allOrders) {
+            workOrderService.recalculateWorkOrderTotal(order.getId());
+            count++;
+        }
+        return ResponseEntity.ok("Recalculated totals for " + count + " work orders");
+    }
+
     public static class AddServiceLineRequest {
         public Long serviceId;
         public Integer quantity;
