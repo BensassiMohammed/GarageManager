@@ -102,6 +102,12 @@ Backend service layer implementing complex business logic:
 - **DashboardService**: Aggregate KPIs (open orders, outstanding balance, low stock, monthly expenses)
 
 ## Recent Changes
+- 2025-11-30: Fixed Angular 21 lazy loading change detection issue
+  - Added ChangeDetectorRef.detectChanges() to all list components after async data loads
+  - Fixed "double-click to show data" bug caused by Angular 21 lazy loading timing
+  - Added withFetch() to HttpClient configuration for better Fetch API timing
+  - Updated 15+ list components with explicit change detection after API calls
+  
 - 2025-11-30: Enhanced with complete feature set
   - Added ProductPriceHistory and ServicePriceHistory entities for price tracking
   - Implemented StockService for computing stock from movements
