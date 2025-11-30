@@ -134,6 +134,10 @@ public class AuthController {
         String newToken = jwtUtil.generateToken(user);
         httpResponse.setHeader("X-New-Access-Token", newToken);
 
-        return ResponseEntity.ok("Password changed successfully");
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("message", "Password changed successfully");
+        response.put("accessToken", newToken);
+        response.put("expiresInSeconds", jwtUtil.getExpirationSeconds());
+        return ResponseEntity.ok(response);
     }
 }

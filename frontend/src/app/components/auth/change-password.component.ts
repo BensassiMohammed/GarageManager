@@ -215,22 +215,32 @@ export class ChangePasswordComponent {
     this.success = '';
 
     this.authService.changePassword(this.passwords).subscribe({
-      next: () => {
+      next: (response: any) => {
         this.loading = false;
-        this.success = 'Password changed successfully!';
+        this.success = 'Password changed successfully! Redirecting...';
+        
+        if (response.accessToken) {
+          this.authService.setToken(response.accessToken);
+        }
         
         this.authService.getCurrentUser().subscribe({
           next: () => {
+            this.cdr.detectChanges();
             setTimeout(() => {
               this.router.navigate(['/']);
-            }, 1500);
+            }, 1000);
+          },
+          error: () => {
+            this.cdr.detectChanges();
+            setTimeout(() => {
+              this.router.navigate(['/']);
+            }, 1000);
           }
         });
-        this.cdr.detectChanges();
       },
       error: (err) => {
         this.loading = false;
-        this.error = err.error || 'Failed to change password';
+        this.error = err.error?.message || err.error || 'Failed to change password';
         this.cdr.detectChanges();
       }
     });
