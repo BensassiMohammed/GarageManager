@@ -283,15 +283,15 @@ export class ApiService {
   }
 
   getProductPriceHistory(productId: number): Observable<ProductPriceHistory[]> {
-    return this.http.get<ProductPriceHistory[]>(`${this.baseUrl}/products/${productId}/price-history`);
+    return this.http.get<ProductPriceHistory[]>(`${this.baseUrl}/products/${productId}/prices`);
   }
 
   addProductPrice(productId: number, price: number, startDate?: string): Observable<ProductPriceHistory> {
-    let params = new HttpParams().set('price', price.toString());
+    const body: any = { price };
     if (startDate) {
-      params = params.set('startDate', startDate);
+      body.startDate = startDate;
     }
-    return this.http.post<ProductPriceHistory>(`${this.baseUrl}/products/${productId}/price-history`, null, { params });
+    return this.http.post<ProductPriceHistory>(`${this.baseUrl}/products/${productId}/prices`, body);
   }
 
   getProductCurrentPrice(productId: number): Observable<number> {
@@ -303,15 +303,15 @@ export class ApiService {
   }
 
   getServicePriceHistory(serviceId: number): Observable<ServicePriceHistory[]> {
-    return this.http.get<ServicePriceHistory[]>(`${this.baseUrl}/services/${serviceId}/price-history`);
+    return this.http.get<ServicePriceHistory[]>(`${this.baseUrl}/services/${serviceId}/prices`);
   }
 
   addServicePrice(serviceId: number, price: number, startDate?: string): Observable<ServicePriceHistory> {
-    let params = new HttpParams().set('price', price.toString());
+    const body: any = { price };
     if (startDate) {
-      params = params.set('startDate', startDate);
+      body.startDate = startDate;
     }
-    return this.http.post<ServicePriceHistory>(`${this.baseUrl}/services/${serviceId}/price-history`, null, { params });
+    return this.http.post<ServicePriceHistory>(`${this.baseUrl}/services/${serviceId}/prices`, body);
   }
 
   getServiceCurrentPrice(serviceId: number): Observable<number> {

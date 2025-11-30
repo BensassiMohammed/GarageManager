@@ -4,6 +4,7 @@ import com.garage.management.entity.Product;
 import com.garage.management.entity.ProductPriceHistory;
 import com.garage.management.repository.ProductRepository;
 import com.garage.management.service.ProductPriceService;
+import com.garage.management.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,9 @@ public class ProductController {
 
     @Autowired
     private ProductPriceService productPriceService;
+
+    @Autowired
+    private StockService stockService;
 
     @GetMapping
     public List<Product> getAll() {
@@ -50,6 +54,12 @@ public class ProductController {
         return productPriceService.getCurrentPrice(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/computed-stock")
+    public ResponseEntity<Integer> getComputedStock(@PathVariable Long id) {
+        Integer stock = stockService.computeCurrentStock(id);
+        return ResponseEntity.ok(stock);
     }
 
     @PostMapping("/{id}/prices")
