@@ -691,21 +691,18 @@ export class WorkOrderFormComponent implements OnInit {
     });
   }
 
-  addLinesToWorkOrder(workOrderId: number) {
-    const servicePromises = this.draftServiceLines.map(line =>
-      this.api.addWorkOrderServiceLine(workOrderId, line.serviceId!, line.quantity, line.discountPercent).toPromise()
-    );
-    const productPromises = this.draftProductLines.map(line =>
-      this.api.addWorkOrderProductLine(workOrderId, line.productId!, line.quantity, line.discountPercent).toPromise()
-    );
-
-    Promise.all([...servicePromises, ...productPromises])
-      .then(() => {
-        this.router.navigate(['/work-orders']);
-      })
-      .catch(err => {
-        alert('Work order saved but some lines failed: ' + (err.message || err));
-        this.router.navigate(['/work-orders']);
-      });
+  async addLinesToWorkOrder(workOrderId: number) {
+    try {
+      for (const line of this.draftServiceLines) {
+        await this.api.addWorkOrderServiceLine(workOrderId, line.serviceId!, line.quantity, line.discountPercent).toPromise();
+      }
+      for (const line of this.draftProductLines) {
+        await this.api.addWorkOrderProductLine(workOrderId, line.productId!, line.quantity, line.discountPercent).toPromise();
+      }
+      this.router.navigate(['/work-orders']);
+    } catch (err: any) {
+      alert('Work order saved but some lines failed: ' + (err.message || err));
+      this.router.navigate(['/work-orders']);
+    }
   }
 }
