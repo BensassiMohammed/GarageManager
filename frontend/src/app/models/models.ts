@@ -1,6 +1,8 @@
 export interface Company {
   id?: number;
   name: string;
+  ice?: string;
+  city?: string;
   address?: string;
   phone?: string;
   email?: string;
@@ -16,6 +18,8 @@ export interface Client {
   lastName: string;
   phone?: string;
   email?: string;
+  city?: string;
+  address?: string;
   company?: Company;
   notes?: string;
   active?: boolean;
@@ -30,6 +34,8 @@ export interface Vehicle {
   model?: string;
   type?: string;
   year?: number;
+  mileage?: number;
+  color?: string;
   currentOwner?: Client;
   status?: string;
   createdAt?: string;
@@ -39,9 +45,12 @@ export interface Vehicle {
 export interface Supplier {
   id?: number;
   name: string;
+  city?: string;
   address?: string;
   phone?: string;
   email?: string;
+  estimatedDeliveryDays?: number;
+  workingDays?: string;
   notes?: string;
   active?: boolean;
   createdAt?: string;
@@ -60,10 +69,16 @@ export interface Category {
 
 export interface Product {
   id?: number;
-  code: string;
   name: string;
+  barcode?: string;
+  brand?: string;
   category?: Category;
+  buyingPrice?: number;
   sellingPrice?: number;
+  vehiclesCompatibility?: string;
+  expirationDate?: string;
+  volume?: number;
+  volumeUnit?: string;
   minStock?: number;
   currentStock?: number;
   active?: boolean;
@@ -73,7 +88,6 @@ export interface Product {
 
 export interface ServiceItem {
   id?: number;
-  code: string;
   name: string;
   category?: Category;
   sellingPrice?: number;
@@ -166,6 +180,7 @@ export interface StockMovement {
 export interface ProductPriceHistory {
   id?: number;
   product?: Product;
+  priceType?: 'SELLING' | 'BUYING';
   startDate: string;
   endDate?: string;
   price: number;

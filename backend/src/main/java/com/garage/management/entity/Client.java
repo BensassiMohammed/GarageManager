@@ -18,6 +18,8 @@ public class Client {
 
     private String phone;
     private String email;
+    private String city;
+    private String address;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id")
@@ -52,6 +54,10 @@ public class Client {
     public void setPhone(String phone) { this.phone = phone; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
     public Company getCompany() { return company; }
     public void setCompany(Company company) { this.company = company; }
     public String getNotes() { return notes; }

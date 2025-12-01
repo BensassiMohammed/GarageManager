@@ -20,10 +20,11 @@ import { Product } from '../../models/models';
         <table>
           <thead>
             <tr>
-              <th>{{ 'products.sku' | translate }}</th>
               <th>{{ 'common.name' | translate }}</th>
+              <th>{{ 'products.barcode' | translate }}</th>
+              <th>{{ 'products.brand' | translate }}</th>
               <th>{{ 'common.category' | translate }}</th>
-              <th>{{ 'common.price' | translate }}</th>
+              <th>{{ 'products.sellingPrice' | translate }}</th>
               <th>{{ 'products.currentStock' | translate }}</th>
               <th>{{ 'common.status' | translate }}</th>
               <th>{{ 'common.actions' | translate }}</th>
@@ -32,8 +33,9 @@ import { Product } from '../../models/models';
           <tbody>
             @for (product of products; track product.id) {
               <tr>
-                <td>{{ product.code }}</td>
                 <td>{{ product.name }}</td>
+                <td>{{ product.barcode || '-' }}</td>
+                <td>{{ product.brand || '-' }}</td>
                 <td>{{ product.category?.name || '-' }}</td>
                 <td>{{ product.sellingPrice | currency }}</td>
                 <td>
@@ -53,7 +55,7 @@ import { Product } from '../../models/models';
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="empty-state">{{ 'products.noProducts' | translate }}</td>
+                <td colspan="8" class="empty-state">{{ 'products.noProducts' | translate }}</td>
               </tr>
             }
           </tbody>

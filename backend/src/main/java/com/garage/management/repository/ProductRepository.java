@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByActiveTrue();
     Long countByActiveTrue();
-    Optional<Product> findByCode(String code);
     List<Product> findByCategoryId(Long categoryId);
+    List<Product> findByCategoryIdAndActiveTrue(Long categoryId);
     
     @Query("SELECT p FROM Product p WHERE p.currentStock <= p.minStock AND p.active = true")
     List<Product> findLowStockProducts();

@@ -39,6 +39,17 @@ import { Company } from '../../models/models';
           </div>
         </div>
 
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'common.city' | translate }}</label>
+            <input type="text" formControlName="city" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>{{ 'common.address' | translate }}</label>
+            <input type="text" formControlName="address" class="form-control">
+          </div>
+        </div>
+
         <div class="form-group">
           <label>{{ 'clients.company' | translate }}</label>
           <select formControlName="companyId" class="form-control">
@@ -85,6 +96,8 @@ export class ClientFormComponent implements OnInit {
       lastName: ['', Validators.required],
       email: [''],
       phone: [''],
+      city: [''],
+      address: [''],
       companyId: [null],
       notes: [''],
       active: [true]
@@ -115,6 +128,8 @@ export class ClientFormComponent implements OnInit {
         lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
+        city: formData.city,
+        address: formData.address,
         notes: formData.notes,
         active: formData.active
       };

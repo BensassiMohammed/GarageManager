@@ -16,6 +16,8 @@ public class ProductPriceHistory {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    private String priceType = "SELLING";
+
     @Column(nullable = false)
     private LocalDate startDate;
 
@@ -38,6 +40,8 @@ public class ProductPriceHistory {
     public void setId(Long id) { this.id = id; }
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }
+    public String getPriceType() { return priceType; }
+    public void setPriceType(String priceType) { this.priceType = priceType; }
     public LocalDate getStartDate() { return startDate; }
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
     public LocalDate getEndDate() { return endDate; }

@@ -44,14 +44,24 @@ public class ProductController {
         return productRepository.findLowStockProducts();
     }
 
+    @GetMapping("/by-category/{categoryId}")
+    public List<Product> getByCategory(@PathVariable Long categoryId) {
+        return productRepository.findByCategoryIdAndActiveTrue(categoryId);
+    }
+
     @GetMapping("/{id}/prices")
-    public List<ProductPriceHistory> getPriceHistory(@PathVariable Long id) {
+    public List<ProductPriceHistory> getPriceHistory(@PathVariable Long id, 
+            @RequestParam(required = false) String priceType) {
+        if (priceType != null) {
+            return productPriceService.getPriceHistoryByType(id, priceType);
+        }
         return productPriceService.getPriceHistory(id);
     }
 
     @GetMapping("/{id}/current-price")
-    public ResponseEntity<BigDecimal> getCurrentPrice(@PathVariable Long id) {
-        return productPriceService.getCurrentPrice(id)
+    public ResponseEntity<BigDecimal> getCurrentPrice(@PathVariable Long id,
+            @RequestParam(defaultValue = "SELLING") String priceType) {
+        return productPriceService.getCurrentPrice(id, priceType)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -64,7 +74,8 @@ public class ProductController {
 
     @PostMapping("/{id}/prices")
     public ResponseEntity<ProductPriceHistory> addPrice(@PathVariable Long id, @RequestBody PriceRequest request) {
-        ProductPriceHistory history = productPriceService.addNewPrice(id, request.price, request.startDate);
+        String priceType = request.priceType != null ? request.priceType : "SELLING";
+        ProductPriceHistory history = productPriceService.addNewPrice(id, request.price, request.startDate, priceType);
         return ResponseEntity.ok(history);
     }
 
@@ -77,9 +88,15 @@ public class ProductController {
     public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
         return productRepository.findById(id)
                 .map(existing -> {
-                    existing.setCode(product.getCode());
                     existing.setName(product.getName());
+                    existing.setBarcode(product.getBarcode());
+                    existing.setBrand(product.getBrand());
                     existing.setCategory(product.getCategory());
+                    existing.setBuyingPrice(product.getBuyingPrice());
+                    existing.setVehiclesCompatibility(product.getVehiclesCompatibility());
+                    existing.setExpirationDate(product.getExpirationDate());
+                    existing.setVolume(product.getVolume());
+                    existing.setVolumeUnit(product.getVolumeUnit());
                     existing.setMinStock(product.getMinStock());
                     existing.setActive(product.getActive());
                     return ResponseEntity.ok(productRepository.save(existing));
@@ -101,5 +118,6 @@ public class ProductController {
     public static class PriceRequest {
         public BigDecimal price;
         public LocalDate startDate;
+        public String priceType;
     }
 }

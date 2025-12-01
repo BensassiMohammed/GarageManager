@@ -28,16 +28,9 @@ import { forkJoin } from 'rxjs';
         <form [formGroup]="form" (ngSubmit)="save()">
           <div class="form-row">
             <div class="form-group">
-              <label class="required">{{ 'products.sku' | translate }}</label>
-              <input type="text" formControlName="code" class="form-control">
-            </div>
-            <div class="form-group">
               <label class="required">{{ 'common.name' | translate }}</label>
               <input type="text" formControlName="name" class="form-control">
             </div>
-          </div>
-          
-          <div class="form-row">
             <div class="form-group">
               <label>{{ 'common.category' | translate }}</label>
               <select formControlName="categoryId" class="form-control">
@@ -47,13 +40,17 @@ import { forkJoin } from 'rxjs';
                 }
               </select>
             </div>
-            @if (!isEdit) {
+          </div>
+          
+          @if (!isEdit) {
+            <div class="form-row">
               <div class="form-group">
                 <label class="required">{{ 'common.price' | translate }}</label>
                 <input type="number" step="0.01" formControlName="sellingPrice" class="form-control" placeholder="0.00">
               </div>
-            }
-          </div>
+              <div class="form-group"></div>
+            </div>
+          }
 
           <div class="form-group">
             <label>
@@ -191,7 +188,6 @@ export class ServiceFormComponent implements OnInit {
     private router: Router
   ) {
     this.form = this.fb.group({
-      code: ['', Validators.required],
       name: ['', Validators.required],
       categoryId: [null],
       sellingPrice: [0, [Validators.required, Validators.min(0)]],
@@ -225,7 +221,6 @@ export class ServiceFormComponent implements OnInit {
       priceHistory: this.api.getServicePriceHistory(this.id)
     }).subscribe(({ service, priceHistory }) => {
       this.form.patchValue({
-        code: service.code,
         name: service.name,
         categoryId: service.category?.id || null,
         active: service.active
@@ -239,7 +234,6 @@ export class ServiceFormComponent implements OnInit {
     if (this.form.valid) {
       const formData = this.form.value;
       const data: any = {
-        code: formData.code,
         name: formData.name,
         active: formData.active
       };

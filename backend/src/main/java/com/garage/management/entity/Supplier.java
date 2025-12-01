@@ -13,9 +13,12 @@ public class Supplier {
     @Column(nullable = false)
     private String name;
 
+    private String city;
     private String address;
     private String phone;
     private String email;
+    private Integer estimatedDeliveryDays;
+    private String workingDays;
 
     @Column(columnDefinition = "TEXT")
     private String notes;
@@ -46,6 +49,12 @@ public class Supplier {
     public void setPhone(String phone) { this.phone = phone; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+    public Integer getEstimatedDeliveryDays() { return estimatedDeliveryDays; }
+    public void setEstimatedDeliveryDays(Integer estimatedDeliveryDays) { this.estimatedDeliveryDays = estimatedDeliveryDays; }
+    public String getWorkingDays() { return workingDays; }
+    public void setWorkingDays(String workingDays) { this.workingDays = workingDays; }
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
     public Boolean getActive() { return active; }

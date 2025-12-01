@@ -45,6 +45,17 @@ import { Client } from '../../models/models';
             <input type="number" formControlName="year" class="form-control">
           </div>
           <div class="form-group">
+            <label>{{ 'vehicles.mileage' | translate }}</label>
+            <input type="number" formControlName="mileage" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'vehicles.color' | translate }}</label>
+            <input type="text" formControlName="color" class="form-control">
+          </div>
+          <div class="form-group">
             <label>{{ 'common.status' | translate }}</label>
             <select formControlName="status" class="form-control">
               <option value="ACTIVE">{{ 'common.active' | translate }}</option>
@@ -91,6 +102,8 @@ export class VehicleFormComponent implements OnInit {
       model: [''],
       type: [''],
       year: [null],
+      mileage: [null],
+      color: [''],
       status: ['ACTIVE'],
       ownerId: [null]
     });
@@ -121,6 +134,8 @@ export class VehicleFormComponent implements OnInit {
         model: formData.model,
         type: formData.type,
         year: formData.year,
+        mileage: formData.mileage,
+        color: formData.color,
         status: formData.status
       };
       

@@ -62,7 +62,6 @@ public class ServiceController {
     public ResponseEntity<ServiceEntity> update(@PathVariable Long id, @RequestBody ServiceEntity service) {
         return serviceRepository.findById(id)
                 .map(existing -> {
-                    existing.setCode(service.getCode());
                     existing.setName(service.getName());
                     existing.setCategory(service.getCategory());
                     existing.setSellingPrice(service.getSellingPrice());

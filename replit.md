@@ -170,6 +170,18 @@ The application supports multi-language interfaces with the following languages:
 3. For RTL components, use `[dir="rtl"]` CSS selectors for layout adjustments
 
 ## Recent Changes
+- 2025-12-01: Major entity enhancements across all modules
+  - **Company**: Added ICE (Identifiant Commun de l'Entreprise) and City fields
+  - **Client**: Added City and Address fields
+  - **Vehicle**: Added Mileage and Color fields
+  - **Supplier**: Added City, Estimated Delivery Days, and Working Days fields
+  - **Product**: Removed SKU/code field; Added Barcode, Brand, Buying Price, Vehicles Compatibility, Expiration Date, Volume, Volume Unit fields
+  - **Service**: Removed SKU/code field
+  - **ProductPriceHistory**: Split into separate BUYING and SELLING price types
+  - Updated all Angular components (forms, tables) to display/edit new fields
+  - Added comprehensive translations for all new fields in English, French, and Arabic
+  - Database schema regenerated to support new fields
+
 - 2025-11-30: Added complete multi-language support (i18n) with English, French, and Arabic
   - Installed ngx-translate v17 with provideTranslateService API
   - Created comprehensive translation files covering all UI text

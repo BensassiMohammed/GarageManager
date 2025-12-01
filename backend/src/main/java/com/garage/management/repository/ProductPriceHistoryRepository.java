@@ -14,12 +14,24 @@ import java.util.Optional;
 public interface ProductPriceHistoryRepository extends JpaRepository<ProductPriceHistory, Long> {
     List<ProductPriceHistory> findByProductIdOrderByStartDateDesc(Long productId);
     
+    List<ProductPriceHistory> findByProductIdAndPriceTypeOrderByStartDateDesc(Long productId, String priceType);
+    
     @Query("SELECT pph FROM ProductPriceHistory pph WHERE pph.product.id = :productId " +
            "AND pph.startDate <= :date AND (pph.endDate IS NULL OR pph.endDate >= :date) " +
            "ORDER BY pph.startDate DESC")
     Optional<ProductPriceHistory> findCurrentPriceForProduct(@Param("productId") Long productId, @Param("date") LocalDate date);
     
     @Query("SELECT pph FROM ProductPriceHistory pph WHERE pph.product.id = :productId " +
+           "AND pph.priceType = :priceType " +
+           "AND pph.startDate <= :date AND (pph.endDate IS NULL OR pph.endDate >= :date) " +
+           "ORDER BY pph.startDate DESC")
+    Optional<ProductPriceHistory> findCurrentPriceForProductByType(@Param("productId") Long productId, @Param("date") LocalDate date, @Param("priceType") String priceType);
+    
+    @Query("SELECT pph FROM ProductPriceHistory pph WHERE pph.product.id = :productId " +
            "AND pph.endDate IS NULL ORDER BY pph.startDate DESC")
     Optional<ProductPriceHistory> findActiveForProduct(@Param("productId") Long productId);
+    
+    @Query("SELECT pph FROM ProductPriceHistory pph WHERE pph.product.id = :productId " +
+           "AND pph.priceType = :priceType AND pph.endDate IS NULL ORDER BY pph.startDate DESC")
+    Optional<ProductPriceHistory> findActiveForProductByType(@Param("productId") Long productId, @Param("priceType") String priceType);
 }
