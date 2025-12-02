@@ -1,253 +1,43 @@
 # Garage Management System
 
 ## Overview
-A complete full-stack web application for managing a small garage business. The application handles clients, vehicles, inventory (products and services) with price history, work orders with product discounts, invoicing with payment allocation, and expenses. Now includes JWT-based authentication with role-based access control.
+A full-stack web application designed to manage small garage businesses. It encompasses client and vehicle management, inventory (products and services with price history), work orders with discounting, invoicing with payment allocation, and expense tracking. The system includes JWT-based authentication with role-based access control.
 
-## Tech Stack
-- **Backend**: Spring Boot 3.2 with Java 17, Maven, SQLite database, Spring Security + JWT
-- **Frontend**: Angular 21 with TypeScript
-- **Database**: SQLite (stored in `backend/garage.db`)
-- **Authentication**: JWT tokens with 15-minute expiration, sliding renewal
+## User Preferences
+I prefer iterative development with clear, concise explanations for each step. Please ask for my approval before making any major architectural changes or implementing complex features. I value well-structured and readable code. I want to be informed about the implications of any changes made, especially concerning data models or API contracts.
 
-## Project Structure
-```
-workspace/
-├── backend/                    # Spring Boot backend application
-│   ├── src/main/java/com/garage/management/
-│   │   ├── GarageManagementApplication.java
-│   │   ├── config/             # CORS, Security, DataInitializer
-│   │   ├── entity/             # JPA entities (25+ entities incl. auth)
-│   │   ├── repository/         # Spring Data JPA repositories
-│   │   ├── service/            # Business logic services
-│   │   ├── security/           # JWT utilities, filters, user details
-│   │   ├── dto/                # Data transfer objects
-│   │   └── controller/         # REST controllers
-│   ├── src/main/resources/
-│   │   └── application.properties
-│   └── pom.xml
-├── frontend/                   # Angular frontend application
-│   ├── src/app/
-│   │   ├── components/         # Angular components (with tabs and modals)
-│   │   │   ├── auth/           # Login, change-password components
-│   │   │   └── users/          # User management (admin-only)
-│   │   ├── services/           # API and Auth services
-│   │   ├── guards/             # Route guards (auth, admin, module)
-│   │   ├── interceptors/       # HTTP interceptor for JWT
-│   │   └── models/             # TypeScript interfaces
-│   ├── angular.json
-│   └── package.json
-└── replit.md                   # This file
-```
+## System Architecture
 
-## Running the Application
-- **Backend**: Runs on port 8080 (`./mvnw spring-boot:run`)
-- **Frontend**: Runs on port 5000 (`npm start`) with proxy to backend
+### UI/UX Decisions
+The frontend is built with Angular 21 and TypeScript, featuring a tabbed interface and modals for enhanced user interaction. It supports multi-language interfaces (English, French, Arabic) with full RTL (right-to-left) layout support for Arabic, implemented using ngx-translate.
 
-## Authentication System
+### Technical Implementations
+- **Backend**: Spring Boot 3.2, Java 17, Maven. Uses SQLite as the database and Spring Security with JWT for authentication.
+- **Frontend**: Angular 21, TypeScript. Includes services for API interaction, authentication guards, and HTTP interceptors for JWT handling.
+- **Authentication**: JWT tokens with a 15-minute expiration and sliding renewal. Supports role-based access control (ADMIN, MANAGER, STAFF) with default admin credentials (`admin`/`123456`) requiring a password change on first login.
+- **Module Permissions**: Granular permissions for `dashboard`, `customers`, `inventory`, `operations`, `finance`, and `users`.
+- **Internationalization**: Implemented using ngx-translate v17. Translation files (`en.json`, `fr.json`, `ar.json`) are located in `frontend/src/assets/i18n/`. A `LanguageService` manages language selection, persistence, and RTL handling.
 
-### Default Credentials
-- **Username**: admin
-- **Password**: 123456
-- **Note**: Must change password on first login
+### Feature Specifications
+- **Customers**: Manage companies (with ICE, city, address), clients (individual, linked to companies, with city and address), and vehicles (with owner, status, mileage, and color).
+- **Inventory**: Manage categories (hierarchical), products (stock tracking, pricing, price history, barcode, brand, buying price, vehicle compatibility, expiration date, volume), services (pricing, price history), and suppliers (with city, address, estimated delivery time, working days).
+- **Operations**: Comprehensive work order management (service/product lines, discounts, invoice generation), supplier orders (with stock update on receipt), and stock management (overview, movement history, adjustments).
+- **Finance**: Invoicing (generated from work orders, tracking balance, various statuses), payment recording (manual or auto-allocation), expense categories, and expense tracking.
+- **Dashboard**: Displays key performance indicators (KPIs) like open work orders, outstanding balance, low stock products, monthly expenses, quick stats, and recent activity.
 
-### Roles
-- **ADMIN**: Full access to all modules including user management
-- **MANAGER**: Access to dashboard, customers, inventory, operations, finance
-- **STAFF**: Access to dashboard, customers, operations
+### System Design Choices
+- **Layered Architecture**: Clear separation between controllers, services, repositories, and entities in the backend.
+- **Data Transfer Objects (DTOs)**: Used for efficient data exchange between frontend and backend.
+- **Price History**: Separate entities (`ProductPriceHistory`, `ServicePriceHistory`) to track historical pricing.
+- **Stock Management**: `StockMovementService` ensures atomic updates to product stock.
+- **Payment Allocation**: `PaymentService` includes logic for auto-allocating payments to outstanding invoices.
 
-### Module Permissions
-- **dashboard**: Main dashboard with KPIs
-- **customers**: Companies, clients, vehicles
-- **inventory**: Products, services, categories, suppliers
-- **operations**: Work orders, supplier orders, stock management
-- **finance**: Invoices, payments, expenses
-- **users**: User administration (admin-only)
-
-### Authentication Flow
-1. User logs in at `/login` with username/password
-2. Backend validates credentials and returns JWT token
-3. Frontend stores token and attaches it to all API requests
-4. If `mustChangePassword=true`, user is redirected to `/change-password`
-5. Token auto-renews when less than 5 minutes remaining
-
-## Features
-
-### Customers
-- **Companies**: Manage company accounts with contact details, ICE (Identifiant Commun de l'Entreprise), city, and address
-- **Clients**: Manage individual clients, optionally linked to companies
-- **Vehicles**: Track vehicles with owner associations and status
-
-### Inventory
-- **Categories**: Product and service categories with hierarchy support
-- **Products**: Inventory items with stock tracking, pricing, and price history
-- **Services**: Service items with pricing and price history
-- **Suppliers**: Manage supplier contacts
-
-### Operations
-- **Work Orders**: Full work order management with service/product lines, discounts, and invoice generation
-- **Supplier Orders**: Purchase orders from suppliers with RECEIVED status to update stock
-- **Stock Management**: Tabbed interface with Stock Overview, Movements History, and New Adjustment tabs
-  - Stock Overview: View all products with current stock, min stock, and low stock warnings
-  - Movements History: View all stock movements sorted by date with type badges
-  - New Adjustment: Record stock adjustments with product, movement type, quantity change, reason, and notes
-
-### Finance
-- **Invoices**: Generated from work orders with remaining balance tracking and status management (DRAFT, ISSUED, PAID, PARTIALLY_PAID, CANCELLED)
-- **Payments**: Payment recording with manual or auto-allocation to oldest unpaid invoices
-- **Expense Categories**: Categorize business expenses
-- **Expenses**: Track business expenses with date and category filtering
-
-### Dashboard
-- **KPIs**: Open Work Orders count, Outstanding Balance total, Low Stock Products count, Monthly Expenses total
-- **Quick Stats**: Companies, Clients, Vehicles, Products, Services, Suppliers counts
-- **Recent Activity**: Recent Open Work Orders and Unpaid Invoices with quick navigation
-
-## API Endpoints
-
-### Authentication Endpoints (Public)
-- `POST /api/auth/login` - Authenticate and get JWT token
-- `GET /api/auth/me` - Get current user info (requires auth)
-- `POST /api/auth/change-password` - Change password (requires auth)
-
-### Admin-Only Endpoints
-- `/api/users` - User CRUD operations
-- `/api/roles` - List available roles
-
-### Protected Endpoints (require authentication)
-- `/api/companies` - Company management
-- `/api/clients` - Client management
-- `/api/vehicles` - Vehicle management
-- `/api/suppliers` - Supplier management
-- `/api/categories` - Category management
-- `/api/products` - Product management with price history (`/api/products/{id}/prices`) and computed stock (`/api/products/{id}/computed-stock`)
-- `/api/services` - Service management with price history (`/api/services/{id}/prices`)
-- `/api/expense-categories` - Expense category management
-- `/api/expenses` - Expense management with filtering
-- `/api/work-orders` - Work order management with invoice generation (`POST /{id}/generate-invoice`)
-- `/api/invoices` - Invoice management with status updates
-- `/api/payments` - Payment management with auto-allocation (`POST /apply`)
-- `/api/supplier-orders` - Supplier order management with receive functionality (`POST /{id}/receive`)
-- `/api/stock-movements` - Stock movement tracking
-- `/api/dashboard/stats` - Dashboard KPI statistics
-
-## Database Schema
-The SQLite database contains the following main entities:
-- AppUser, Role, ModulePermission (authentication)
-- Company, Client, Vehicle (customer domain)
-- Supplier, Category, Product, ServiceEntity, ProductPriceHistory, ServicePriceHistory (inventory domain)
-- WorkOrder, WorkOrderServiceLine, WorkOrderProductLine (operations)
-- Invoice, InvoiceLine, Payment, PaymentAllocation (finance)
-- SupplierOrder, SupplierOrderLine, StockMovement (purchasing)
-- ExpenseCategory, Expense (expense tracking)
-
-## Services
-Backend service layer implementing complex business logic:
-- **ProductPriceService**: Manage product price history with effective date tracking
-- **ServicePriceService**: Manage service price history with effective date tracking
-- **StockService**: Compute current stock from movements, identify low stock products
-- **StockMovementService**: Create and delete stock movements with atomic product stock updates
-- **WorkOrderService**: Generate invoices from completed work orders
-- **PaymentService**: Apply payments with auto-allocation to oldest unpaid invoices
-- **DashboardService**: Aggregate KPIs (open orders, outstanding balance, low stock, monthly expenses)
-- **CustomUserDetailsService**: Load user details for Spring Security authentication
-
-## Internationalization (i18n)
-The application supports multi-language interfaces with the following languages:
-- **English (en)**: Default language, LTR layout
-- **French (fr)**: Full translation, LTR layout
-- **Arabic (ar)**: Full translation with RTL (right-to-left) layout support
-
-### i18n Implementation
-- **Library**: ngx-translate v17 with standalone Angular configuration
-- **Translation Files**: Located in `frontend/src/assets/i18n/` (en.json, fr.json, ar.json)
-- **LanguageService**: Manages language selection, localStorage persistence, and RTL handling
-- **Language Switcher**: Dropdown in the header for switching languages on the fly
-- **RTL Support**: Arabic language triggers RTL layout via document dir attribute and CSS overrides
-
-### Adding New Translations
-1. Add new keys to all three translation files (en.json, fr.json, ar.json)
-2. Use the translate pipe in templates: `{{ 'KEY.PATH' | translate }}`
-3. For RTL components, use `[dir="rtl"]` CSS selectors for layout adjustments
-
-## Recent Changes
-- 2025-12-02: Enhanced Supplier module with new fields
-  - City (Ville/المدينة) - Supplier location city
-  - Address (Adresse/العنوان) - Full supplier address (existing field)
-  - Estimated Delivery Time (Délai de livraison/وقت التسليم) - Days for delivery
-  - Working Days (Jours ouvrables/أيام العمل) - Supplier working days
-  - Backend Supplier entity and SupplierController updated
-  - Frontend form and table updated with new input fields and columns
-  - Translations added for English, French, and Arabic
-
-- 2025-12-02: Added Mileage and Color fields to Vehicle module
-  - Mileage (Kilométrage/الكيلومترات) - Vehicle mileage in KM
-  - Color (Couleur/اللون) - Vehicle color
-  - Backend Vehicle entity and VehicleController updated
-  - Frontend form and table updated to display and edit new fields
-  - Mileage displays with KM suffix in vehicle list
-  - Translations added for English, French, and Arabic
-
-- 2025-12-02: Added City and Address fields to Client module
-  - City (Ville/المدينة) - Client location city
-  - Address (Adresse/العنوان) - Client full address
-  - Backend Client entity and ClientController updated
-  - Frontend form and table updated to display and edit new fields
-  - Translations added for English, French, and Arabic
-
-- 2025-12-02: Added new fields to Company module
-  - ICE (Identifiant Commun de l'Entreprise) - Moroccan business identifier
-  - City (Ville) - Company location city
-  - Address (Adresse) - Full company address
-  - Backend entity updated with new fields and getters/setters
-  - Frontend form and table updated to display and edit new fields
-  - Translations added for English, French, and Arabic
-
-- 2025-11-30: Added complete multi-language support (i18n) with English, French, and Arabic
-  - Installed ngx-translate v17 with provideTranslateService API
-  - Created comprehensive translation files covering all UI text
-  - Built LanguageService for language switching and localStorage persistence
-  - Added language switcher dropdown in header
-  - Implemented RTL support for Arabic with CSS overrides
-  - Converted all 24+ components to use translate pipe
-
-- 2025-11-30: Fixed change-password form getting stuck with JSON parsing error
-  - Backend change-password endpoint now returns proper JSON response instead of plain text
-  - Response includes message, accessToken, and expiresInSeconds
-  - Frontend properly handles response, updates token, and redirects to dashboard
-
-- 2025-11-30: Added JWT-based authentication with role-based access control
-  - Created AppUser, Role, ModulePermission entities with JPA relationships
-  - Implemented JwtUtil for token generation/validation with HS384 algorithm
-  - Added SecurityConfig with protected/public endpoints
-  - Created auth endpoints: login, me, change-password
-  - Added user management (CRUD) for admins
-  - Frontend auth service with token storage, interceptor, guards
-  - Login page with must-change-password flow
-  - Role-based menu visibility using allowedModules
-  - Default admin user created on first startup (admin/123456)
-
-- 2025-11-30: Fixed product price not persisting after edit
-  - Removed sellingPrice from ProductController.update() so it can only be modified through price history
-  - Product price set via Price History now persists correctly after product edits
-
-- 2025-11-30: Fixed product edit resetting currentStock to 0
-  - Removed currentStock from ProductController.update() so it can only be modified through stock movements
-  - Product view and Inventory view now show consistent stock values
-
-- 2025-11-30: Fixed stock adjustment not updating Product.currentStock
-  - Created StockMovementService with createMovement() method that atomically updates product stock
-  - When stock adjustments are recorded, Product.currentStock is now correctly updated
-  - Delete operations properly reverse the stock delta
-  - StockMovementController now delegates to the service layer instead of direct repository calls
-
-- 2025-11-30: Added discount support to Services in Work Orders
-  - Services now have Std Price, Discount %, Final Price, and Total columns (same as Products)
-  - Add Service modal includes optional Discount % field
-  - Backend WorkOrderServiceLine entity extended with discountPercent and finalUnitPrice fields
-  - Totals section shows Services Subtotal, Services Discount Total, Parts Subtotal, Parts Discount Total, and Grand Total
-
-## Recommended Next Steps
-1. Add unit/integration tests for authentication flows
-2. Implement password reset via email
-3. Add audit logging for sensitive operations
-4. Add reports and analytics features
+## External Dependencies
+- **Spring Boot**: For building the backend API.
+- **Spring Security**: For authentication and authorization.
+- **JSON Web Tokens (JWT)**: For secure API authentication.
+- **Maven**: Project build automation tool for Java.
+- **SQLite**: Embedded database for data persistence (`backend/garage.db`).
+- **Angular**: Frontend framework.
+- **TypeScript**: Superset of JavaScript for frontend development.
+- **ngx-translate v17**: Angular library for internationalization.

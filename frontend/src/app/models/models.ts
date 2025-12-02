@@ -71,8 +71,14 @@ export interface Product {
   id?: number;
   code: string;
   name: string;
+  barcode?: string;
+  brand?: string;
   category?: Category;
+  buyingPrice?: number;
   sellingPrice?: number;
+  vehicleCompatibility?: string;
+  expirationDate?: string;
+  volume?: string;
   minStock?: number;
   currentStock?: number;
   active?: boolean;

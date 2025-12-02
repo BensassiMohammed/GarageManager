@@ -29,7 +29,7 @@ import { forkJoin } from 'rxjs';
         <form [formGroup]="form" (ngSubmit)="save()">
           <div class="form-row">
             <div class="form-group">
-              <label class="required">{{ 'products.sku' | translate }}</label>
+              <label class="required">{{ 'products.code' | translate }}</label>
               <input type="text" formControlName="code" class="form-control">
             </div>
             <div class="form-group">
@@ -38,6 +38,17 @@ import { forkJoin } from 'rxjs';
             </div>
           </div>
           
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{ 'products.barcode' | translate }}</label>
+              <input type="text" formControlName="barcode" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>{{ 'products.brand' | translate }}</label>
+              <input type="text" formControlName="brand" class="form-control">
+            </div>
+          </div>
+
           <div class="form-row">
             <div class="form-group">
               <label>{{ 'common.category' | translate }}</label>
@@ -49,19 +60,39 @@ import { forkJoin } from 'rxjs';
               </select>
             </div>
             <div class="form-group">
-              <label>{{ 'products.minStock' | translate }}</label>
-              <input type="number" formControlName="minStock" class="form-control">
+              <label>{{ 'products.vehicleCompatibility' | translate }}</label>
+              <input type="text" formControlName="vehicleCompatibility" class="form-control" placeholder="e.g. Toyota, Honda">
             </div>
           </div>
 
-          @if (!isEdit) {
-            <div class="form-row">
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{ 'products.buyingPrice' | translate }}</label>
+              <input type="number" step="0.01" formControlName="buyingPrice" class="form-control" placeholder="0.00">
+            </div>
+            @if (!isEdit) {
               <div class="form-group">
-                <label class="required">{{ 'common.price' | translate }}</label>
+                <label class="required">{{ 'products.sellingPrice' | translate }}</label>
                 <input type="number" step="0.01" formControlName="sellingPrice" class="form-control" placeholder="0.00">
               </div>
+            }
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{ 'products.expirationDate' | translate }}</label>
+              <input type="date" formControlName="expirationDate" class="form-control">
             </div>
-          }
+            <div class="form-group">
+              <label>{{ 'products.volume' | translate }}</label>
+              <input type="text" formControlName="volume" class="form-control" placeholder="e.g. 5L, 10KG">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>{{ 'products.minStock' | translate }}</label>
+            <input type="number" formControlName="minStock" class="form-control">
+          </div>
 
           <div class="form-group">
             <label>
@@ -250,9 +281,15 @@ export class ProductFormComponent implements OnInit {
     this.form = this.fb.group({
       code: ['', Validators.required],
       name: ['', Validators.required],
+      barcode: [''],
+      brand: [''],
       categoryId: [null],
-      minStock: [0],
+      buyingPrice: [null],
       sellingPrice: [0, [Validators.required, Validators.min(0)]],
+      vehicleCompatibility: [''],
+      expirationDate: [null],
+      volume: [''],
+      minStock: [0],
       active: [true]
     });
 
@@ -286,7 +323,13 @@ export class ProductFormComponent implements OnInit {
       this.form.patchValue({
         code: product.code,
         name: product.name,
+        barcode: product.barcode || '',
+        brand: product.brand || '',
         categoryId: product.category?.id || null,
+        buyingPrice: product.buyingPrice || null,
+        vehicleCompatibility: product.vehicleCompatibility || '',
+        expirationDate: product.expirationDate || null,
+        volume: product.volume || '',
         minStock: product.minStock || 0,
         active: product.active
       });
@@ -303,6 +346,12 @@ export class ProductFormComponent implements OnInit {
       const data: any = {
         code: formData.code,
         name: formData.name,
+        barcode: formData.barcode,
+        brand: formData.brand,
+        buyingPrice: formData.buyingPrice,
+        vehicleCompatibility: formData.vehicleCompatibility,
+        expirationDate: formData.expirationDate,
+        volume: formData.volume,
         minStock: formData.minStock,
         active: formData.active
       };

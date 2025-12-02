@@ -79,7 +79,13 @@ public class ProductController {
                 .map(existing -> {
                     existing.setCode(product.getCode());
                     existing.setName(product.getName());
+                    existing.setBarcode(product.getBarcode());
+                    existing.setBrand(product.getBrand());
                     existing.setCategory(product.getCategory());
+                    existing.setBuyingPrice(product.getBuyingPrice());
+                    existing.setVehicleCompatibility(product.getVehicleCompatibility());
+                    existing.setExpirationDate(product.getExpirationDate());
+                    existing.setVolume(product.getVolume());
                     existing.setMinStock(product.getMinStock());
                     existing.setActive(product.getActive());
                     return ResponseEntity.ok(productRepository.save(existing));
