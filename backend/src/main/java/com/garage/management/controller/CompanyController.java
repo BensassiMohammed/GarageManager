@@ -37,6 +37,8 @@ public class CompanyController {
         return companyRepository.findById(id)
                 .map(existing -> {
                     existing.setName(company.getName());
+                    existing.setIce(company.getIce());
+                    existing.setCity(company.getCity());
                     existing.setAddress(company.getAddress());
                     existing.setPhone(company.getPhone());
                     existing.setEmail(company.getEmail());
