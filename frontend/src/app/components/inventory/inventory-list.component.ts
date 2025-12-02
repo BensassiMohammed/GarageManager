@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
-import { Product, StockMovement } from '../../models/models';
+import { Product, StockMovement, Category } from '../../models/models';
 
 @Component({
   selector: 'app-inventory-list',
@@ -36,6 +36,18 @@ import { Product, StockMovement } from '../../models/models';
     </div>
 
     @if (activeTab === 'overview') {
+      <div class="filter-section">
+        <div class="form-group">
+          <label>{{ 'common.category' | translate }}</label>
+          <select [(ngModel)]="overviewCategoryFilter" (change)="applyOverviewFilter()" class="form-control">
+            <option [ngValue]="null">{{ 'common.all' | translate }}</option>
+            @for (cat of productCategories; track cat.id) {
+              <option [ngValue]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
       <div class="card">
         <div class="table-container">
           <table>
@@ -43,16 +55,18 @@ import { Product, StockMovement } from '../../models/models';
               <tr>
                 <th>{{ 'products.code' | translate }}</th>
                 <th>{{ 'common.name' | translate }}</th>
+                <th>{{ 'common.category' | translate }}</th>
                 <th>{{ 'stockManagement.currentStock' | translate }}</th>
                 <th>{{ 'stockManagement.minStock' | translate }}</th>
                 <th>{{ 'common.status' | translate }}</th>
               </tr>
             </thead>
             <tbody>
-              @for (product of products; track product.id) {
+              @for (product of filteredProducts; track product.id) {
                 <tr>
                   <td>{{ product.code }}</td>
                   <td>{{ product.name }}</td>
+                  <td>{{ product.category?.name || '-' }}</td>
                   <td>{{ product.currentStock || 0 }}</td>
                   <td>{{ product.minStock || 0 }}</td>
                   <td>
@@ -65,7 +79,7 @@ import { Product, StockMovement } from '../../models/models';
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="5" class="empty-state">{{ 'products.noProducts' | translate }}</td>
+                  <td colspan="6" class="empty-state">{{ 'products.noProducts' | translate }}</td>
                 </tr>
               }
             </tbody>
@@ -75,6 +89,18 @@ import { Product, StockMovement } from '../../models/models';
     }
 
     @if (activeTab === 'history') {
+      <div class="filter-section">
+        <div class="form-group">
+          <label>{{ 'common.category' | translate }}</label>
+          <select [(ngModel)]="historyCategoryFilter" (change)="applyHistoryFilter()" class="form-control">
+            <option [ngValue]="null">{{ 'common.all' | translate }}</option>
+            @for (cat of productCategories; track cat.id) {
+              <option [ngValue]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
       <div class="card">
         <div class="table-container">
           <table>
@@ -82,16 +108,18 @@ import { Product, StockMovement } from '../../models/models';
               <tr>
                 <th>{{ 'common.date' | translate }}</th>
                 <th>{{ 'stockManagement.product' | translate }}</th>
+                <th>{{ 'common.category' | translate }}</th>
                 <th>{{ 'common.type' | translate }}</th>
                 <th>{{ 'common.quantity' | translate }}</th>
                 <th>{{ 'stockManagement.reason' | translate }}</th>
               </tr>
             </thead>
             <tbody>
-              @for (movement of movements; track movement.id) {
+              @for (movement of filteredMovements; track movement.id) {
                 <tr>
                   <td>{{ formatDate(movement.date) }}</td>
                   <td>{{ movement.product?.name || '-' }}</td>
+                  <td>{{ movement.product?.category?.name || '-' }}</td>
                   <td>
                     <span [class]="getMovementTypeClass(movement.type)">
                       {{ getMovementTypeLabel(movement.type) | translate }}
@@ -104,7 +132,7 @@ import { Product, StockMovement } from '../../models/models';
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="5" class="empty-state">{{ 'stockManagement.noMovements' | translate }}</td>
+                  <td colspan="6" class="empty-state">{{ 'stockManagement.noMovements' | translate }}</td>
                 </tr>
               }
             </tbody>
@@ -269,6 +297,25 @@ import { Product, StockMovement } from '../../models/models';
       color: var(--danger);
       font-weight: 500;
     }
+    .filter-section {
+      background: var(--card);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+    .filter-section .form-group {
+      flex: 0 0 250px;
+      margin-bottom: 0;
+    }
+    .filter-section label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+      display: block;
+    }
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
@@ -288,8 +335,14 @@ import { Product, StockMovement } from '../../models/models';
 })
 export class InventoryListComponent implements OnInit {
   products: Product[] = [];
+  filteredProducts: Product[] = [];
   movements: StockMovement[] = [];
+  filteredMovements: StockMovement[] = [];
+  productCategories: Category[] = [];
   activeTab: 'overview' | 'history' | 'adjustment' = 'overview';
+  
+  overviewCategoryFilter: number | null = null;
+  historyCategoryFilter: number | null = null;
   
   adjustment = {
     productId: null as number | null,
@@ -303,12 +356,24 @@ export class InventoryListComponent implements OnInit {
 
   ngOnInit() {
     this.loadData();
+    this.loadCategories();
+  }
+
+  loadCategories() {
+    this.api.getCategories().subscribe({
+      next: data => {
+        this.productCategories = (data || []).filter(c => c.type === 'PRODUCT');
+        this.cdr.detectChanges();
+      },
+      error: () => this.productCategories = []
+    });
   }
 
   loadData() {
     this.api.getProducts().subscribe({
       next: data => {
         this.products = data || [];
+        this.applyOverviewFilter();
         this.cdr.detectChanges();
       },
       error: () => this.products = []
@@ -320,10 +385,27 @@ export class InventoryListComponent implements OnInit {
           const dateB = this.parseDate(b.date);
           return dateB - dateA;
         });
+        this.applyHistoryFilter();
         this.cdr.detectChanges();
       },
       error: () => this.movements = []
     });
+  }
+
+  applyOverviewFilter() {
+    if (this.overviewCategoryFilter) {
+      this.filteredProducts = this.products.filter(p => p.category?.id === this.overviewCategoryFilter);
+    } else {
+      this.filteredProducts = [...this.products];
+    }
+  }
+
+  applyHistoryFilter() {
+    if (this.historyCategoryFilter) {
+      this.filteredMovements = this.movements.filter(m => m.product?.category?.id === this.historyCategoryFilter);
+    } else {
+      this.filteredMovements = [...this.movements];
+    }
   }
 
   parseDate(dateValue: any): number {
