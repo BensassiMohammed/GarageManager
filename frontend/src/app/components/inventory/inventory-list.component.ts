@@ -148,14 +148,26 @@ import { Product, StockMovement, Category } from '../../models/models';
         <form (ngSubmit)="recordAdjustment()">
           <div class="form-row">
             <div class="form-group">
+              <label class="required">{{ 'common.category' | translate }}</label>
+              <select [(ngModel)]="adjustment.categoryId" name="categoryId" (ngModelChange)="onAdjustmentCategoryChange()" class="form-control" required>
+                <option [ngValue]="null">{{ 'stockManagement.selectCategory' | translate }}</option>
+                @for (cat of productCategories; track cat.id) {
+                  <option [ngValue]="cat.id">{{ cat.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
               <label class="required">{{ 'stockManagement.product' | translate }}</label>
-              <select [(ngModel)]="adjustment.productId" name="productId" class="form-control" required>
+              <select [(ngModel)]="adjustment.productId" name="productId" class="form-control" required [disabled]="!adjustment.categoryId">
                 <option [ngValue]="null">{{ 'stockManagement.selectProduct' | translate }}</option>
-                @for (product of products; track product.id) {
+                @for (product of adjustmentProducts; track product.id) {
                   <option [ngValue]="product.id">{{ product.name }}</option>
                 }
               </select>
             </div>
+          </div>
+
+          <div class="form-row">
             <div class="form-group">
               <label class="required">{{ 'stockManagement.movementType' | translate }}</label>
               <select [(ngModel)]="adjustment.type" name="type" class="form-control" required>
@@ -164,9 +176,6 @@ import { Product, StockMovement, Category } from '../../models/models';
                 <option value="CONSUMPTION">{{ 'stockManagement.sale' | translate }}</option>
               </select>
             </div>
-          </div>
-
-          <div class="form-row">
             <div class="form-group">
               <label class="required">{{ 'stockManagement.quantityChange' | translate }}</label>
               <input 
@@ -176,8 +185,10 @@ import { Product, StockMovement, Category } from '../../models/models';
                 class="form-control" 
                 placeholder="0"
                 required>
-              <small class="form-hint">{{ 'stockManagement.quantityChange' | translate }}</small>
             </div>
+          </div>
+
+          <div class="form-row">
             <div class="form-group">
               <label>{{ 'stockManagement.reason' | translate }}</label>
               <input 
@@ -339,12 +350,14 @@ export class InventoryListComponent implements OnInit {
   movements: StockMovement[] = [];
   filteredMovements: StockMovement[] = [];
   productCategories: Category[] = [];
+  adjustmentProducts: Product[] = [];
   activeTab: 'overview' | 'history' | 'adjustment' = 'overview';
   
   overviewCategoryFilter: number | null = null;
   historyCategoryFilter: number | null = null;
   
   adjustment = {
+    categoryId: null as number | null,
     productId: null as number | null,
     type: 'ADJUSTMENT',
     quantityDelta: null as number | null,
@@ -434,6 +447,15 @@ export class InventoryListComponent implements OnInit {
     }
   }
 
+  onAdjustmentCategoryChange() {
+    this.adjustment.productId = null;
+    if (this.adjustment.categoryId) {
+      this.adjustmentProducts = this.products.filter(p => p.category?.id === this.adjustment.categoryId);
+    } else {
+      this.adjustmentProducts = [];
+    }
+  }
+
   parseDate(dateValue: any): number {
     if (!dateValue) return 0;
     if (typeof dateValue === 'string') {
@@ -479,7 +501,8 @@ export class InventoryListComponent implements OnInit {
   }
 
   isFormValid(): boolean {
-    return this.adjustment.productId !== null && 
+    return this.adjustment.categoryId !== null &&
+           this.adjustment.productId !== null && 
            this.adjustment.quantityDelta !== null && 
            this.adjustment.quantityDelta !== 0;
   }
@@ -516,11 +539,13 @@ export class InventoryListComponent implements OnInit {
 
   resetAdjustment() {
     this.adjustment = {
+      categoryId: null,
       productId: null,
       type: 'ADJUSTMENT',
       quantityDelta: null,
       reason: '',
       notes: ''
     };
+    this.adjustmentProducts = [];
   }
 }

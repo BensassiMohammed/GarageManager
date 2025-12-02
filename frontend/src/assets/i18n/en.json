@@ -255,6 +255,7 @@
     "purchase": "Purchase",
     "return": "Return",
     "damaged": "Damaged",
+    "selectCategory": "Select a category",
     "selectProduct": "Select a product",
     "selectType": "Select movement type"
   },
