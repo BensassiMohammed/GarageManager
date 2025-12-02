@@ -34,6 +34,8 @@ export interface Vehicle {
   model?: string;
   type?: string;
   year?: number;
+  mileage?: number;
+  color?: string;
   currentOwner?: Client;
   status?: string;
   createdAt?: string;

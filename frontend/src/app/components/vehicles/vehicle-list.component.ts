@@ -24,6 +24,8 @@ import { Vehicle } from '../../models/models';
               <th>{{ 'vehicles.make' | translate }}</th>
               <th>{{ 'vehicles.model' | translate }}</th>
               <th>{{ 'vehicles.year' | translate }}</th>
+              <th>{{ 'vehicles.mileage' | translate }}</th>
+              <th>{{ 'vehicles.color' | translate }}</th>
               <th>{{ 'vehicles.owner' | translate }}</th>
               <th>{{ 'common.status' | translate }}</th>
               <th>{{ 'common.actions' | translate }}</th>
@@ -36,6 +38,8 @@ import { Vehicle } from '../../models/models';
                 <td>{{ vehicle.brand || '-' }}</td>
                 <td>{{ vehicle.model || '-' }}</td>
                 <td>{{ vehicle.year || '-' }}</td>
+                <td>{{ vehicle.mileage ? (vehicle.mileage | number) + ' KM' : '-' }}</td>
+                <td>{{ vehicle.color || '-' }}</td>
                 <td>{{ vehicle.currentOwner ? vehicle.currentOwner.firstName + ' ' + vehicle.currentOwner.lastName : '-' }}</td>
                 <td>
                   <span class="badge badge-info">{{ vehicle.status || 'ACTIVE' }}</span>
@@ -47,7 +51,7 @@ import { Vehicle } from '../../models/models';
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="empty-state">{{ 'vehicles.noVehicles' | translate }}</td>
+                <td colspan="9" class="empty-state">{{ 'vehicles.noVehicles' | translate }}</td>
               </tr>
             }
           </tbody>

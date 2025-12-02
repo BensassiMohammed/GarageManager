@@ -170,6 +170,14 @@ The application supports multi-language interfaces with the following languages:
 3. For RTL components, use `[dir="rtl"]` CSS selectors for layout adjustments
 
 ## Recent Changes
+- 2025-12-02: Added Mileage and Color fields to Vehicle module
+  - Mileage (Kilométrage/الكيلومترات) - Vehicle mileage in KM
+  - Color (Couleur/اللون) - Vehicle color
+  - Backend Vehicle entity and VehicleController updated
+  - Frontend form and table updated to display and edit new fields
+  - Mileage displays with KM suffix in vehicle list
+  - Translations added for English, French, and Arabic
+
 - 2025-12-02: Added City and Address fields to Client module
   - City (Ville/المدينة) - Client location city
   - Address (Adresse/العنوان) - Client full address

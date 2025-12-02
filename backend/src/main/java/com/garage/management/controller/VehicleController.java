@@ -41,6 +41,8 @@ public class VehicleController {
                     existing.setModel(vehicle.getModel());
                     existing.setType(vehicle.getType());
                     existing.setYear(vehicle.getYear());
+                    existing.setMileage(vehicle.getMileage());
+                    existing.setColor(vehicle.getColor());
                     existing.setCurrentOwner(vehicle.getCurrentOwner());
                     existing.setStatus(vehicle.getStatus());
                     return ResponseEntity.ok(vehicleRepository.save(existing));

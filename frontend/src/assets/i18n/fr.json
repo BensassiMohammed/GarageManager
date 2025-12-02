@@ -144,6 +144,8 @@
     "make": "Marque",
     "model": "Modele",
     "year": "Annee",
+    "mileage": "Kilometrage (KM)",
+    "color": "Couleur",
     "vin": "NIV",
     "owner": "Proprietaire",
     "client": "Client",
