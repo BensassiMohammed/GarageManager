@@ -544,8 +544,24 @@ export class ProductFormComponent implements OnInit {
   }
 
   handleError(err: any) {
-    if (err.status === 500) {
-      const errorBody = err.error;
+    const errorBody = err.error;
+    
+    if (err.status === 409) {
+      const message = errorBody?.message || '';
+      if (message === 'UNIQUE_PRODUCT_CODE' || message.includes('products.code')) {
+        this.translate.get('products.errors.duplicateCode').subscribe(msg => {
+          this.errorMessage = msg || 'A product with this code already exists. Please use a different code.';
+        });
+      } else if (message === 'UNIQUE_PRODUCT_BARCODE') {
+        this.translate.get('products.errors.duplicateEntry').subscribe(msg => {
+          this.errorMessage = msg || 'A product with this barcode already exists.';
+        });
+      } else {
+        this.translate.get('products.errors.duplicateEntry').subscribe(msg => {
+          this.errorMessage = msg || 'A product with these details already exists.';
+        });
+      }
+    } else if (err.status === 500) {
       if (typeof errorBody === 'string') {
         if (errorBody.includes('UNIQUE constraint failed: products.code')) {
           this.translate.get('products.errors.duplicateCode').subscribe(msg => {
@@ -565,8 +581,28 @@ export class ProductFormComponent implements OnInit {
           this.translate.get('products.errors.duplicateCode').subscribe(msg => {
             this.errorMessage = msg || 'A product with this code already exists. Please use a different code.';
           });
+        } else if (errorBody.message.includes('UNIQUE constraint failed')) {
+          this.translate.get('products.errors.duplicateEntry').subscribe(msg => {
+            this.errorMessage = msg || 'A product with these details already exists.';
+          });
         } else {
-          this.errorMessage = errorBody.message;
+          this.translate.get('common.errors.serverError').subscribe(msg => {
+            this.errorMessage = msg || 'An error occurred while saving. Please try again.';
+          });
+        }
+      } else if (errorBody?.trace) {
+        if (errorBody.trace.includes('UNIQUE constraint failed: products.code')) {
+          this.translate.get('products.errors.duplicateCode').subscribe(msg => {
+            this.errorMessage = msg || 'A product with this code already exists. Please use a different code.';
+          });
+        } else if (errorBody.trace.includes('UNIQUE constraint failed')) {
+          this.translate.get('products.errors.duplicateEntry').subscribe(msg => {
+            this.errorMessage = msg || 'A product with these details already exists.';
+          });
+        } else {
+          this.translate.get('common.errors.serverError').subscribe(msg => {
+            this.errorMessage = msg || 'An error occurred while saving. Please try again.';
+          });
         }
       } else {
         this.translate.get('common.errors.serverError').subscribe(msg => {

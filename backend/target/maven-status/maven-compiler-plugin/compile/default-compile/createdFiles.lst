@@ -2,6 +2,7 @@ com/garage/management/service/PaymentService.class
 com/garage/management/service/PaymentService$AllocationRequest.class
 com/garage/management/config/DataInitializer.class
 com/garage/management/controller/AuthController.class
+com/garage/management/exception/GlobalExceptionHandler.class
 com/garage/management/entity/Role.class
 com/garage/management/entity/Product.class
 com/garage/management/repository/InvoiceRepository.class
@@ -69,8 +70,8 @@ com/garage/management/repository/ProductPriceHistoryRepository.class
 com/garage/management/repository/AppUserRepository.class
 com/garage/management/enums/WorkOrderStatus.class
 com/garage/management/repository/WorkOrderRepository.class
-com/garage/management/entity/Expense.class
 com/garage/management/entity/Invoice.class
+com/garage/management/entity/Expense.class
 com/garage/management/entity/ServiceEntity.class
 com/garage/management/controller/ProductController$PriceRequest.class
 com/garage/management/GarageManagementApplication.class
