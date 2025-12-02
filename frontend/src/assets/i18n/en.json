@@ -121,6 +121,8 @@
     "companyName": "Company Name",
     "contactPerson": "Contact Person",
     "taxId": "Tax ID",
+    "ice": "ICE (Common Business Identifier)",
+    "city": "City",
     "noCompanies": "No companies found"
   },
   "clients": {

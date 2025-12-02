@@ -13,6 +13,8 @@ public class Company {
     @Column(nullable = false)
     private String name;
 
+    private String ice;
+    private String city;
     private String address;
     private String phone;
     private String email;
@@ -40,6 +42,10 @@ public class Company {
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    public String getIce() { return ice; }
+    public void setIce(String ice) { this.ice = ice; }
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
     public String getPhone() { return phone; }

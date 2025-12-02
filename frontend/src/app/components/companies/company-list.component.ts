@@ -21,8 +21,11 @@ import { Company } from '../../models/models';
           <thead>
             <tr>
               <th>{{ 'common.name' | translate }}</th>
+              <th>{{ 'companies.ice' | translate }}</th>
               <th>{{ 'common.email' | translate }}</th>
               <th>{{ 'common.phone' | translate }}</th>
+              <th>{{ 'companies.city' | translate }}</th>
+              <th>{{ 'common.address' | translate }}</th>
               <th>{{ 'common.status' | translate }}</th>
               <th>{{ 'common.actions' | translate }}</th>
             </tr>
@@ -31,8 +34,11 @@ import { Company } from '../../models/models';
             @for (company of companies; track company.id) {
               <tr>
                 <td>{{ company.name }}</td>
+                <td>{{ company.ice || '-' }}</td>
                 <td>{{ company.email || '-' }}</td>
                 <td>{{ company.phone || '-' }}</td>
+                <td>{{ company.city || '-' }}</td>
+                <td>{{ company.address || '-' }}</td>
                 <td>
                   <span [class]="company.active ? 'badge badge-success' : 'badge badge-danger'">
                     {{ (company.active ? 'common.active' : 'common.inactive') | translate }}
@@ -45,7 +51,7 @@ import { Company } from '../../models/models';
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="empty-state">{{ 'companies.noCompanies' | translate }}</td>
+                <td colspan="8" class="empty-state">{{ 'companies.noCompanies' | translate }}</td>
               </tr>
             }
           </tbody>

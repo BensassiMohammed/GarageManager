@@ -1,6 +1,8 @@
 export interface Company {
   id?: number;
   name: string;
+  ice?: string;
+  city?: string;
   address?: string;
   phone?: string;
   email?: string;

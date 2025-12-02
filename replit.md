@@ -73,7 +73,7 @@ workspace/
 ## Features
 
 ### Customers
-- **Companies**: Manage company accounts with contact details
+- **Companies**: Manage company accounts with contact details, ICE (Identifiant Commun de l'Entreprise), city, and address
 - **Clients**: Manage individual clients, optionally linked to companies
 - **Vehicles**: Track vehicles with owner associations and status
 
@@ -170,6 +170,14 @@ The application supports multi-language interfaces with the following languages:
 3. For RTL components, use `[dir="rtl"]` CSS selectors for layout adjustments
 
 ## Recent Changes
+- 2025-12-02: Added new fields to Company module
+  - ICE (Identifiant Commun de l'Entreprise) - Moroccan business identifier
+  - City (Ville) - Company location city
+  - Address (Adresse) - Full company address
+  - Backend entity updated with new fields and getters/setters
+  - Frontend form and table updated to display and edit new fields
+  - Translations added for English, French, and Arabic
+
 - 2025-11-30: Added complete multi-language support (i18n) with English, French, and Arabic
   - Installed ngx-translate v17 with provideTranslateService API
   - Created comprehensive translation files covering all UI text

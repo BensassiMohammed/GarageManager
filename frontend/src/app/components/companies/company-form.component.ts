@@ -22,15 +22,26 @@ import { ApiService } from '../../services/api.service';
             <input type="text" formControlName="name" class="form-control">
           </div>
           <div class="form-group">
-            <label>{{ 'common.email' | translate }}</label>
-            <input type="email" formControlName="email" class="form-control">
+            <label>{{ 'companies.ice' | translate }}</label>
+            <input type="text" formControlName="ice" class="form-control">
           </div>
         </div>
         
         <div class="form-row">
           <div class="form-group">
+            <label>{{ 'common.email' | translate }}</label>
+            <input type="email" formControlName="email" class="form-control">
+          </div>
+          <div class="form-group">
             <label>{{ 'common.phone' | translate }}</label>
             <input type="text" formControlName="phone" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'companies.city' | translate }}</label>
+            <input type="text" formControlName="city" class="form-control">
           </div>
           <div class="form-group">
             <label>{{ 'common.address' | translate }}</label>
@@ -70,9 +81,11 @@ export class CompanyFormComponent implements OnInit {
   ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
+      ice: [''],
+      city: [''],
+      address: [''],
       email: [''],
       phone: [''],
-      address: [''],
       notes: [''],
       active: [true]
     });
