@@ -121,7 +121,7 @@
     "companyName": "Nom de l'entreprise",
     "contactPerson": "Personne de contact",
     "taxId": "Numero fiscal",
-    "ice": "Identifiant Commun de l'Entreprise (ICE)",
+    "ice": "ICE",
     "city": "Ville",
     "noCompanies": "Aucune entreprise trouvee"
   },
