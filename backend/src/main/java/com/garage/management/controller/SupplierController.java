@@ -37,9 +37,12 @@ public class SupplierController {
         return supplierRepository.findById(id)
                 .map(existing -> {
                     existing.setName(supplier.getName());
+                    existing.setCity(supplier.getCity());
                     existing.setAddress(supplier.getAddress());
                     existing.setPhone(supplier.getPhone());
                     existing.setEmail(supplier.getEmail());
+                    existing.setEstimatedDeliveryTime(supplier.getEstimatedDeliveryTime());
+                    existing.setWorkingDays(supplier.getWorkingDays());
                     existing.setNotes(supplier.getNotes());
                     existing.setActive(supplier.getActive());
                     return ResponseEntity.ok(supplierRepository.save(existing));

@@ -157,6 +157,9 @@
     "newSupplier": "New Supplier",
     "editSupplier": "Edit Supplier",
     "supplierName": "Supplier Name",
+    "city": "City",
+    "estimatedDeliveryTime": "Delivery Time (days)",
+    "workingDays": "Working Days",
     "noSuppliers": "No suppliers found"
   },
   "categories": {

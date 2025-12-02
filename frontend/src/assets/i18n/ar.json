@@ -157,6 +157,9 @@
     "newSupplier": "مورد جديد",
     "editSupplier": "تعديل المورد",
     "supplierName": "اسم المورد",
+    "city": "المدينة",
+    "estimatedDeliveryTime": "وقت التسليم (أيام)",
+    "workingDays": "أيام العمل",
     "noSuppliers": "لم يتم العثور على موردين"
   },
   "categories": {

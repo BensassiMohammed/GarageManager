@@ -23,6 +23,9 @@ import { Supplier } from '../../models/models';
               <th>{{ 'common.name' | translate }}</th>
               <th>{{ 'common.email' | translate }}</th>
               <th>{{ 'common.phone' | translate }}</th>
+              <th>{{ 'suppliers.city' | translate }}</th>
+              <th>{{ 'suppliers.estimatedDeliveryTime' | translate }}</th>
+              <th>{{ 'suppliers.workingDays' | translate }}</th>
               <th>{{ 'common.status' | translate }}</th>
               <th>{{ 'common.actions' | translate }}</th>
             </tr>
@@ -33,6 +36,9 @@ import { Supplier } from '../../models/models';
                 <td>{{ supplier.name }}</td>
                 <td>{{ supplier.email || '-' }}</td>
                 <td>{{ supplier.phone || '-' }}</td>
+                <td>{{ supplier.city || '-' }}</td>
+                <td>{{ supplier.estimatedDeliveryTime ? supplier.estimatedDeliveryTime + ' days' : '-' }}</td>
+                <td>{{ supplier.workingDays || '-' }}</td>
                 <td>
                   <span [class]="supplier.active ? 'badge badge-success' : 'badge badge-danger'">
                     {{ (supplier.active ? 'common.active' : 'common.inactive') | translate }}
@@ -45,7 +51,7 @@ import { Supplier } from '../../models/models';
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="empty-state">{{ 'suppliers.noSuppliers' | translate }}</td>
+                <td colspan="8" class="empty-state">{{ 'suppliers.noSuppliers' | translate }}</td>
               </tr>
             }
           </tbody>

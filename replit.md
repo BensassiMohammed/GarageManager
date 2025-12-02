@@ -170,6 +170,15 @@ The application supports multi-language interfaces with the following languages:
 3. For RTL components, use `[dir="rtl"]` CSS selectors for layout adjustments
 
 ## Recent Changes
+- 2025-12-02: Enhanced Supplier module with new fields
+  - City (Ville/المدينة) - Supplier location city
+  - Address (Adresse/العنوان) - Full supplier address (existing field)
+  - Estimated Delivery Time (Délai de livraison/وقت التسليم) - Days for delivery
+  - Working Days (Jours ouvrables/أيام العمل) - Supplier working days
+  - Backend Supplier entity and SupplierController updated
+  - Frontend form and table updated with new input fields and columns
+  - Translations added for English, French, and Arabic
+
 - 2025-12-02: Added Mileage and Color fields to Vehicle module
   - Mileage (Kilométrage/الكيلومترات) - Vehicle mileage in KM
   - Color (Couleur/اللون) - Vehicle color

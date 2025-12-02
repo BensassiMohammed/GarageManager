@@ -157,6 +157,9 @@
     "newSupplier": "Nouveau fournisseur",
     "editSupplier": "Modifier le fournisseur",
     "supplierName": "Nom du fournisseur",
+    "city": "Ville",
+    "estimatedDeliveryTime": "Delai de livraison (jours)",
+    "workingDays": "Jours ouvrables",
     "noSuppliers": "Aucun fournisseur trouve"
   },
   "categories": {

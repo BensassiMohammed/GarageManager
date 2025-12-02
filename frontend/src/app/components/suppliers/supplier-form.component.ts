@@ -33,8 +33,24 @@ import { ApiService } from '../../services/api.service';
             <input type="text" formControlName="phone" class="form-control">
           </div>
           <div class="form-group">
-            <label>{{ 'common.address' | translate }}</label>
-            <input type="text" formControlName="address" class="form-control">
+            <label>{{ 'suppliers.city' | translate }}</label>
+            <input type="text" formControlName="city" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'common.address' | translate }}</label>
+          <input type="text" formControlName="address" class="form-control">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'suppliers.estimatedDeliveryTime' | translate }}</label>
+            <input type="number" formControlName="estimatedDeliveryTime" class="form-control" min="1">
+          </div>
+          <div class="form-group">
+            <label>{{ 'suppliers.workingDays' | translate }}</label>
+            <input type="text" formControlName="workingDays" class="form-control" placeholder="e.g. Mon-Fri">
           </div>
         </div>
 
@@ -72,7 +88,10 @@ export class SupplierFormComponent implements OnInit {
       name: ['', Validators.required],
       email: [''],
       phone: [''],
+      city: [''],
       address: [''],
+      estimatedDeliveryTime: [null],
+      workingDays: [''],
       notes: [''],
       active: [true]
     });

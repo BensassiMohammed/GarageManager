@@ -45,9 +45,12 @@ export interface Vehicle {
 export interface Supplier {
   id?: number;
   name: string;
+  city?: string;
   address?: string;
   phone?: string;
   email?: string;
+  estimatedDeliveryTime?: number;
+  workingDays?: string;
   notes?: string;
   active?: boolean;
   createdAt?: string;
