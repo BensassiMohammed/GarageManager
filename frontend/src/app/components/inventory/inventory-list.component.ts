@@ -41,8 +41,8 @@ import { Product, StockMovement } from '../../models/models';
           <table>
             <thead>
               <tr>
+                <th>{{ 'products.sku' | translate }}</th>
                 <th>{{ 'common.name' | translate }}</th>
-                <th>{{ 'products.barcode' | translate }}</th>
                 <th>{{ 'stockManagement.currentStock' | translate }}</th>
                 <th>{{ 'stockManagement.minStock' | translate }}</th>
                 <th>{{ 'common.status' | translate }}</th>
@@ -51,8 +51,8 @@ import { Product, StockMovement } from '../../models/models';
             <tbody>
               @for (product of products; track product.id) {
                 <tr>
+                  <td>{{ product.code }}</td>
                   <td>{{ product.name }}</td>
-                  <td>{{ product.barcode || '-' }}</td>
                   <td>{{ product.currentStock || 0 }}</td>
                   <td>{{ product.minStock || 0 }}</td>
                   <td>

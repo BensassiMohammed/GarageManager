@@ -28,23 +28,19 @@ public class ProductPriceService {
         return priceHistoryRepository.findByProductIdOrderByStartDateDesc(productId);
     }
     
-    public List<ProductPriceHistory> getPriceHistoryByType(Long productId, String priceType) {
-        return priceHistoryRepository.findByProductIdAndPriceTypeOrderByStartDateDesc(productId, priceType);
-    }
-    
-    public Optional<BigDecimal> getCurrentPrice(Long productId, String priceType) {
-        return priceHistoryRepository.findCurrentPriceForProductByType(productId, LocalDate.now(), priceType)
+    public Optional<BigDecimal> getCurrentPrice(Long productId) {
+        return priceHistoryRepository.findCurrentPriceForProduct(productId, LocalDate.now())
                 .map(ProductPriceHistory::getPrice);
     }
     
     @Transactional
-    public ProductPriceHistory addNewPrice(Long productId, BigDecimal price, LocalDate startDate, String priceType) {
+    public ProductPriceHistory addNewPrice(Long productId, BigDecimal price, LocalDate startDate) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         
         final LocalDate effectiveStartDate = (startDate == null) ? LocalDate.now() : startDate;
         
-        priceHistoryRepository.findActiveForProductByType(productId, priceType)
+        priceHistoryRepository.findActiveForProduct(productId)
                 .ifPresent(activePrice -> {
                     activePrice.setEndDate(effectiveStartDate.minusDays(1));
                     priceHistoryRepository.save(activePrice);
@@ -52,18 +48,13 @@ public class ProductPriceService {
         
         ProductPriceHistory newPriceHistory = new ProductPriceHistory();
         newPriceHistory.setProduct(product);
-        newPriceHistory.setPriceType(priceType);
         newPriceHistory.setPrice(price);
         newPriceHistory.setStartDate(effectiveStartDate);
         newPriceHistory.setEndDate(null);
         
         ProductPriceHistory saved = priceHistoryRepository.save(newPriceHistory);
         
-        if ("SELLING".equals(priceType)) {
-            product.setSellingPrice(price);
-        } else if ("BUYING".equals(priceType)) {
-            product.setBuyingPrice(price);
-        }
+        product.setSellingPrice(price);
         productRepository.save(product);
         
         return saved;

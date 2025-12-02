@@ -16,11 +16,8 @@ public class StockMovementController {
     private StockMovementService stockMovementService;
 
     @GetMapping
-    public List<StockMovement> getAll(@RequestParam(required = false) Long categoryId) {
-        if (categoryId != null) {
-            return stockMovementService.findByCategoryId(categoryId);
-        }
-        return stockMovementService.findAllOrdered();
+    public List<StockMovement> getAll() {
+        return stockMovementService.findAll();
     }
 
     @GetMapping("/{id}")

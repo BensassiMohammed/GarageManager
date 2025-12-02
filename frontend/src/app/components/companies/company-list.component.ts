@@ -21,8 +21,6 @@ import { Company } from '../../models/models';
           <thead>
             <tr>
               <th>{{ 'common.name' | translate }}</th>
-              <th>{{ 'companies.ice' | translate }}</th>
-              <th>{{ 'companies.city' | translate }}</th>
               <th>{{ 'common.email' | translate }}</th>
               <th>{{ 'common.phone' | translate }}</th>
               <th>{{ 'common.status' | translate }}</th>
@@ -33,8 +31,6 @@ import { Company } from '../../models/models';
             @for (company of companies; track company.id) {
               <tr>
                 <td>{{ company.name }}</td>
-                <td>{{ company.ice || '-' }}</td>
-                <td>{{ company.city || '-' }}</td>
                 <td>{{ company.email || '-' }}</td>
                 <td>{{ company.phone || '-' }}</td>
                 <td>
@@ -49,7 +45,7 @@ import { Company } from '../../models/models';
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="empty-state">{{ 'companies.noCompanies' | translate }}</td>
+                <td colspan="5" class="empty-state">{{ 'companies.noCompanies' | translate }}</td>
               </tr>
             }
           </tbody>

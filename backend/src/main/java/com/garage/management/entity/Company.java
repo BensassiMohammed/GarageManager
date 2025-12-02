@@ -13,8 +13,6 @@ public class Company {
     @Column(nullable = false)
     private String name;
 
-    private String ice;
-    private String city;
     private String address;
     private String phone;
     private String email;
@@ -48,10 +46,6 @@ public class Company {
     public void setPhone(String phone) { this.phone = phone; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-    public String getIce() { return ice; }
-    public void setIce(String ice) { this.ice = ice; }
-    public String getCity() { return city; }
-    public void setCity(String city) { this.city = city; }
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
     public Boolean getActive() { return active; }

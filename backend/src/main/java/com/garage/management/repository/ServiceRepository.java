@@ -11,5 +11,6 @@ import java.util.Optional;
 public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
     List<ServiceEntity> findByActiveTrue();
     Long countByActiveTrue();
+    Optional<ServiceEntity> findByCode(String code);
     List<ServiceEntity> findByCategoryId(Long categoryId);
 }

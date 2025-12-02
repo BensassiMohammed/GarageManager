@@ -18,8 +18,6 @@ public class Vehicle {
     private String model;
     private String type;
     private Integer year;
-    private Integer mileage;
-    private String color;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "current_owner_id")
@@ -54,10 +52,6 @@ public class Vehicle {
     public void setType(String type) { this.type = type; }
     public Integer getYear() { return year; }
     public void setYear(Integer year) { this.year = year; }
-    public Integer getMileage() { return mileage; }
-    public void setMileage(Integer mileage) { this.mileage = mileage; }
-    public String getColor() { return color; }
-    public void setColor(String color) { this.color = color; }
     public Client getCurrentOwner() { return currentOwner; }
     public void setCurrentOwner(Client currentOwner) { this.currentOwner = currentOwner; }
     public VehicleStatus getStatus() { return status; }

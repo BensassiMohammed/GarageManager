@@ -24,20 +24,12 @@ public class StockMovementService {
         return stockMovementRepository.findAll();
     }
 
-    public List<StockMovement> findAllOrdered() {
-        return stockMovementRepository.findAllByOrderByDateDesc();
-    }
-
     public Optional<StockMovement> findById(Long id) {
         return stockMovementRepository.findById(id);
     }
 
     public List<StockMovement> findByProductId(Long productId) {
         return stockMovementRepository.findByProductId(productId);
-    }
-
-    public List<StockMovement> findByCategoryId(Long categoryId) {
-        return stockMovementRepository.findByCategoryId(categoryId);
     }
 
     @Transactional

@@ -23,7 +23,6 @@ import { Client } from '../../models/models';
               <th>{{ 'common.name' | translate }}</th>
               <th>{{ 'common.email' | translate }}</th>
               <th>{{ 'common.phone' | translate }}</th>
-              <th>{{ 'common.city' | translate }}</th>
               <th>{{ 'clients.company' | translate }}</th>
               <th>{{ 'common.status' | translate }}</th>
               <th>{{ 'common.actions' | translate }}</th>
@@ -35,7 +34,6 @@ import { Client } from '../../models/models';
                 <td>{{ client.firstName }} {{ client.lastName }}</td>
                 <td>{{ client.email || '-' }}</td>
                 <td>{{ client.phone || '-' }}</td>
-                <td>{{ client.city || '-' }}</td>
                 <td>{{ client.company?.name || '-' }}</td>
                 <td>
                   <span [class]="client.active ? 'badge badge-success' : 'badge badge-danger'">
@@ -49,7 +47,7 @@ import { Client } from '../../models/models';
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="empty-state">{{ 'clients.noClients' | translate }}</td>
+                <td colspan="6" class="empty-state">{{ 'clients.noClients' | translate }}</td>
               </tr>
             }
           </tbody>

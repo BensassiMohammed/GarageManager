@@ -20,6 +20,7 @@ import { ServiceItem } from '../../models/models';
         <table>
           <thead>
             <tr>
+              <th>{{ 'products.sku' | translate }}</th>
               <th>{{ 'common.name' | translate }}</th>
               <th>{{ 'common.category' | translate }}</th>
               <th>{{ 'common.price' | translate }}</th>
@@ -30,6 +31,7 @@ import { ServiceItem } from '../../models/models';
           <tbody>
             @for (service of services; track service.id) {
               <tr>
+                <td>{{ service.code }}</td>
                 <td>{{ service.name }}</td>
                 <td>{{ service.category?.name || '-' }}</td>
                 <td>{{ service.sellingPrice | currency }}</td>
@@ -45,7 +47,7 @@ import { ServiceItem } from '../../models/models';
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="empty-state">{{ 'services.noServices' | translate }}</td>
+                <td colspan="6" class="empty-state">{{ 'services.noServices' | translate }}</td>
               </tr>
             }
           </tbody>

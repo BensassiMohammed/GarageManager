@@ -165,7 +165,7 @@ import { forkJoin } from 'rxjs';
                 <li class="item">
                   <div class="item-main">
                     <span class="item-title">{{ prod.name }}</span>
-                    <span class="item-subtitle">{{ prod.barcode || prod.brand || '-' }}</span>
+                    <span class="item-subtitle">{{ prod.code }}</span>
                   </div>
                   <div class="item-meta">
                     <span class="badge badge-danger">{{ prod.currentStock || 0 }} {{ 'dashboard.inStock' | translate }}</span>

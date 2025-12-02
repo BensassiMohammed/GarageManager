@@ -29,20 +29,16 @@ import { forkJoin } from 'rxjs';
         <form [formGroup]="form" (ngSubmit)="save()">
           <div class="form-row">
             <div class="form-group">
+              <label class="required">{{ 'products.sku' | translate }}</label>
+              <input type="text" formControlName="code" class="form-control">
+            </div>
+            <div class="form-group">
               <label class="required">{{ 'common.name' | translate }}</label>
               <input type="text" formControlName="name" class="form-control">
             </div>
-            <div class="form-group">
-              <label>{{ 'products.brand' | translate }}</label>
-              <input type="text" formControlName="brand" class="form-control">
-            </div>
           </div>
-
+          
           <div class="form-row">
-            <div class="form-group">
-              <label>{{ 'products.barcode' | translate }}</label>
-              <input type="text" formControlName="barcode" class="form-control">
-            </div>
             <div class="form-group">
               <label>{{ 'common.category' | translate }}</label>
               <select formControlName="categoryId" class="form-control">
@@ -52,64 +48,20 @@ import { forkJoin } from 'rxjs';
                 }
               </select>
             </div>
-          </div>
-          
-          <div class="form-row">
             <div class="form-group">
-              <label>{{ 'products.buyingPrice' | translate }}</label>
-              <input type="number" step="0.01" formControlName="buyingPrice" class="form-control" placeholder="0.00">
+              <label>{{ 'products.minStock' | translate }}</label>
+              <input type="number" formControlName="minStock" class="form-control">
             </div>
-            @if (!isEdit) {
-              <div class="form-group">
-                <label class="required">{{ 'products.sellingPrice' | translate }}</label>
-                <input type="number" step="0.01" formControlName="sellingPrice" class="form-control" placeholder="0.00">
-              </div>
-            }
-            @if (isEdit) {
-              <div class="form-group">
-                <label>{{ 'products.minStock' | translate }}</label>
-                <input type="number" formControlName="minStock" class="form-control">
-              </div>
-            }
           </div>
 
           @if (!isEdit) {
             <div class="form-row">
               <div class="form-group">
-                <label>{{ 'products.minStock' | translate }}</label>
-                <input type="number" formControlName="minStock" class="form-control">
+                <label class="required">{{ 'common.price' | translate }}</label>
+                <input type="number" step="0.01" formControlName="sellingPrice" class="form-control" placeholder="0.00">
               </div>
-              <div class="form-group"></div>
             </div>
           }
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>{{ 'products.volume' | translate }}</label>
-              <input type="number" step="0.01" formControlName="volume" class="form-control" placeholder="0">
-            </div>
-            <div class="form-group">
-              <label>{{ 'products.volumeUnit' | translate }}</label>
-              <select formControlName="volumeUnit" class="form-control">
-                <option [ngValue]="null">-- {{ 'common.select' | translate }} --</option>
-                <option value="L">L</option>
-                <option value="KG">KG</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>{{ 'products.expirationDate' | translate }}</label>
-              <input type="date" formControlName="expirationDate" class="form-control">
-            </div>
-            <div class="form-group"></div>
-          </div>
-
-          <div class="form-group">
-            <label>{{ 'products.vehiclesCompatibility' | translate }}</label>
-            <textarea formControlName="vehiclesCompatibility" class="form-control" rows="3" placeholder="{{ 'products.vehiclesCompatibilityPlaceholder' | translate }}"></textarea>
-          </div>
 
           <div class="form-group">
             <label>
@@ -296,17 +248,11 @@ export class ProductFormComponent implements OnInit {
     private router: Router
   ) {
     this.form = this.fb.group({
+      code: ['', Validators.required],
       name: ['', Validators.required],
-      barcode: [''],
-      brand: [''],
       categoryId: [null],
-      buyingPrice: [null],
-      sellingPrice: [0, [Validators.required, Validators.min(0)]],
-      vehiclesCompatibility: [''],
-      expirationDate: [null],
-      volume: [null],
-      volumeUnit: [null],
       minStock: [0],
+      sellingPrice: [0, [Validators.required, Validators.min(0)]],
       active: [true]
     });
 
@@ -338,15 +284,9 @@ export class ProductFormComponent implements OnInit {
       computedStock: this.api.getProductComputedStock(this.id)
     }).subscribe(({ product, priceHistory, computedStock }) => {
       this.form.patchValue({
+        code: product.code,
         name: product.name,
-        barcode: product.barcode || '',
-        brand: product.brand || '',
         categoryId: product.category?.id || null,
-        buyingPrice: product.buyingPrice || null,
-        vehiclesCompatibility: product.vehiclesCompatibility || '',
-        expirationDate: product.expirationDate || null,
-        volume: product.volume || null,
-        volumeUnit: product.volumeUnit || null,
         minStock: product.minStock || 0,
         active: product.active
       });
@@ -361,14 +301,8 @@ export class ProductFormComponent implements OnInit {
     if (this.form.valid) {
       const formData = this.form.value;
       const data: any = {
+        code: formData.code,
         name: formData.name,
-        barcode: formData.barcode || null,
-        brand: formData.brand || null,
-        buyingPrice: formData.buyingPrice || null,
-        vehiclesCompatibility: formData.vehiclesCompatibility || null,
-        expirationDate: formData.expirationDate || null,
-        volume: formData.volume || null,
-        volumeUnit: formData.volumeUnit || null,
         minStock: formData.minStock,
         active: formData.active
       };
