@@ -5,7 +5,6 @@
   },
   "common": {
     "save": "Enregistrer",
-    "saving": "Enregistrement",
     "cancel": "Annuler",
     "delete": "Supprimer",
     "edit": "Modifier",
@@ -52,12 +51,7 @@
     "success": "Succes",
     "error": "Erreur",
     "warning": "Avertissement",
-    "info": "Information",
-    "errors": {
-      "serverError": "Une erreur s'est produite lors de l'enregistrement. Veuillez reessayer.",
-      "invalidData": "Donnees invalides. Veuillez verifier vos informations et reessayer.",
-      "unauthorized": "Vous n'avez pas la permission d'effectuer cette action."
-    }
+    "info": "Information"
   },
   "auth": {
     "login": "Connexion",
@@ -210,11 +204,7 @@
     "startDate": "Date de debut",
     "endDate": "Date de fin",
     "historical": "Historique",
-    "current": "Actuel",
-    "errors": {
-      "duplicateCode": "Un produit avec ce code existe deja. Veuillez utiliser un code different.",
-      "duplicateEntry": "Un produit avec ces details existe deja."
-    }
+    "current": "Actuel"
   },
   "services": {
     "title": "Services",
