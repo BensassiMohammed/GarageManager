@@ -5,6 +5,7 @@
   },
   "common": {
     "save": "Save",
+    "saving": "Saving",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
@@ -51,7 +52,12 @@
     "success": "Success",
     "error": "Error",
     "warning": "Warning",
-    "info": "Info"
+    "info": "Info",
+    "errors": {
+      "serverError": "An error occurred while saving. Please try again.",
+      "invalidData": "Invalid data. Please check your input and try again.",
+      "unauthorized": "You do not have permission to perform this action."
+    }
   },
   "auth": {
     "login": "Sign In",
@@ -204,7 +210,11 @@
     "startDate": "Start Date",
     "endDate": "End Date",
     "historical": "Historical",
-    "current": "Current"
+    "current": "Current",
+    "errors": {
+      "duplicateCode": "A product with this code already exists. Please use a different code.",
+      "duplicateEntry": "A product with these details already exists."
+    }
   },
   "services": {
     "title": "Services",

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Category, ProductPriceHistory, ProductBuyingPriceHistory } from '../../models/models';
 import { forkJoin } from 'rxjs';
@@ -17,6 +17,12 @@ import { forkJoin } from 'rxjs';
     </div>
 
     <div class="card">
+      @if (errorMessage) {
+        <div class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+      }
+
       @if (isEdit) {
         <div class="tabs">
           <button [class.active]="activeTab === 'details'" (click)="activeTab = 'details'">{{ 'products.details' | translate }}</button>
@@ -101,7 +107,13 @@ import { forkJoin } from 'rxjs';
           </div>
 
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary" [disabled]="form.invalid">{{ 'common.save' | translate }}</button>
+            <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">
+              @if (saving) {
+                {{ 'common.saving' | translate }}...
+              } @else {
+                {{ 'common.save' | translate }}
+              }
+            </button>
             <a routerLink="/products" class="btn btn-secondary">{{ 'common.cancel' | translate }}</a>
           </div>
         </form>
@@ -350,12 +362,17 @@ import { forkJoin } from 'rxjs';
     .alert {
       padding: 1rem;
       border-radius: 8px;
-      margin-top: 1rem;
+      margin-bottom: 1rem;
     }
     .alert-warning {
       background: rgba(255, 193, 7, 0.1);
       border: 1px solid rgba(255, 193, 7, 0.3);
       color: #856404;
+    }
+    .alert-danger {
+      background: rgba(220, 53, 69, 0.1);
+      border: 1px solid rgba(220, 53, 69, 0.3);
+      color: #721c24;
     }
   `]
 })
@@ -374,12 +391,15 @@ export class ProductFormComponent implements OnInit {
   currentBuyingPrice = 0;
   computedStock = 0;
   minStock = 0;
+  errorMessage = '';
+  saving = false;
 
   constructor(
     private fb: FormBuilder,
     private api: ApiService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {
     this.form = this.fb.group({
       code: ['', Validators.required],
@@ -453,6 +473,9 @@ export class ProductFormComponent implements OnInit {
 
   save() {
     if (this.form.valid) {
+      this.saving = true;
+      this.errorMessage = '';
+      
       const formData = this.form.value;
       const data: any = {
         code: formData.code,
@@ -479,28 +502,88 @@ export class ProductFormComponent implements OnInit {
         ? this.api.updateProduct(this.id!, data)
         : this.api.createProduct(data);
       
-      request.subscribe((savedProduct) => {
-        if (!this.isEdit) {
-          const today = new Date().toISOString().split('T')[0];
-          const requests = [];
-          
-          if (formData.sellingPrice > 0) {
-            requests.push(this.api.addProductSellingPrice(savedProduct.id!, formData.sellingPrice, today));
-          }
-          if (formData.buyingPrice > 0) {
-            requests.push(this.api.addProductBuyingPrice(savedProduct.id!, formData.buyingPrice, today));
-          }
-          
-          if (requests.length > 0) {
-            forkJoin(requests).subscribe(() => {
+      request.subscribe({
+        next: (savedProduct) => {
+          if (!this.isEdit) {
+            const today = new Date().toISOString().split('T')[0];
+            const requests = [];
+            
+            if (formData.sellingPrice > 0) {
+              requests.push(this.api.addProductSellingPrice(savedProduct.id!, formData.sellingPrice, today));
+            }
+            if (formData.buyingPrice > 0) {
+              requests.push(this.api.addProductBuyingPrice(savedProduct.id!, formData.buyingPrice, today));
+            }
+            
+            if (requests.length > 0) {
+              forkJoin(requests).subscribe({
+                next: () => {
+                  this.saving = false;
+                  this.router.navigate(['/products']);
+                },
+                error: () => {
+                  this.saving = false;
+                  this.router.navigate(['/products']);
+                }
+              });
+            } else {
+              this.saving = false;
               this.router.navigate(['/products']);
-            });
+            }
           } else {
+            this.saving = false;
             this.router.navigate(['/products']);
           }
-        } else {
-          this.router.navigate(['/products']);
+        },
+        error: (err) => {
+          this.saving = false;
+          this.handleError(err);
         }
+      });
+    }
+  }
+
+  handleError(err: any) {
+    if (err.status === 500) {
+      const errorBody = err.error;
+      if (typeof errorBody === 'string') {
+        if (errorBody.includes('UNIQUE constraint failed: products.code')) {
+          this.translate.get('products.errors.duplicateCode').subscribe(msg => {
+            this.errorMessage = msg || 'A product with this code already exists. Please use a different code.';
+          });
+        } else if (errorBody.includes('UNIQUE constraint failed')) {
+          this.translate.get('products.errors.duplicateEntry').subscribe(msg => {
+            this.errorMessage = msg || 'A product with these details already exists.';
+          });
+        } else {
+          this.translate.get('common.errors.serverError').subscribe(msg => {
+            this.errorMessage = msg || 'An error occurred while saving. Please try again.';
+          });
+        }
+      } else if (errorBody?.message) {
+        if (errorBody.message.includes('UNIQUE constraint failed: products.code')) {
+          this.translate.get('products.errors.duplicateCode').subscribe(msg => {
+            this.errorMessage = msg || 'A product with this code already exists. Please use a different code.';
+          });
+        } else {
+          this.errorMessage = errorBody.message;
+        }
+      } else {
+        this.translate.get('common.errors.serverError').subscribe(msg => {
+          this.errorMessage = msg || 'An error occurred while saving. Please try again.';
+        });
+      }
+    } else if (err.status === 400) {
+      this.translate.get('common.errors.invalidData').subscribe(msg => {
+        this.errorMessage = msg || 'Invalid data. Please check your input and try again.';
+      });
+    } else if (err.status === 401 || err.status === 403) {
+      this.translate.get('common.errors.unauthorized').subscribe(msg => {
+        this.errorMessage = msg || 'You do not have permission to perform this action.';
+      });
+    } else {
+      this.translate.get('common.errors.serverError').subscribe(msg => {
+        this.errorMessage = msg || 'An error occurred while saving. Please try again.';
       });
     }
   }
