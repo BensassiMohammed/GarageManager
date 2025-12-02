@@ -5,11 +5,12 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { DashboardStats, WorkOrder, Invoice, Product } from '../../models/models';
 import { forkJoin } from 'rxjs';
+import { MadCurrencyPipe } from '../../pipes/mad-currency.pipe';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule],
+  imports: [CommonModule, RouterLink, TranslateModule, MadCurrencyPipe],
   template: `
     <div class="page-header">
       <h2 class="page-title">{{ 'dashboard.title' | translate }}</h2>
@@ -36,7 +37,7 @@ import { forkJoin } from 'rxjs';
           </svg>
         </div>
         <div class="kpi-content">
-          <div class="kpi-value">{{ stats.outstandingAmount | currency }}</div>
+          <div class="kpi-value">{{ stats.outstandingAmount | madCurrency }}</div>
           <div class="kpi-label">{{ 'dashboard.outstandingBalance' | translate }}</div>
         </div>
       </div>
@@ -63,7 +64,7 @@ import { forkJoin } from 'rxjs';
           </svg>
         </div>
         <div class="kpi-content">
-          <div class="kpi-value">{{ stats.monthlyExpenses | currency }}</div>
+          <div class="kpi-value">{{ stats.monthlyExpenses | madCurrency }}</div>
           <div class="kpi-label">{{ 'dashboard.monthlyExpenses' | translate }}</div>
         </div>
       </div>
@@ -115,7 +116,7 @@ import { forkJoin } from 'rxjs';
                   </div>
                   <div class="item-meta">
                     <span class="badge badge-warning">{{ wo.status }}</span>
-                    <span class="item-amount">{{ wo.totalAmount | currency }}</span>
+                    <span class="item-amount">{{ wo.totalAmount | madCurrency }}</span>
                   </div>
                 </li>
               }
@@ -141,8 +142,8 @@ import { forkJoin } from 'rxjs';
                     <span class="item-subtitle">{{ inv.date }}</span>
                   </div>
                   <div class="item-meta">
-                    <span class="badge badge-danger">{{ inv.remainingBalance | currency }}</span>
-                    <span class="item-total">of {{ inv.totalAmount | currency }}</span>
+                    <span class="badge badge-danger">{{ inv.remainingBalance | madCurrency }}</span>
+                    <span class="item-total">of {{ inv.totalAmount | madCurrency }}</span>
                   </div>
                 </li>
               }

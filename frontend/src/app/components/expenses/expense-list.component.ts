@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Expense, ExpenseCategory } from '../../models/models';
+import { MadCurrencyPipe } from '../../pipes/mad-currency.pipe';
 
 @Component({
   selector: 'app-expense-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, TranslateModule],
+  imports: [CommonModule, RouterLink, FormsModule, TranslateModule, MadCurrencyPipe],
   template: `
     <div class="page-header">
       <h2 class="page-title">{{ 'expenses.title' | translate }}</h2>
@@ -52,7 +53,7 @@ import { Expense, ExpenseCategory } from '../../models/models';
 
     <div class="summary-cards">
       <div class="summary-card">
-        <div class="summary-value">{{ getTotalAmount() | currency }}</div>
+        <div class="summary-value">{{ getTotalAmount() | madCurrency }}</div>
         <div class="summary-label">{{ 'common.total' | translate }} ({{ filteredExpenses.length }} items)</div>
       </div>
       @if (selectedCategoryId) {
@@ -82,7 +83,7 @@ import { Expense, ExpenseCategory } from '../../models/models';
                 <td>{{ expense.date }}</td>
                 <td>{{ expense.label }}</td>
                 <td>{{ expense.expenseCategory?.name || '-' }}</td>
-                <td>{{ expense.amount | currency }}</td>
+                <td>{{ expense.amount | madCurrency }}</td>
                 <td>{{ expense.paymentMethod || '-' }}</td>
                 <td class="actions">
                   <a [routerLink]="['/expenses', expense.id]" class="btn btn-sm btn-secondary">{{ 'common.edit' | translate }}</a>

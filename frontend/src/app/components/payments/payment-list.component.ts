@@ -5,11 +5,12 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Payment, PaymentAllocation, Client, Company, Invoice, ApplyPaymentRequest } from '../../models/models';
 import { forkJoin } from 'rxjs';
+import { MadCurrencyPipe } from '../../pipes/mad-currency.pipe';
 
 @Component({
   selector: 'app-payment-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, MadCurrencyPipe],
   template: `
     <div class="page-header">
       <h2 class="page-title">{{ 'payments.title' | translate }}</h2>
@@ -38,7 +39,7 @@ import { forkJoin } from 'rxjs';
                 </td>
                 <td>{{ payment.date }}</td>
                 <td>{{ getPaymentMethodLabel(payment.method) | translate }}</td>
-                <td>{{ payment.totalAmount | currency }}</td>
+                <td>{{ payment.totalAmount | madCurrency }}</td>
                 <td class="actions">
                   <button class="btn btn-sm btn-secondary" (click)="viewAllocations(payment)">{{ 'payments.allocations' | translate }}</button>
                 </td>
@@ -131,8 +132,8 @@ import { forkJoin } from 'rxjs';
                       <tr>
                         <td>#{{ inv.id }}</td>
                         <td>{{ inv.date }}</td>
-                        <td>{{ inv.totalAmount | currency }}</td>
-                        <td class="text-danger">{{ inv.remainingBalance | currency }}</td>
+                        <td>{{ inv.totalAmount | madCurrency }}</td>
+                        <td class="text-danger">{{ inv.remainingBalance | madCurrency }}</td>
                         <td>
                           <input type="number" step="0.01" min="0" [max]="inv.remainingBalance || 0"
                             [(ngModel)]="allocations[i].amount" class="form-control form-control-sm">
@@ -143,8 +144,8 @@ import { forkJoin } from 'rxjs';
                 </table>
               </div>
               <div class="allocation-summary">
-                <span>{{ 'payments.allocatedAmount' | translate }}: {{ getTotalAllocated() | currency }}</span>
-                <span>{{ 'payments.unallocated' | translate }}: {{ newPayment.totalAmount - getTotalAllocated() | currency }}</span>
+                <span>{{ 'payments.allocatedAmount' | translate }}: {{ getTotalAllocated() | madCurrency }}</span>
+                <span>{{ 'payments.unallocated' | translate }}: {{ newPayment.totalAmount - getTotalAllocated() | madCurrency }}</span>
               </div>
             }
 
@@ -171,7 +172,7 @@ import { forkJoin } from 'rxjs';
             <div class="payment-info">
               <div class="info-group">
                 <label>{{ 'invoices.totalAmount' | translate }}:</label>
-                <span>{{ selectedPayment.totalAmount | currency }}</span>
+                <span>{{ selectedPayment.totalAmount | madCurrency }}</span>
               </div>
               <div class="info-group">
                 <label>{{ 'payments.paymentDate' | translate }}:</label>
@@ -196,7 +197,7 @@ import { forkJoin } from 'rxjs';
                   @for (alloc of paymentAllocations; track alloc.id) {
                     <tr>
                       <td>{{ 'invoices.invoiceNumber' | translate }} #{{ alloc.invoice?.id }}</td>
-                      <td>{{ alloc.allocatedAmount | currency }}</td>
+                      <td>{{ alloc.allocatedAmount | madCurrency }}</td>
                     </tr>
                   } @empty {
                     <tr><td colspan="2" class="empty-state">{{ 'payments.noPayments' | translate }}</td></tr>

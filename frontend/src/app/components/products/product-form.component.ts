@@ -6,11 +6,12 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Category, ProductPriceHistory, ProductBuyingPriceHistory } from '../../models/models';
 import { forkJoin } from 'rxjs';
+import { MadCurrencyPipe } from '../../pipes/mad-currency.pipe';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule, MadCurrencyPipe],
   template: `
     <div class="page-header">
       <h2 class="page-title">{{ (isEdit ? 'products.editProduct' : 'products.newProduct') | translate }}</h2>
@@ -117,7 +118,7 @@ import { forkJoin } from 'rxjs';
           @if (priceTab === 'selling') {
             <div class="current-price-card">
               <h4>{{ 'products.currentSellingPrice' | translate }}</h4>
-              <div class="price-display selling">{{ currentSellingPrice | currency }}</div>
+              <div class="price-display selling">{{ currentSellingPrice | madCurrency }}</div>
             </div>
 
             <div class="change-price-form">
@@ -153,7 +154,7 @@ import { forkJoin } from 'rxjs';
                 <tbody>
                   @for (history of sellingPriceHistory; track history.id) {
                     <tr>
-                      <td>{{ history.price | currency }}</td>
+                      <td>{{ history.price | madCurrency }}</td>
                       <td>{{ history.startDate }}</td>
                       <td>{{ history.endDate || '-' }}</td>
                       <td>
@@ -175,7 +176,7 @@ import { forkJoin } from 'rxjs';
           @if (priceTab === 'buying') {
             <div class="current-price-card">
               <h4>{{ 'products.currentBuyingPrice' | translate }}</h4>
-              <div class="price-display buying">{{ currentBuyingPrice | currency }}</div>
+              <div class="price-display buying">{{ currentBuyingPrice | madCurrency }}</div>
             </div>
 
             <div class="change-price-form">
@@ -211,7 +212,7 @@ import { forkJoin } from 'rxjs';
                 <tbody>
                   @for (history of buyingPriceHistory; track history.id) {
                     <tr>
-                      <td>{{ history.price | currency }}</td>
+                      <td>{{ history.price | madCurrency }}</td>
                       <td>{{ history.startDate }}</td>
                       <td>{{ history.endDate || '-' }}</td>
                       <td>

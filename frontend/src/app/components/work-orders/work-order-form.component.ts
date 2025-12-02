@@ -6,6 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { WorkOrder, WorkOrderProductLine, WorkOrderServiceLine, Client, Vehicle, ServiceItem, Product } from '../../models/models';
 import { forkJoin } from 'rxjs';
+import { MadCurrencyPipe } from '../../pipes/mad-currency.pipe';
 
 interface DraftServiceLine {
   serviceId: number | null;
@@ -30,7 +31,7 @@ interface DraftProductLine {
 @Component({
   selector: 'app-work-order-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, TranslateModule],
+  imports: [CommonModule, FormsModule, RouterLink, TranslateModule, MadCurrencyPipe],
   template: `
     <div class="page-header">
       <h2 class="page-title">{{ (isEdit ? 'workOrders.editWorkOrder' : 'workOrders.newWorkOrder') | translate }}</h2>
@@ -102,7 +103,7 @@ interface DraftProductLine {
               <tr>
                 <td>{{ line.serviceName }}</td>
                 <td class="col-qty">{{ line.quantity }}</td>
-                <td class="col-price">{{ line.unitPrice | currency }}</td>
+                <td class="col-price">{{ line.unitPrice | madCurrency }}</td>
                 <td class="col-discount">
                   @if (line.discountPercent > 0) {
                     <span class="discount-badge">{{ line.discountPercent }}%</span>
@@ -110,8 +111,8 @@ interface DraftProductLine {
                     -
                   }
                 </td>
-                <td class="col-price">{{ line.finalUnitPrice | currency }}</td>
-                <td class="col-total">{{ line.lineTotal | currency }}</td>
+                <td class="col-price">{{ line.finalUnitPrice | madCurrency }}</td>
+                <td class="col-total">{{ line.lineTotal | madCurrency }}</td>
                 <td class="col-action">
                   <button class="btn btn-danger btn-sm" (click)="removeServiceLine(i)">&times;</button>
                 </td>
@@ -147,7 +148,7 @@ interface DraftProductLine {
               <tr>
                 <td>{{ line.productName }}</td>
                 <td class="col-qty">{{ line.quantity }}</td>
-                <td class="col-price">{{ line.standardPrice | currency }}</td>
+                <td class="col-price">{{ line.standardPrice | madCurrency }}</td>
                 <td class="col-discount">
                   @if (line.discountPercent > 0) {
                     <span class="discount-badge">{{ line.discountPercent }}%</span>
@@ -155,8 +156,8 @@ interface DraftProductLine {
                     -
                   }
                 </td>
-                <td class="col-price">{{ line.finalUnitPrice | currency }}</td>
-                <td class="col-total">{{ line.lineTotal | currency }}</td>
+                <td class="col-price">{{ line.finalUnitPrice | madCurrency }}</td>
+                <td class="col-total">{{ line.lineTotal | madCurrency }}</td>
                 <td class="col-action">
                   <button class="btn btn-danger btn-sm" (click)="removeProductLine(i)">&times;</button>
                 </td>
@@ -174,23 +175,23 @@ interface DraftProductLine {
       <div class="totals-section">
         <div class="totals-row">
           <span>{{ 'workOrders.servicesSubtotal' | translate }}:</span>
-          <span>{{ getServicesBeforeDiscount() | currency }}</span>
+          <span>{{ getServicesBeforeDiscount() | madCurrency }}</span>
         </div>
         <div class="totals-row discount-row">
           <span>{{ 'workOrders.servicesDiscount' | translate }}:</span>
-          <span>-{{ getServicesDiscount() | currency }}</span>
+          <span>-{{ getServicesDiscount() | madCurrency }}</span>
         </div>
         <div class="totals-row">
           <span>{{ 'workOrders.partsSubtotal' | translate }}:</span>
-          <span>{{ getProductsBeforeDiscount() | currency }}</span>
+          <span>{{ getProductsBeforeDiscount() | madCurrency }}</span>
         </div>
         <div class="totals-row discount-row">
           <span>{{ 'workOrders.partsDiscount' | translate }}:</span>
-          <span>-{{ getProductsDiscount() | currency }}</span>
+          <span>-{{ getProductsDiscount() | madCurrency }}</span>
         </div>
         <div class="totals-row grand-total-row">
           <span>{{ 'workOrders.grandTotal' | translate }}:</span>
-          <span>{{ getGrandTotal() | currency }}</span>
+          <span>{{ getGrandTotal() | madCurrency }}</span>
         </div>
       </div>
 
@@ -218,7 +219,7 @@ interface DraftProductLine {
               <select [(ngModel)]="newServiceLine.serviceId" (change)="onServiceSelect()" class="form-control">
                 <option [ngValue]="null">{{ 'common.select' | translate }}</option>
                 @for (svc of availableServices; track svc.id) {
-                  <option [ngValue]="svc.id">{{ svc.name }} ({{ svc.sellingPrice | currency }})</option>
+                  <option [ngValue]="svc.id">{{ svc.name }} ({{ svc.sellingPrice | madCurrency }})</option>
                 }
               </select>
             </div>
@@ -234,9 +235,9 @@ interface DraftProductLine {
             </div>
             @if (newServiceLine.serviceId) {
               <div class="line-preview">
-                <span>{{ 'workOrders.stdPrice' | translate }}: {{ getSelectedServicePrice() | currency }}</span>
-                <span>{{ 'workOrders.finalPrice' | translate }}: {{ getSelectedServiceFinalPrice() | currency }}</span>
-                <span>{{ 'workOrders.lineTotal' | translate }}: {{ getSelectedServiceLineTotal() | currency }}</span>
+                <span>{{ 'workOrders.stdPrice' | translate }}: {{ getSelectedServicePrice() | madCurrency }}</span>
+                <span>{{ 'workOrders.finalPrice' | translate }}: {{ getSelectedServiceFinalPrice() | madCurrency }}</span>
+                <span>{{ 'workOrders.lineTotal' | translate }}: {{ getSelectedServiceLineTotal() | madCurrency }}</span>
               </div>
             }
             <div class="form-actions">
@@ -261,7 +262,7 @@ interface DraftProductLine {
               <select [(ngModel)]="newProductLine.productId" (change)="onProductSelect()" class="form-control">
                 <option [ngValue]="null">{{ 'common.select' | translate }}</option>
                 @for (prod of availableProducts; track prod.id) {
-                  <option [ngValue]="prod.id">{{ prod.name }} ({{ prod.sellingPrice | currency }})</option>
+                  <option [ngValue]="prod.id">{{ prod.name }} ({{ prod.sellingPrice | madCurrency }})</option>
                 }
               </select>
             </div>
@@ -277,9 +278,9 @@ interface DraftProductLine {
             </div>
             @if (newProductLine.productId) {
               <div class="line-preview">
-                <span>{{ 'workOrders.stdPrice' | translate }}: {{ getSelectedProductPrice() | currency }}</span>
-                <span>{{ 'workOrders.finalPrice' | translate }}: {{ getSelectedProductFinalPrice() | currency }}</span>
-                <span>{{ 'workOrders.lineTotal' | translate }}: {{ getSelectedProductLineTotal() | currency }}</span>
+                <span>{{ 'workOrders.stdPrice' | translate }}: {{ getSelectedProductPrice() | madCurrency }}</span>
+                <span>{{ 'workOrders.finalPrice' | translate }}: {{ getSelectedProductFinalPrice() | madCurrency }}</span>
+                <span>{{ 'workOrders.lineTotal' | translate }}: {{ getSelectedProductLineTotal() | madCurrency }}</span>
               </div>
             }
             <div class="form-actions">

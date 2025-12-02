@@ -4,11 +4,12 @@ import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Product } from '../../models/models';
+import { MadCurrencyPipe } from '../../pipes/mad-currency.pipe';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule],
+  imports: [CommonModule, RouterLink, TranslateModule, MadCurrencyPipe],
   template: `
     <div class="page-header">
       <h2 class="page-title">{{ 'products.title' | translate }}</h2>
@@ -38,8 +39,8 @@ import { Product } from '../../models/models';
                 <td>{{ product.name }}</td>
                 <td>{{ product.brand || '-' }}</td>
                 <td>{{ product.category?.name || '-' }}</td>
-                <td>{{ product.buyingPrice ? (product.buyingPrice | currency) : '-' }}</td>
-                <td>{{ product.sellingPrice | currency }}</td>
+                <td>{{ product.buyingPrice ? (product.buyingPrice | madCurrency) : '-' }}</td>
+                <td>{{ product.sellingPrice | madCurrency }}</td>
                 <td>
                   <span [class]="(product.currentStock || 0) <= (product.minStock || 0) ? 'badge badge-danger' : 'badge badge-success'">
                     {{ product.currentStock || 0 }}

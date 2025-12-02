@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { SupplierOrder, SupplierOrderLine, Supplier, Product } from '../../models/models';
+import { MadCurrencyPipe } from '../../pipes/mad-currency.pipe';
 
 @Component({
   selector: 'app-supplier-order-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, MadCurrencyPipe],
   template: `
     <div class="page-header">
       <h2 class="page-title">{{ 'supplierOrders.title' | translate }}</h2>
@@ -47,7 +48,7 @@ import { SupplierOrder, SupplierOrderLine, Supplier, Product } from '../../model
                 <td>
                   <span [class]="getStatusClass(order.status)">{{ getStatusLabel(order.status) | translate }}</span>
                 </td>
-                <td>{{ order.totalAmount | currency }}</td>
+                <td>{{ order.totalAmount | madCurrency }}</td>
                 <td class="actions">
                   <button class="btn btn-sm btn-secondary" (click)="viewDetails(order)">{{ 'common.details' | translate }}</button>
                   @if (order.status === 'ORDERED') {
@@ -104,8 +105,8 @@ import { SupplierOrder, SupplierOrderLine, Supplier, Product } from '../../model
                     <tr>
                       <td>{{ line.product?.name }}</td>
                       <td>{{ line.quantity }}</td>
-                      <td>{{ line.unitPrice | currency }}</td>
-                      <td>{{ line.lineTotal | currency }}</td>
+                      <td>{{ line.unitPrice | madCurrency }}</td>
+                      <td>{{ line.lineTotal | madCurrency }}</td>
                     </tr>
                   } @empty {
                     <tr><td colspan="4" class="empty-state">{{ 'supplierOrders.noOrders' | translate }}</td></tr>
@@ -116,7 +117,7 @@ import { SupplierOrder, SupplierOrderLine, Supplier, Product } from '../../model
 
             <div class="order-total">
               <span>{{ 'common.total' | translate }}:</span>
-              <span class="total-value">{{ selectedOrder.totalAmount | currency }}</span>
+              <span class="total-value">{{ selectedOrder.totalAmount | madCurrency }}</span>
             </div>
 
             @if (selectedOrder.status === 'ORDERED') {

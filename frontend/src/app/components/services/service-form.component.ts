@@ -6,11 +6,12 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Category, ServicePriceHistory } from '../../models/models';
 import { forkJoin } from 'rxjs';
+import { MadCurrencyPipe } from '../../pipes/mad-currency.pipe';
 
 @Component({
   selector: 'app-service-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule, MadCurrencyPipe],
   template: `
     <div class="page-header">
       <h2 class="page-title">{{ (isEdit ? 'services.editService' : 'services.newService') | translate }}</h2>
@@ -72,7 +73,7 @@ import { forkJoin } from 'rxjs';
         <div class="price-section">
           <div class="current-price-card">
             <h4>{{ 'common.price' | translate }}</h4>
-            <div class="price-display">{{ currentPrice | currency }}</div>
+            <div class="price-display">{{ currentPrice | madCurrency }}</div>
           </div>
 
           <div class="change-price-form">
@@ -108,7 +109,7 @@ import { forkJoin } from 'rxjs';
               <tbody>
                 @for (history of priceHistory; track history.id) {
                   <tr>
-                    <td>{{ history.price | currency }}</td>
+                    <td>{{ history.price | madCurrency }}</td>
                     <td>{{ history.startDate }}</td>
                     <td>{{ history.endDate || '-' }}</td>
                     <td>

@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { Invoice, InvoiceLine } from '../../models/models';
+import { MadCurrencyPipe } from '../../pipes/mad-currency.pipe';
 
 @Component({
   selector: 'app-invoice-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, MadCurrencyPipe],
   template: `
     <div class="page-header">
       <h2 class="page-title">{{ 'invoices.title' | translate }}</h2>
@@ -57,10 +58,10 @@ import { Invoice, InvoiceLine } from '../../models/models';
                 <td>
                   <span [class]="getStatusClass(invoice.status)">{{ getStatusLabel(invoice.status) | translate }}</span>
                 </td>
-                <td>{{ invoice.totalAmount | currency }}</td>
+                <td>{{ invoice.totalAmount | madCurrency }}</td>
                 <td>
                   @if ((invoice.remainingBalance || 0) > 0) {
-                    <span class="text-danger">{{ invoice.remainingBalance | currency }}</span>
+                    <span class="text-danger">{{ invoice.remainingBalance | madCurrency }}</span>
                   } @else {
                     <span class="text-success">{{ 'invoices.paid' | translate }}</span>
                   }
@@ -137,7 +138,7 @@ import { Invoice, InvoiceLine } from '../../models/models';
                         {{ line.description || line.product?.name || line.service?.name || '-' }}
                       </td>
                       <td>{{ line.quantity }}</td>
-                      <td>{{ line.standardPrice | currency }}</td>
+                      <td>{{ line.standardPrice | madCurrency }}</td>
                       <td>
                         @if (line.discountPercent && line.discountPercent > 0) {
                           <span class="badge badge-success">{{ line.discountPercent }}%</span>
@@ -145,8 +146,8 @@ import { Invoice, InvoiceLine } from '../../models/models';
                           -
                         }
                       </td>
-                      <td>{{ line.finalUnitPrice | currency }}</td>
-                      <td>{{ line.lineTotal | currency }}</td>
+                      <td>{{ line.finalUnitPrice | madCurrency }}</td>
+                      <td>{{ line.lineTotal | madCurrency }}</td>
                     </tr>
                   } @empty {
                     <tr><td colspan="6" class="empty-state">{{ 'invoices.noInvoices' | translate }}</td></tr>
@@ -158,16 +159,16 @@ import { Invoice, InvoiceLine } from '../../models/models';
             <div class="invoice-totals">
               <div class="totals-row">
                 <span>{{ 'invoices.totalAmount' | translate }}:</span>
-                <span>{{ selectedInvoice.totalAmount | currency }}</span>
+                <span>{{ selectedInvoice.totalAmount | madCurrency }}</span>
               </div>
               <div class="totals-row">
                 <span>{{ 'invoices.paidAmount' | translate }}:</span>
-                <span class="text-success">{{ (selectedInvoice.totalAmount || 0) - (selectedInvoice.remainingBalance || 0) | currency }}</span>
+                <span class="text-success">{{ (selectedInvoice.totalAmount || 0) - (selectedInvoice.remainingBalance || 0) | madCurrency }}</span>
               </div>
               <div class="totals-row balance">
                 <span>{{ 'invoices.remainingBalance' | translate }}:</span>
                 <span [class]="(selectedInvoice.remainingBalance || 0) > 0 ? 'text-danger' : 'text-success'">
-                  {{ selectedInvoice.remainingBalance | currency }}
+                  {{ selectedInvoice.remainingBalance | madCurrency }}
                 </span>
               </div>
             </div>

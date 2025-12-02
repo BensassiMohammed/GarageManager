@@ -4,11 +4,12 @@ import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { ServiceItem } from '../../models/models';
+import { MadCurrencyPipe } from '../../pipes/mad-currency.pipe';
 
 @Component({
   selector: 'app-service-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslateModule],
+  imports: [CommonModule, RouterLink, TranslateModule, MadCurrencyPipe],
   template: `
     <div class="page-header">
       <h2 class="page-title">{{ 'services.title' | translate }}</h2>
@@ -34,7 +35,7 @@ import { ServiceItem } from '../../models/models';
                 <td>{{ service.code }}</td>
                 <td>{{ service.name }}</td>
                 <td>{{ service.category?.name || '-' }}</td>
-                <td>{{ service.sellingPrice | currency }}</td>
+                <td>{{ service.sellingPrice | madCurrency }}</td>
                 <td>
                   <span [class]="service.active ? 'badge badge-success' : 'badge badge-danger'">
                     {{ (service.active ? 'common.active' : 'common.inactive') | translate }}
