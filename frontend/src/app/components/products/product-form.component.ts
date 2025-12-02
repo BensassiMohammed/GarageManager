@@ -545,83 +545,50 @@ export class ProductFormComponent implements OnInit {
 
   handleError(err: any) {
     const errorBody = err.error;
+    let errorKey = 'common.errors.serverError';
+    let fallbackMessage = 'An error occurred while saving. Please try again.';
     
     if (err.status === 409) {
       const message = errorBody?.message || '';
       if (message === 'UNIQUE_PRODUCT_CODE' || message.includes('products.code')) {
-        this.translate.get('products.errors.duplicateCode').subscribe(msg => {
-          this.errorMessage = msg || 'A product with this code already exists. Please use a different code.';
-        });
+        errorKey = 'products.errors.duplicateCode';
+        fallbackMessage = 'A product with this code already exists. Please use a different code.';
       } else if (message === 'UNIQUE_PRODUCT_BARCODE') {
-        this.translate.get('products.errors.duplicateEntry').subscribe(msg => {
-          this.errorMessage = msg || 'A product with this barcode already exists.';
-        });
+        errorKey = 'products.errors.duplicateEntry';
+        fallbackMessage = 'A product with this barcode already exists.';
       } else {
-        this.translate.get('products.errors.duplicateEntry').subscribe(msg => {
-          this.errorMessage = msg || 'A product with these details already exists.';
-        });
+        errorKey = 'products.errors.duplicateEntry';
+        fallbackMessage = 'A product with these details already exists.';
       }
     } else if (err.status === 500) {
-      if (typeof errorBody === 'string') {
-        if (errorBody.includes('UNIQUE constraint failed: products.code')) {
-          this.translate.get('products.errors.duplicateCode').subscribe(msg => {
-            this.errorMessage = msg || 'A product with this code already exists. Please use a different code.';
-          });
-        } else if (errorBody.includes('UNIQUE constraint failed')) {
-          this.translate.get('products.errors.duplicateEntry').subscribe(msg => {
-            this.errorMessage = msg || 'A product with these details already exists.';
-          });
-        } else {
-          this.translate.get('common.errors.serverError').subscribe(msg => {
-            this.errorMessage = msg || 'An error occurred while saving. Please try again.';
-          });
-        }
-      } else if (errorBody?.message) {
-        if (errorBody.message.includes('UNIQUE constraint failed: products.code')) {
-          this.translate.get('products.errors.duplicateCode').subscribe(msg => {
-            this.errorMessage = msg || 'A product with this code already exists. Please use a different code.';
-          });
-        } else if (errorBody.message.includes('UNIQUE constraint failed')) {
-          this.translate.get('products.errors.duplicateEntry').subscribe(msg => {
-            this.errorMessage = msg || 'A product with these details already exists.';
-          });
-        } else {
-          this.translate.get('common.errors.serverError').subscribe(msg => {
-            this.errorMessage = msg || 'An error occurred while saving. Please try again.';
-          });
-        }
-      } else if (errorBody?.trace) {
-        if (errorBody.trace.includes('UNIQUE constraint failed: products.code')) {
-          this.translate.get('products.errors.duplicateCode').subscribe(msg => {
-            this.errorMessage = msg || 'A product with this code already exists. Please use a different code.';
-          });
-        } else if (errorBody.trace.includes('UNIQUE constraint failed')) {
-          this.translate.get('products.errors.duplicateEntry').subscribe(msg => {
-            this.errorMessage = msg || 'A product with these details already exists.';
-          });
-        } else {
-          this.translate.get('common.errors.serverError').subscribe(msg => {
-            this.errorMessage = msg || 'An error occurred while saving. Please try again.';
-          });
-        }
-      } else {
-        this.translate.get('common.errors.serverError').subscribe(msg => {
-          this.errorMessage = msg || 'An error occurred while saving. Please try again.';
-        });
+      const fullMessage = this.getFullErrorMessage(errorBody);
+      if (fullMessage.includes('UNIQUE constraint failed: products.code')) {
+        errorKey = 'products.errors.duplicateCode';
+        fallbackMessage = 'A product with this code already exists. Please use a different code.';
+      } else if (fullMessage.includes('UNIQUE constraint failed')) {
+        errorKey = 'products.errors.duplicateEntry';
+        fallbackMessage = 'A product with these details already exists.';
       }
     } else if (err.status === 400) {
-      this.translate.get('common.errors.invalidData').subscribe(msg => {
-        this.errorMessage = msg || 'Invalid data. Please check your input and try again.';
-      });
+      errorKey = 'common.errors.invalidData';
+      fallbackMessage = 'Invalid data. Please check your input and try again.';
     } else if (err.status === 401 || err.status === 403) {
-      this.translate.get('common.errors.unauthorized').subscribe(msg => {
-        this.errorMessage = msg || 'You do not have permission to perform this action.';
-      });
-    } else {
-      this.translate.get('common.errors.serverError').subscribe(msg => {
-        this.errorMessage = msg || 'An error occurred while saving. Please try again.';
-      });
+      errorKey = 'common.errors.unauthorized';
+      fallbackMessage = 'You do not have permission to perform this action.';
     }
+    
+    const translated = this.translate.instant(errorKey);
+    this.errorMessage = translated !== errorKey ? translated : fallbackMessage;
+  }
+
+  private getFullErrorMessage(errorBody: any): string {
+    if (!errorBody) return '';
+    if (typeof errorBody === 'string') return errorBody;
+    let result = '';
+    if (errorBody.message) result += errorBody.message + ' ';
+    if (errorBody.error) result += errorBody.error + ' ';
+    if (errorBody.trace) result += errorBody.trace + ' ';
+    return result;
   }
 
   addNewSellingPrice() {

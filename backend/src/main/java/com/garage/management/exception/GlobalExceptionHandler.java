@@ -1,5 +1,7 @@
 package com.garage.management.exception;
 
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +9,7 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import jakarta.persistence.PersistenceException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,20 +19,57 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-        String message = extractConstraintMessage(ex.getMessage());
+        String message = extractConstraintMessage(getFullExceptionMessage(ex));
         return buildErrorResponse(HttpStatus.CONFLICT, message);
     }
 
     @ExceptionHandler(JpaSystemException.class)
     public ResponseEntity<Map<String, Object>> handleJpaSystemException(JpaSystemException ex) {
-        String rootCauseMessage = ex.getRootCause() != null ? ex.getRootCause().getMessage() : ex.getMessage();
-        String message = extractConstraintMessage(rootCauseMessage);
+        String message = extractConstraintMessage(getFullExceptionMessage(ex));
         return buildErrorResponse(HttpStatus.CONFLICT, message);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex) {
+        String message = extractConstraintMessage(getFullExceptionMessage(ex));
+        return buildErrorResponse(HttpStatus.CONFLICT, message);
+    }
+
+    @ExceptionHandler(PersistenceException.class)
+    public ResponseEntity<Map<String, Object>> handlePersistenceException(PersistenceException ex) {
+        String fullMessage = getFullExceptionMessage(ex);
+        if (fullMessage.contains("UNIQUE constraint failed") || fullMessage.contains("FOREIGN KEY constraint failed")) {
+            String message = extractConstraintMessage(fullMessage);
+            return buildErrorResponse(HttpStatus.CONFLICT, message);
+        }
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "DATABASE_ERROR");
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<Map<String, Object>> handleDataAccessException(DataAccessException ex) {
+        String fullMessage = getFullExceptionMessage(ex);
+        if (fullMessage.contains("UNIQUE constraint failed") || fullMessage.contains("FOREIGN KEY constraint failed")) {
+            String message = extractConstraintMessage(fullMessage);
+            return buildErrorResponse(HttpStatus.CONFLICT, message);
+        }
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "DATABASE_ERROR");
+    }
+
+    private String getFullExceptionMessage(Throwable ex) {
+        StringBuilder sb = new StringBuilder();
+        Throwable current = ex;
+        while (current != null) {
+            if (current.getMessage() != null) {
+                sb.append(current.getMessage()).append(" ");
+            }
+            current = current.getCause();
+        }
+        return sb.toString();
     }
 
     private String extractConstraintMessage(String exceptionMessage) {
         if (exceptionMessage == null) {
-            return "A database constraint was violated.";
+            return "DATABASE_CONSTRAINT_VIOLATION";
         }
         
         if (exceptionMessage.contains("UNIQUE constraint failed: products.code")) {
