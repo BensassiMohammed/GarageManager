@@ -109,7 +109,7 @@ public class ProductController {
 
     @PostMapping
     public Product create(@RequestBody Product product) {
-        return productRepository.save(product);
+        return productRepository.saveAndFlush(product);
     }
 
     @PutMapping("/{id}")
@@ -127,7 +127,7 @@ public class ProductController {
                     existing.setVolume(product.getVolume());
                     existing.setMinStock(product.getMinStock());
                     existing.setActive(product.getActive());
-                    return ResponseEntity.ok(productRepository.save(existing));
+                    return ResponseEntity.ok(productRepository.saveAndFlush(existing));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
