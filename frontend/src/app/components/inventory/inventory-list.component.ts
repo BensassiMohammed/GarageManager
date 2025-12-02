@@ -373,10 +373,14 @@ export class InventoryListComponent implements OnInit {
     this.api.getProducts().subscribe({
       next: data => {
         this.products = data || [];
+        this.validateOverviewFilter();
         this.applyOverviewFilter();
         this.cdr.detectChanges();
       },
-      error: () => this.products = []
+      error: () => {
+        this.products = [];
+        this.filteredProducts = [];
+      }
     });
     this.api.getStockMovements().subscribe({
       next: data => {
@@ -385,11 +389,33 @@ export class InventoryListComponent implements OnInit {
           const dateB = this.parseDate(b.date);
           return dateB - dateA;
         });
+        this.validateHistoryFilter();
         this.applyHistoryFilter();
         this.cdr.detectChanges();
       },
-      error: () => this.movements = []
+      error: () => {
+        this.movements = [];
+        this.filteredMovements = [];
+      }
     });
+  }
+
+  validateOverviewFilter() {
+    if (this.overviewCategoryFilter) {
+      const categoryExists = this.productCategories.some(c => c.id === this.overviewCategoryFilter);
+      if (!categoryExists) {
+        this.overviewCategoryFilter = null;
+      }
+    }
+  }
+
+  validateHistoryFilter() {
+    if (this.historyCategoryFilter) {
+      const categoryExists = this.productCategories.some(c => c.id === this.historyCategoryFilter);
+      if (!categoryExists) {
+        this.historyCategoryFilter = null;
+      }
+    }
   }
 
   applyOverviewFilter() {
