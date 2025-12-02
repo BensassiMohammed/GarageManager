@@ -131,6 +131,7 @@
     "editClient": "تعديل العميل",
     "firstName": "الاسم الأول",
     "lastName": "اسم العائلة",
+    "city": "المدينة",
     "company": "الشركة",
     "noClients": "لم يتم العثور على عملاء",
     "selectCompany": "اختر شركة (اختياري)"

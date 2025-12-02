@@ -18,6 +18,8 @@ export interface Client {
   lastName: string;
   phone?: string;
   email?: string;
+  city?: string;
+  address?: string;
   company?: Company;
   notes?: string;
   active?: boolean;

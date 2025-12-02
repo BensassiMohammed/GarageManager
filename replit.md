@@ -170,6 +170,13 @@ The application supports multi-language interfaces with the following languages:
 3. For RTL components, use `[dir="rtl"]` CSS selectors for layout adjustments
 
 ## Recent Changes
+- 2025-12-02: Added City and Address fields to Client module
+  - City (Ville/المدينة) - Client location city
+  - Address (Adresse/العنوان) - Client full address
+  - Backend Client entity and ClientController updated
+  - Frontend form and table updated to display and edit new fields
+  - Translations added for English, French, and Arabic
+
 - 2025-12-02: Added new fields to Company module
   - ICE (Identifiant Commun de l'Entreprise) - Moroccan business identifier
   - City (Ville) - Company location city

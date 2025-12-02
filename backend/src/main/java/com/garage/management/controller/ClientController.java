@@ -45,6 +45,8 @@ public class ClientController {
                     existing.setLastName(client.getLastName());
                     existing.setPhone(client.getPhone());
                     existing.setEmail(client.getEmail());
+                    existing.setCity(client.getCity());
+                    existing.setAddress(client.getAddress());
                     existing.setCompany(client.getCompany());
                     existing.setNotes(client.getNotes());
                     existing.setActive(client.getActive());

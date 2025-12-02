@@ -131,6 +131,7 @@
     "editClient": "Edit Client",
     "firstName": "First Name",
     "lastName": "Last Name",
+    "city": "City",
     "company": "Company",
     "noClients": "No clients found",
     "selectCompany": "Select a company (optional)"
