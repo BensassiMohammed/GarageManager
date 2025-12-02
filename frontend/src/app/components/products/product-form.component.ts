@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
-import { Category, ProductPriceHistory } from '../../models/models';
+import { Category, ProductPriceHistory, ProductBuyingPriceHistory } from '../../models/models';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -65,18 +65,18 @@ import { forkJoin } from 'rxjs';
             </div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>{{ 'products.buyingPrice' | translate }}</label>
-              <input type="number" step="0.01" formControlName="buyingPrice" class="form-control" placeholder="0.00">
-            </div>
-            @if (!isEdit) {
+          @if (!isEdit) {
+            <div class="form-row">
+              <div class="form-group">
+                <label>{{ 'products.buyingPrice' | translate }}</label>
+                <input type="number" step="0.01" formControlName="buyingPrice" class="form-control" placeholder="0.00">
+              </div>
               <div class="form-group">
                 <label class="required">{{ 'products.sellingPrice' | translate }}</label>
                 <input type="number" step="0.01" formControlName="sellingPrice" class="form-control" placeholder="0.00">
               </div>
-            }
-          </div>
+            </div>
+          }
 
           <div class="form-row">
             <div class="form-group">
@@ -109,61 +109,126 @@ import { forkJoin } from 'rxjs';
 
       @if (activeTab === 'pricing') {
         <div class="price-section">
-          <div class="current-price-card">
-            <h4>{{ 'common.price' | translate }}</h4>
-            <div class="price-display">{{ currentPrice | currency }}</div>
+          <div class="sub-tabs">
+            <button [class.active]="priceTab === 'selling'" (click)="priceTab = 'selling'">{{ 'products.sellingPrice' | translate }}</button>
+            <button [class.active]="priceTab === 'buying'" (click)="priceTab = 'buying'">{{ 'products.buyingPrice' | translate }}</button>
           </div>
 
-          <div class="change-price-form">
-            <h4>{{ 'products.addPrice' | translate }}</h4>
-            <form [formGroup]="priceForm" (ngSubmit)="addNewPrice()">
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="required">{{ 'common.price' | translate }}</label>
-                  <input type="number" step="0.01" formControlName="price" class="form-control">
-                </div>
-                <div class="form-group">
-                  <label>{{ 'products.effectiveDate' | translate }}</label>
-                  <input type="date" formControlName="startDate" class="form-control">
-                </div>
-                <div class="form-group">
-                  <button type="submit" class="btn btn-primary" [disabled]="priceForm.invalid">{{ 'common.save' | translate }}</button>
-                </div>
-              </div>
-            </form>
-          </div>
+          @if (priceTab === 'selling') {
+            <div class="current-price-card">
+              <h4>{{ 'products.currentSellingPrice' | translate }}</h4>
+              <div class="price-display selling">{{ currentSellingPrice | currency }}</div>
+            </div>
 
-          <h4>{{ 'products.priceHistory' | translate }}</h4>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>{{ 'common.price' | translate }}</th>
-                  <th>{{ 'common.date' | translate }}</th>
-                  <th>{{ 'common.date' | translate }}</th>
-                  <th>{{ 'common.status' | translate }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (history of priceHistory; track history.id) {
+            <div class="change-price-form">
+              <h4>{{ 'products.updateSellingPrice' | translate }}</h4>
+              <form [formGroup]="sellingPriceForm" (ngSubmit)="addNewSellingPrice()">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="required">{{ 'common.price' | translate }}</label>
+                    <input type="number" step="0.01" formControlName="price" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label>{{ 'products.effectiveDate' | translate }}</label>
+                    <input type="date" formControlName="startDate" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary" [disabled]="sellingPriceForm.invalid">{{ 'common.save' | translate }}</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <h4>{{ 'products.sellingPriceHistory' | translate }}</h4>
+            <div class="table-container">
+              <table>
+                <thead>
                   <tr>
-                    <td>{{ history.price | currency }}</td>
-                    <td>{{ history.startDate }}</td>
-                    <td>{{ history.endDate || '-' }}</td>
-                    <td>
-                      <span [class]="history.endDate ? 'badge badge-secondary' : 'badge badge-success'">
-                        {{ history.endDate ? 'Historical' : 'Current' }}
-                      </span>
-                    </td>
+                    <th>{{ 'common.price' | translate }}</th>
+                    <th>{{ 'products.startDate' | translate }}</th>
+                    <th>{{ 'products.endDate' | translate }}</th>
+                    <th>{{ 'common.status' | translate }}</th>
                   </tr>
-                } @empty {
+                </thead>
+                <tbody>
+                  @for (history of sellingPriceHistory; track history.id) {
+                    <tr>
+                      <td>{{ history.price | currency }}</td>
+                      <td>{{ history.startDate }}</td>
+                      <td>{{ history.endDate || '-' }}</td>
+                      <td>
+                        <span [class]="history.endDate ? 'badge badge-secondary' : 'badge badge-success'">
+                          {{ (history.endDate ? 'products.historical' : 'products.current') | translate }}
+                        </span>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="4" class="empty-state">{{ 'products.noPriceHistory' | translate }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          @if (priceTab === 'buying') {
+            <div class="current-price-card">
+              <h4>{{ 'products.currentBuyingPrice' | translate }}</h4>
+              <div class="price-display buying">{{ currentBuyingPrice | currency }}</div>
+            </div>
+
+            <div class="change-price-form">
+              <h4>{{ 'products.updateBuyingPrice' | translate }}</h4>
+              <form [formGroup]="buyingPriceForm" (ngSubmit)="addNewBuyingPrice()">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="required">{{ 'common.price' | translate }}</label>
+                    <input type="number" step="0.01" formControlName="price" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label>{{ 'products.effectiveDate' | translate }}</label>
+                    <input type="date" formControlName="startDate" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary" [disabled]="buyingPriceForm.invalid">{{ 'common.save' | translate }}</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <h4>{{ 'products.buyingPriceHistory' | translate }}</h4>
+            <div class="table-container">
+              <table>
+                <thead>
                   <tr>
-                    <td colspan="4" class="empty-state">{{ 'products.noPriceHistory' | translate }}</td>
+                    <th>{{ 'common.price' | translate }}</th>
+                    <th>{{ 'products.startDate' | translate }}</th>
+                    <th>{{ 'products.endDate' | translate }}</th>
+                    <th>{{ 'common.status' | translate }}</th>
                   </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  @for (history of buyingPriceHistory; track history.id) {
+                    <tr>
+                      <td>{{ history.price | currency }}</td>
+                      <td>{{ history.startDate }}</td>
+                      <td>{{ history.endDate || '-' }}</td>
+                      <td>
+                        <span [class]="history.endDate ? 'badge badge-secondary' : 'badge badge-success'">
+                          {{ (history.endDate ? 'products.historical' : 'products.current') | translate }}
+                        </span>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="4" class="empty-state">{{ 'products.noPriceHistory' | translate }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
         </div>
       }
 
@@ -215,6 +280,34 @@ import { forkJoin } from 'rxjs';
     .tabs button:hover:not(.active) {
       background: var(--surface-hover);
     }
+    .sub-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 4px;
+      width: fit-content;
+    }
+    .sub-tabs button {
+      padding: 0.5rem 1.5rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .sub-tabs button:hover:not(.active) {
+      color: var(--text);
+      background: var(--surface-hover);
+    }
+    .sub-tabs button.active {
+      background: var(--primary);
+      color: white;
+    }
     .current-price-card, .stock-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -227,6 +320,12 @@ import { forkJoin } from 'rxjs';
       font-size: 2rem;
       font-weight: bold;
       color: var(--primary);
+    }
+    .price-display.selling {
+      color: var(--success);
+    }
+    .price-display.buying {
+      color: var(--warning);
     }
     .stock-value.low-stock {
       color: var(--danger);
@@ -262,13 +361,17 @@ import { forkJoin } from 'rxjs';
 })
 export class ProductFormComponent implements OnInit {
   form: FormGroup;
-  priceForm: FormGroup;
+  sellingPriceForm: FormGroup;
+  buyingPriceForm: FormGroup;
   isEdit = false;
   id?: number;
   categories: Category[] = [];
   activeTab = 'details';
-  priceHistory: ProductPriceHistory[] = [];
-  currentPrice = 0;
+  priceTab: 'selling' | 'buying' = 'selling';
+  sellingPriceHistory: ProductPriceHistory[] = [];
+  buyingPriceHistory: ProductBuyingPriceHistory[] = [];
+  currentSellingPrice = 0;
+  currentBuyingPrice = 0;
   computedStock = 0;
   minStock = 0;
 
@@ -293,7 +396,12 @@ export class ProductFormComponent implements OnInit {
       active: [true]
     });
 
-    this.priceForm = this.fb.group({
+    this.sellingPriceForm = this.fb.group({
+      price: [0, [Validators.required, Validators.min(0)]],
+      startDate: [new Date().toISOString().split('T')[0]]
+    });
+
+    this.buyingPriceForm = this.fb.group({
       price: [0, [Validators.required, Validators.min(0)]],
       startDate: [new Date().toISOString().split('T')[0]]
     });
@@ -317,9 +425,10 @@ export class ProductFormComponent implements OnInit {
     
     forkJoin({
       product: this.api.getProduct(this.id),
-      priceHistory: this.api.getProductPriceHistory(this.id),
+      sellingPriceHistory: this.api.getProductSellingPriceHistory(this.id),
+      buyingPriceHistory: this.api.getProductBuyingPriceHistory(this.id),
       computedStock: this.api.getProductComputedStock(this.id)
-    }).subscribe(({ product, priceHistory, computedStock }) => {
+    }).subscribe(({ product, sellingPriceHistory, buyingPriceHistory, computedStock }) => {
       this.form.patchValue({
         code: product.code,
         name: product.name,
@@ -333,8 +442,10 @@ export class ProductFormComponent implements OnInit {
         minStock: product.minStock || 0,
         active: product.active
       });
-      this.priceHistory = priceHistory;
-      this.currentPrice = product.sellingPrice || 0;
+      this.sellingPriceHistory = sellingPriceHistory;
+      this.buyingPriceHistory = buyingPriceHistory;
+      this.currentSellingPrice = product.sellingPrice || 0;
+      this.currentBuyingPrice = product.buyingPrice || 0;
       this.computedStock = computedStock;
       this.minStock = product.minStock || 0;
     });
@@ -369,11 +480,24 @@ export class ProductFormComponent implements OnInit {
         : this.api.createProduct(data);
       
       request.subscribe((savedProduct) => {
-        if (!this.isEdit && formData.sellingPrice > 0) {
+        if (!this.isEdit) {
           const today = new Date().toISOString().split('T')[0];
-          this.api.addProductPrice(savedProduct.id!, formData.sellingPrice, today).subscribe(() => {
+          const requests = [];
+          
+          if (formData.sellingPrice > 0) {
+            requests.push(this.api.addProductSellingPrice(savedProduct.id!, formData.sellingPrice, today));
+          }
+          if (formData.buyingPrice > 0) {
+            requests.push(this.api.addProductBuyingPrice(savedProduct.id!, formData.buyingPrice, today));
+          }
+          
+          if (requests.length > 0) {
+            forkJoin(requests).subscribe(() => {
+              this.router.navigate(['/products']);
+            });
+          } else {
             this.router.navigate(['/products']);
-          });
+          }
         } else {
           this.router.navigate(['/products']);
         }
@@ -381,12 +505,22 @@ export class ProductFormComponent implements OnInit {
     }
   }
 
-  addNewPrice() {
-    if (this.priceForm.valid && this.id) {
-      const { price, startDate } = this.priceForm.value;
-      this.api.addProductPrice(this.id, price, startDate).subscribe(() => {
+  addNewSellingPrice() {
+    if (this.sellingPriceForm.valid && this.id) {
+      const { price, startDate } = this.sellingPriceForm.value;
+      this.api.addProductSellingPrice(this.id, price, startDate).subscribe(() => {
         this.loadProduct();
-        this.priceForm.patchValue({ price: 0 });
+        this.sellingPriceForm.patchValue({ price: 0 });
+      });
+    }
+  }
+
+  addNewBuyingPrice() {
+    if (this.buyingPriceForm.valid && this.id) {
+      const { price, startDate } = this.buyingPriceForm.value;
+      this.api.addProductBuyingPrice(this.id, price, startDate).subscribe(() => {
+        this.loadProduct();
+        this.buyingPriceForm.patchValue({ price: 0 });
       });
     }
   }

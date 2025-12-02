@@ -2,6 +2,7 @@ package com.garage.management.controller;
 
 import com.garage.management.entity.Product;
 import com.garage.management.entity.ProductPriceHistory;
+import com.garage.management.entity.ProductBuyingPriceHistory;
 import com.garage.management.repository.ProductRepository;
 import com.garage.management.service.ProductPriceService;
 import com.garage.management.service.StockService;
@@ -44,28 +45,66 @@ public class ProductController {
         return productRepository.findLowStockProducts();
     }
 
+    // Selling Price History Endpoints
     @GetMapping("/{id}/prices")
     public List<ProductPriceHistory> getPriceHistory(@PathVariable Long id) {
-        return productPriceService.getPriceHistory(id);
+        return productPriceService.getSellingPriceHistory(id);
+    }
+
+    @GetMapping("/{id}/selling-prices")
+    public List<ProductPriceHistory> getSellingPriceHistory(@PathVariable Long id) {
+        return productPriceService.getSellingPriceHistory(id);
     }
 
     @GetMapping("/{id}/current-price")
     public ResponseEntity<BigDecimal> getCurrentPrice(@PathVariable Long id) {
-        return productPriceService.getCurrentPrice(id)
+        return productPriceService.getCurrentSellingPrice(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/current-selling-price")
+    public ResponseEntity<BigDecimal> getCurrentSellingPrice(@PathVariable Long id) {
+        return productPriceService.getCurrentSellingPrice(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/prices")
+    public ResponseEntity<ProductPriceHistory> addPrice(@PathVariable Long id, @RequestBody PriceRequest request) {
+        ProductPriceHistory history = productPriceService.addNewSellingPrice(id, request.price, request.startDate);
+        return ResponseEntity.ok(history);
+    }
+
+    @PostMapping("/{id}/selling-prices")
+    public ResponseEntity<ProductPriceHistory> addSellingPrice(@PathVariable Long id, @RequestBody PriceRequest request) {
+        ProductPriceHistory history = productPriceService.addNewSellingPrice(id, request.price, request.startDate);
+        return ResponseEntity.ok(history);
+    }
+
+    // Buying Price History Endpoints
+    @GetMapping("/{id}/buying-prices")
+    public List<ProductBuyingPriceHistory> getBuyingPriceHistory(@PathVariable Long id) {
+        return productPriceService.getBuyingPriceHistory(id);
+    }
+
+    @GetMapping("/{id}/current-buying-price")
+    public ResponseEntity<BigDecimal> getCurrentBuyingPrice(@PathVariable Long id) {
+        return productPriceService.getCurrentBuyingPrice(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/buying-prices")
+    public ResponseEntity<ProductBuyingPriceHistory> addBuyingPrice(@PathVariable Long id, @RequestBody PriceRequest request) {
+        ProductBuyingPriceHistory history = productPriceService.addNewBuyingPrice(id, request.price, request.startDate);
+        return ResponseEntity.ok(history);
     }
 
     @GetMapping("/{id}/computed-stock")
     public ResponseEntity<Integer> getComputedStock(@PathVariable Long id) {
         Integer stock = stockService.computeCurrentStock(id);
         return ResponseEntity.ok(stock);
-    }
-
-    @PostMapping("/{id}/prices")
-    public ResponseEntity<ProductPriceHistory> addPrice(@PathVariable Long id, @RequestBody PriceRequest request) {
-        ProductPriceHistory history = productPriceService.addNewPrice(id, request.price, request.startDate);
-        return ResponseEntity.ok(history);
     }
 
     @PostMapping

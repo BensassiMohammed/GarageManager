@@ -194,7 +194,17 @@
     "effectiveDate": "Effective Date",
     "noPriceHistory": "No price history available",
     "computedStock": "Computed Stock",
-    "lowStock": "Low Stock"
+    "lowStock": "Low Stock",
+    "currentSellingPrice": "Current Selling Price",
+    "currentBuyingPrice": "Current Buying Price",
+    "updateSellingPrice": "Update Selling Price",
+    "updateBuyingPrice": "Update Buying Price",
+    "sellingPriceHistory": "Selling Price History",
+    "buyingPriceHistory": "Buying Price History",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "historical": "Historical",
+    "current": "Current"
   },
   "services": {
     "title": "Services",

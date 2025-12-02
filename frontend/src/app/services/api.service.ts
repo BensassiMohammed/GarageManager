@@ -5,7 +5,7 @@ import {
   Company, Client, Vehicle, Supplier, Category, 
   Product, ServiceItem, ExpenseCategory, Expense,
   SupplierOrder, WorkOrder, Invoice, Payment, StockMovement,
-  ProductPriceHistory, ServicePriceHistory, WorkOrderProductLine,
+  ProductPriceHistory, ProductBuyingPriceHistory, ServicePriceHistory, WorkOrderProductLine,
   WorkOrderServiceLine, WorkOrderTotals, SupplierOrderLine, InvoiceLine,
   PaymentAllocation, DashboardStats, ApplyPaymentRequest
 } from '../models/models';
@@ -286,8 +286,13 @@ export class ApiService {
     return this.http.post<StockMovement>(`${this.baseUrl}/stock-movements`, movement);
   }
 
+  // Selling Price History
   getProductPriceHistory(productId: number): Observable<ProductPriceHistory[]> {
     return this.http.get<ProductPriceHistory[]>(`${this.baseUrl}/products/${productId}/prices`);
+  }
+
+  getProductSellingPriceHistory(productId: number): Observable<ProductPriceHistory[]> {
+    return this.http.get<ProductPriceHistory[]>(`${this.baseUrl}/products/${productId}/selling-prices`);
   }
 
   addProductPrice(productId: number, price: number, startDate?: string): Observable<ProductPriceHistory> {
@@ -298,8 +303,37 @@ export class ApiService {
     return this.http.post<ProductPriceHistory>(`${this.baseUrl}/products/${productId}/prices`, body);
   }
 
+  addProductSellingPrice(productId: number, price: number, startDate?: string): Observable<ProductPriceHistory> {
+    const body: any = { price };
+    if (startDate) {
+      body.startDate = startDate;
+    }
+    return this.http.post<ProductPriceHistory>(`${this.baseUrl}/products/${productId}/selling-prices`, body);
+  }
+
   getProductCurrentPrice(productId: number): Observable<number> {
     return this.http.get<number>(`${this.baseUrl}/products/${productId}/current-price`);
+  }
+
+  getProductCurrentSellingPrice(productId: number): Observable<number> {
+    return this.http.get<number>(`${this.baseUrl}/products/${productId}/current-selling-price`);
+  }
+
+  // Buying Price History
+  getProductBuyingPriceHistory(productId: number): Observable<ProductBuyingPriceHistory[]> {
+    return this.http.get<ProductBuyingPriceHistory[]>(`${this.baseUrl}/products/${productId}/buying-prices`);
+  }
+
+  addProductBuyingPrice(productId: number, price: number, startDate?: string): Observable<ProductBuyingPriceHistory> {
+    const body: any = { price };
+    if (startDate) {
+      body.startDate = startDate;
+    }
+    return this.http.post<ProductBuyingPriceHistory>(`${this.baseUrl}/products/${productId}/buying-prices`, body);
+  }
+
+  getProductCurrentBuyingPrice(productId: number): Observable<number> {
+    return this.http.get<number>(`${this.baseUrl}/products/${productId}/current-buying-price`);
   }
 
   getProductComputedStock(productId: number): Observable<number> {

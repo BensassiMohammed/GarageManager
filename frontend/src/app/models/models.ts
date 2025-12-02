@@ -187,6 +187,15 @@ export interface ProductPriceHistory {
   createdAt?: string;
 }
 
+export interface ProductBuyingPriceHistory {
+  id?: number;
+  product?: Product;
+  startDate: string;
+  endDate?: string;
+  price: number;
+  createdAt?: string;
+}
+
 export interface ServicePriceHistory {
   id?: number;
   service?: ServiceItem;

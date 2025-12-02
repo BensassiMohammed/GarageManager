@@ -39,6 +39,7 @@ com/garage/management/entity/ExpenseCategory.class
 com/garage/management/enums/PayerType.class
 com/garage/management/repository/PaymentRepository.class
 com/garage/management/service/DashboardService$DashboardStats.class
+com/garage/management/entity/ProductBuyingPriceHistory.class
 com/garage/management/controller/StockMovementController.class
 com/garage/management/service/DashboardService.class
 com/garage/management/enums/InvoiceStatus.class
@@ -54,6 +55,7 @@ com/garage/management/controller/WorkOrderController$AddProductLineRequest.class
 com/garage/management/entity/Vehicle.class
 com/garage/management/controller/VehicleController.class
 com/garage/management/controller/PaymentController.class
+com/garage/management/repository/ProductBuyingPriceHistoryRepository.class
 com/garage/management/repository/ProductRepository.class
 com/garage/management/dto/UserListResponse.class
 com/garage/management/controller/ServiceController.class

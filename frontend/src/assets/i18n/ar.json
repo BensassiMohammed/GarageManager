@@ -194,7 +194,17 @@
     "effectiveDate": "تاريخ السريان",
     "noPriceHistory": "لا يوجد سجل أسعار متاح",
     "computedStock": "المخزون المحسوب",
-    "lowStock": "مخزون منخفض"
+    "lowStock": "مخزون منخفض",
+    "currentSellingPrice": "سعر البيع الحالي",
+    "currentBuyingPrice": "سعر الشراء الحالي",
+    "updateSellingPrice": "تحديث سعر البيع",
+    "updateBuyingPrice": "تحديث سعر الشراء",
+    "sellingPriceHistory": "سجل أسعار البيع",
+    "buyingPriceHistory": "سجل أسعار الشراء",
+    "startDate": "تاريخ البداية",
+    "endDate": "تاريخ النهاية",
+    "historical": "تاريخي",
+    "current": "حالي"
   },
   "services": {
     "title": "الخدمات",

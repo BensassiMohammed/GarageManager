@@ -8,6 +8,7 @@
 /home/runner/workspace/backend/src/main/java/com/garage/management/config/CorsConfig.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/entity/Role.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/ExpenseController.java
+/home/runner/workspace/backend/src/main/java/com/garage/management/repository/ProductBuyingPriceHistoryRepository.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/security/JwtUtil.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/dto/UserDto.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/PaymentRepository.java
@@ -77,6 +78,7 @@
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/ProductRepository.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/GarageManagementApplication.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/enums/CategoryType.java
+/home/runner/workspace/backend/src/main/java/com/garage/management/entity/ProductBuyingPriceHistory.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/controller/SupplierController.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/dto/ChangePasswordRequest.java
 /home/runner/workspace/backend/src/main/java/com/garage/management/repository/ServicePriceHistoryRepository.java

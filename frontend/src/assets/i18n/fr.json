@@ -194,7 +194,17 @@
     "effectiveDate": "Date d'effet",
     "noPriceHistory": "Aucun historique de prix disponible",
     "computedStock": "Stock calcule",
-    "lowStock": "Stock faible"
+    "lowStock": "Stock faible",
+    "currentSellingPrice": "Prix de vente actuel",
+    "currentBuyingPrice": "Prix d'achat actuel",
+    "updateSellingPrice": "Modifier le prix de vente",
+    "updateBuyingPrice": "Modifier le prix d'achat",
+    "sellingPriceHistory": "Historique prix de vente",
+    "buyingPriceHistory": "Historique prix d'achat",
+    "startDate": "Date de debut",
+    "endDate": "Date de fin",
+    "historical": "Historique",
+    "current": "Actuel"
   },
   "services": {
     "title": "Services",
