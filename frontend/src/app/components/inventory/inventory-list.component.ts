@@ -41,7 +41,7 @@ import { Product, StockMovement } from '../../models/models';
           <table>
             <thead>
               <tr>
-                <th>{{ 'products.sku' | translate }}</th>
+                <th>{{ 'products.code' | translate }}</th>
                 <th>{{ 'common.name' | translate }}</th>
                 <th>{{ 'stockManagement.currentStock' | translate }}</th>
                 <th>{{ 'stockManagement.minStock' | translate }}</th>

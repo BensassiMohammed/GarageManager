@@ -20,10 +20,12 @@ import { Product } from '../../models/models';
         <table>
           <thead>
             <tr>
-              <th>{{ 'products.sku' | translate }}</th>
+              <th>{{ 'products.code' | translate }}</th>
               <th>{{ 'common.name' | translate }}</th>
+              <th>{{ 'products.brand' | translate }}</th>
               <th>{{ 'common.category' | translate }}</th>
-              <th>{{ 'common.price' | translate }}</th>
+              <th>{{ 'products.buyingPrice' | translate }}</th>
+              <th>{{ 'products.sellingPrice' | translate }}</th>
               <th>{{ 'products.currentStock' | translate }}</th>
               <th>{{ 'common.status' | translate }}</th>
               <th>{{ 'common.actions' | translate }}</th>
@@ -34,7 +36,9 @@ import { Product } from '../../models/models';
               <tr>
                 <td>{{ product.code }}</td>
                 <td>{{ product.name }}</td>
+                <td>{{ product.brand || '-' }}</td>
                 <td>{{ product.category?.name || '-' }}</td>
+                <td>{{ product.buyingPrice ? (product.buyingPrice | currency) : '-' }}</td>
                 <td>{{ product.sellingPrice | currency }}</td>
                 <td>
                   <span [class]="(product.currentStock || 0) <= (product.minStock || 0) ? 'badge badge-danger' : 'badge badge-success'">
@@ -53,7 +57,7 @@ import { Product } from '../../models/models';
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="empty-state">{{ 'products.noProducts' | translate }}</td>
+                <td colspan="9" class="empty-state">{{ 'products.noProducts' | translate }}</td>
               </tr>
             }
           </tbody>
