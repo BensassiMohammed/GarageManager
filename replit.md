@@ -17,6 +17,7 @@ The frontend is built with Angular 21 and TypeScript, featuring a tabbed interfa
 - **Authentication**: JWT tokens with a 15-minute expiration and sliding renewal. Supports role-based access control (ADMIN, MANAGER, STAFF) with default admin credentials (`admin`/`123456`) requiring a password change on first login.
 - **Module Permissions**: Granular permissions for `dashboard`, `customers`, `inventory`, `operations`, `finance`, and `users`.
 - **Internationalization**: Implemented using ngx-translate v17. Translation files (`en.json`, `fr.json`, `ar.json`) are located in `frontend/src/assets/i18n/`. A `LanguageService` manages language selection, persistence, and RTL handling.
+- **Currency**: Configured to use Moroccan Dirham (MAD) as the default currency throughout the application.
 
 ### Feature Specifications
 - **Customers**: Manage companies (with ICE, city, address), clients (individual, linked to companies, with city and address), and vehicles (with owner, status, mileage, and color).
@@ -28,7 +29,7 @@ The frontend is built with Angular 21 and TypeScript, featuring a tabbed interfa
 ### System Design Choices
 - **Layered Architecture**: Clear separation between controllers, services, repositories, and entities in the backend.
 - **Data Transfer Objects (DTOs)**: Used for efficient data exchange between frontend and backend.
-- **Price History**: Separate entities (`ProductPriceHistory`, `ServicePriceHistory`) to track historical pricing.
+- **Price History**: Dual price history tracking for products with separate entities (`ProductPriceHistory` for selling prices, `ProductBuyingPriceHistory` for buying prices). Services have `ServicePriceHistory` for selling price tracking. The product form includes a tabbed interface to view and manage both selling and buying price histories independently.
 - **Stock Management**: `StockMovementService` ensures atomic updates to product stock.
 - **Payment Allocation**: `PaymentService` includes logic for auto-allocating payments to outstanding invoices.
 
