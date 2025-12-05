@@ -41,14 +41,10 @@
             <scope>runtime</scope>
         </dependency>
         
-        <!-- Flyway for database migrations -->
+        <!-- Flyway for database migrations (version managed by Spring Boot 3.2 parent - Flyway 9.x) -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
         
         <!-- SQLite JDBC Driver (commented out - keeping for reference)
