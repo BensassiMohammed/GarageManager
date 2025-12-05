@@ -3,42 +3,6 @@ package com.garage.management.migration;
 import java.sql.*;
 import java.util.*;
 
-/**
- * =============================================================================
- * SQLite to PostgreSQL Data Migration Utility
- * =============================================================================
- * 
- * This is a one-time migration tool to copy data from an existing SQLite 
- * database to a PostgreSQL database.
- * 
- * PREREQUISITES:
- * 1. PostgreSQL database must exist and be accessible
- * 2. Flyway migration V1__baseline_schema.sql must be applied first
- *    (run the Spring Boot app once to create the schema)
- * 3. PostgreSQL tables should be EMPTY before running this migration
- *    (or truncate them first)
- * 4. SQLite database file must exist at the specified path
- * 
- * HOW TO RUN IN REPLIT:
- * 1. Stop the Spring Boot Backend workflow
- * 2. From the backend directory, run:
- *    cd backend && ./mvnw compile exec:java \
- *      -Dexec.mainClass="com.garage.management.migration.SQLiteToPostgresMigrator"
- * 
- * Or use the shell command:
- *    cd backend && ./mvnw compile exec:java -Dexec.mainClass="com.garage.management.migration.SQLiteToPostgresMigrator"
- * 
- * ENVIRONMENT VARIABLES REQUIRED:
- * - PGHOST: PostgreSQL host
- * - PGPORT: PostgreSQL port (default: 5432)
- * - PGDATABASE: PostgreSQL database name
- * - PGUSER: PostgreSQL username
- * - PGPASSWORD: PostgreSQL password
- * 
- * WARNING: This tool is intended to be run ONLY ONCE on an empty PostgreSQL DB.
- *          Running it multiple times may cause duplicate data or constraint violations.
- * =============================================================================
- */
 public class SQLiteToPostgresMigrator {
 
     private static final String SQLITE_DB_PATH = "garage.db";
@@ -82,6 +46,24 @@ public class SQLiteToPostgresMigrator {
         "invoices", "invoice_lines", "payments", "payment_allocations",
         "expense_categories", "expenses"
     };
+
+    private static final Set<String> TIMESTAMP_COLUMNS = Set.of(
+        "created_at", "updated_at", "effective_date", "order_date", "expected_delivery_date",
+        "received_date", "invoice_date", "due_date", "paid_date", "payment_date",
+        "expense_date", "movement_date", "expiration_date", "start_date", "end_date", "date"
+    );
+
+    private static final Set<String> BOOLEAN_COLUMNS = Set.of(
+        "active", "must_change_password"
+    );
+
+    private static final Set<String> DATE_ONLY_COLUMNS = Set.of(
+        "order_date", "expected_delivery_date", "received_date", "invoice_date", 
+        "due_date", "paid_date", "payment_date", "expense_date", "effective_date",
+        "expiration_date", "start_date", "end_date"
+    );
+
+    private static Map<String, Map<String, String>> pgColumnTypes = new HashMap<>();
 
     public static void main(String[] args) {
         System.out.println("=".repeat(70));
@@ -139,6 +121,11 @@ public class SQLiteToPostgresMigrator {
             int totalMigrated = 0;
             Map<String, Integer> migrationStats = new LinkedHashMap<>();
 
+            System.out.println("\nDisabling foreign key constraints...");
+            try (Statement stmt = pgConn.createStatement()) {
+                stmt.execute("SET session_replication_role = 'replica'");
+            }
+
             for (String table : MIGRATION_ORDER) {
                 int count = migrateTable(sqliteConn, pgConn, table);
                 migrationStats.put(table, count);
@@ -146,7 +133,15 @@ public class SQLiteToPostgresMigrator {
             }
 
             System.out.println("\n" + "-".repeat(70));
-            System.out.println("Updating PostgreSQL sequences...");
+            System.out.println("Re-enabling foreign key constraints...");
+            try (Statement stmt = pgConn.createStatement()) {
+                stmt.execute("SET session_replication_role = 'origin'");
+            }
+
+            System.out.println("Cleaning up orphaned records...");
+            cleanupOrphanedRecords(pgConn);
+
+            System.out.println("\nUpdating PostgreSQL sequences...");
             updateSequences(pgConn);
 
             pgConn.commit();
@@ -190,9 +185,24 @@ public class SQLiteToPostgresMigrator {
             throws SQLException {
         System.out.println("\nMigrating table: " + tableName);
 
-        List<String> columns = getTableColumns(sqliteConn, tableName);
-        if (columns.isEmpty()) {
+        List<String> sqliteColumns = getTableColumns(sqliteConn, tableName);
+        if (sqliteColumns.isEmpty()) {
             System.out.println("  No columns found or table doesn't exist in SQLite. Skipping.");
+            return 0;
+        }
+
+        Set<String> pgColumns = getPgTableColumns(pgConn, tableName);
+        List<String> columns = new ArrayList<>();
+        for (String col : sqliteColumns) {
+            if (pgColumns.contains(col.toLowerCase())) {
+                columns.add(col);
+            } else {
+                System.out.println("  Skipping column '" + col + "' (not in PostgreSQL schema)");
+            }
+        }
+
+        if (columns.isEmpty()) {
+            System.out.println("  No matching columns found. Skipping.");
             return 0;
         }
 
@@ -207,15 +217,38 @@ public class SQLiteToPostgresMigrator {
              ResultSet rs = selectStmt.executeQuery(selectSql);
              PreparedStatement insertStmt = pgConn.prepareStatement(insertSql)) {
 
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
+            int columnCount = columns.size();
 
             while (rs.next()) {
                 for (int i = 1; i <= columnCount; i++) {
+                    String colName = columns.get(i - 1).toLowerCase();
                     Object value = rs.getObject(i);
                     
-                    if (value instanceof Integer && isBooleanColumn(tableName, columns.get(i - 1))) {
-                        insertStmt.setBoolean(i, ((Integer) value) == 1);
+                    if (value == null) {
+                        insertStmt.setNull(i, Types.NULL);
+                    } else if (isTimestampColumn(colName)) {
+                        long epochMillis = rs.getLong(i);
+                        if (epochMillis > 0) {
+                            Timestamp ts = new Timestamp(epochMillis);
+                            if (isDateOnlyColumn(colName)) {
+                                insertStmt.setDate(i, new java.sql.Date(epochMillis));
+                            } else {
+                                insertStmt.setTimestamp(i, ts);
+                            }
+                        } else {
+                            insertStmt.setNull(i, Types.TIMESTAMP);
+                        }
+                    } else if (isBooleanColumn(colName)) {
+                        if (value instanceof Number) {
+                            insertStmt.setBoolean(i, ((Number) value).intValue() == 1);
+                        } else if (value instanceof String) {
+                            String strVal = ((String) value).toLowerCase();
+                            insertStmt.setBoolean(i, strVal.equals("true") || strVal.equals("1"));
+                        } else if (value instanceof Boolean) {
+                            insertStmt.setBoolean(i, (Boolean) value);
+                        } else {
+                            insertStmt.setBoolean(i, false);
+                        }
                     } else {
                         insertStmt.setObject(i, value);
                     }
@@ -250,11 +283,31 @@ public class SQLiteToPostgresMigrator {
         return columns;
     }
 
-    private static boolean isBooleanColumn(String tableName, String columnName) {
-        Set<String> booleanColumns = Set.of(
-            "active", "must_change_password"
-        );
-        return booleanColumns.contains(columnName.toLowerCase());
+    private static Set<String> getPgTableColumns(Connection pgConn, String tableName) throws SQLException {
+        Set<String> columns = new HashSet<>();
+        String sql = "SELECT column_name FROM information_schema.columns WHERE table_name = ? AND table_schema = 'public'";
+        
+        try (PreparedStatement stmt = pgConn.prepareStatement(sql)) {
+            stmt.setString(1, tableName);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    columns.add(rs.getString("column_name").toLowerCase());
+                }
+            }
+        }
+        return columns;
+    }
+
+    private static boolean isTimestampColumn(String columnName) {
+        return TIMESTAMP_COLUMNS.contains(columnName.toLowerCase());
+    }
+
+    private static boolean isBooleanColumn(String columnName) {
+        return BOOLEAN_COLUMNS.contains(columnName.toLowerCase());
+    }
+
+    private static boolean isDateOnlyColumn(String columnName) {
+        return DATE_ONLY_COLUMNS.contains(columnName.toLowerCase());
     }
 
     private static void updateSequences(Connection pgConn) throws SQLException {
@@ -270,6 +323,43 @@ public class SQLiteToPostgresMigrator {
                 System.out.println("  Updated sequence: " + sequenceName);
             } catch (SQLException e) {
                 System.out.println("  Note: Sequence " + sequenceName + " not found (table may be empty or use different PK)");
+            }
+        }
+    }
+
+    private static void cleanupOrphanedRecords(Connection pgConn) throws SQLException {
+        String[][] orphanCleanups = {
+            {"work_order_service_lines", "work_order_id", "work_orders", "id"},
+            {"work_order_product_lines", "work_order_id", "work_orders", "id"},
+            {"invoice_lines", "invoice_id", "invoices", "id"},
+            {"payment_allocations", "payment_id", "payments", "id"},
+            {"payment_allocations", "invoice_id", "invoices", "id"},
+            {"stock_movements", "product_id", "products", "id"},
+            {"product_price_history", "product_id", "products", "id"},
+            {"product_buying_price_history", "product_id", "products", "id"},
+            {"service_price_history", "service_id", "services", "id"},
+            {"vehicles", "owner_id", "clients", "id"},
+            {"clients", "company_id", "companies", "id"},
+        };
+
+        for (String[] cleanup : orphanCleanups) {
+            String childTable = cleanup[0];
+            String fkColumn = cleanup[1];
+            String parentTable = cleanup[2];
+            String pkColumn = cleanup[3];
+
+            String deleteSql = String.format(
+                "DELETE FROM %s WHERE %s IS NOT NULL AND %s NOT IN (SELECT %s FROM %s)",
+                childTable, fkColumn, fkColumn, pkColumn, parentTable
+            );
+
+            try (Statement stmt = pgConn.createStatement()) {
+                int deleted = stmt.executeUpdate(deleteSql);
+                if (deleted > 0) {
+                    System.out.println("  Cleaned up " + deleted + " orphaned records from " + childTable);
+                }
+            } catch (SQLException e) {
+                System.out.println("  Note: Could not clean " + childTable + ": " + e.getMessage());
             }
         }
     }
