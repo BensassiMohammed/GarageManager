@@ -12,7 +12,7 @@ I prefer iterative development with clear, concise explanations for each step. P
 The frontend is built with Angular 21 and TypeScript, featuring a tabbed interface and modals for enhanced user interaction. It supports multi-language interfaces (English, French, Arabic) with full RTL (right-to-left) layout support for Arabic, implemented using ngx-translate.
 
 ### Technical Implementations
-- **Backend**: Spring Boot 3.2, Java 17, Maven. Uses SQLite as the database and Spring Security with JWT for authentication.
+- **Backend**: Spring Boot 3.2, Java 17, Maven. Uses PostgreSQL as the database with Flyway for schema migrations, and Spring Security with JWT for authentication.
 - **Frontend**: Angular 21, TypeScript. Includes services for API interaction, authentication guards, and HTTP interceptors for JWT handling.
 - **Authentication**: JWT tokens with a 15-minute expiration and sliding renewal. Supports role-based access control (ADMIN, MANAGER, STAFF) with default admin credentials (`admin`/`123456`) requiring a password change on first login.
 - **Module Permissions**: Granular permissions for `dashboard`, `customers`, `inventory`, `operations`, `finance`, and `users`.
@@ -38,7 +38,18 @@ The frontend is built with Angular 21 and TypeScript, featuring a tabbed interfa
 - **Spring Security**: For authentication and authorization.
 - **JSON Web Tokens (JWT)**: For secure API authentication.
 - **Maven**: Project build automation tool for Java.
-- **SQLite**: Embedded database for data persistence (`backend/garage.db`).
+- **PostgreSQL**: Relational database for data persistence (configured via environment variables: `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`).
+- **Flyway**: Database migration tool for schema versioning (migrations in `backend/src/main/resources/db/migration/`).
 - **Angular**: Frontend framework.
 - **TypeScript**: Superset of JavaScript for frontend development.
 - **ngx-translate v17**: Angular library for internationalization.
+
+## Database Configuration
+The application connects to PostgreSQL using environment variables:
+- `PGHOST` - Database host
+- `PGPORT` - Database port  
+- `PGDATABASE` - Database name
+- `PGUSER` - Database username
+- `PGPASSWORD` - Database password
+
+Schema migrations are managed by Flyway with `spring.jpa.hibernate.ddl-auto=none` to prevent Hibernate auto-DDL. Migration files should be placed in `backend/src/main/resources/db/migration/` following the naming convention `V{version}__{description}.sql`.
