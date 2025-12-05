@@ -338,8 +338,6 @@ public class SQLiteToPostgresMigrator {
             {"product_price_history", "product_id", "products", "id"},
             {"product_buying_price_history", "product_id", "products", "id"},
             {"service_price_history", "service_id", "services", "id"},
-            {"vehicles", "owner_id", "clients", "id"},
-            {"clients", "company_id", "companies", "id"},
         };
 
         for (String[] cleanup : orphanCleanups) {
@@ -348,15 +346,28 @@ public class SQLiteToPostgresMigrator {
             String parentTable = cleanup[2];
             String pkColumn = cleanup[3];
 
-            String deleteSql = String.format(
-                "DELETE FROM %s WHERE %s IS NOT NULL AND %s NOT IN (SELECT %s FROM %s)",
-                childTable, fkColumn, fkColumn, pkColumn, parentTable
-            );
+            try {
+                String checkSql = String.format(
+                    "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = '%s' AND column_name = '%s'",
+                    childTable, fkColumn
+                );
+                try (Statement checkStmt = pgConn.createStatement();
+                     ResultSet rs = checkStmt.executeQuery(checkSql)) {
+                    if (rs.next() && rs.getInt(1) == 0) {
+                        continue;
+                    }
+                }
 
-            try (Statement stmt = pgConn.createStatement()) {
-                int deleted = stmt.executeUpdate(deleteSql);
-                if (deleted > 0) {
-                    System.out.println("  Cleaned up " + deleted + " orphaned records from " + childTable);
+                String deleteSql = String.format(
+                    "DELETE FROM %s WHERE %s IS NOT NULL AND %s NOT IN (SELECT %s FROM %s)",
+                    childTable, fkColumn, fkColumn, pkColumn, parentTable
+                );
+
+                try (Statement stmt = pgConn.createStatement()) {
+                    int deleted = stmt.executeUpdate(deleteSql);
+                    if (deleted > 0) {
+                        System.out.println("  Cleaned up " + deleted + " orphaned records from " + childTable);
+                    }
                 }
             } catch (SQLException e) {
                 System.out.println("  Note: Could not clean " + childTable + ": " + e.getMessage());
