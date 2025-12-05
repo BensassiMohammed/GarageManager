@@ -36,6 +36,7 @@ com/garage/management/entity/ProductPriceHistory.class
 com/garage/management/repository/ClientRepository.class
 com/garage/management/enums/PaymentMethod.class
 com/garage/management/entity/ExpenseCategory.class
+com/garage/management/migration/SQLiteToPostgresMigrator.class
 com/garage/management/enums/PayerType.class
 com/garage/management/repository/PaymentRepository.class
 com/garage/management/service/DashboardService$DashboardStats.class
@@ -69,8 +70,8 @@ com/garage/management/repository/ProductPriceHistoryRepository.class
 com/garage/management/repository/AppUserRepository.class
 com/garage/management/enums/WorkOrderStatus.class
 com/garage/management/repository/WorkOrderRepository.class
-com/garage/management/entity/Expense.class
 com/garage/management/entity/Invoice.class
+com/garage/management/entity/Expense.class
 com/garage/management/entity/ServiceEntity.class
 com/garage/management/controller/ProductController$PriceRequest.class
 com/garage/management/GarageManagementApplication.class
