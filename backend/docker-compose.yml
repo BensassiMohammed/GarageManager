@@ -38,16 +38,14 @@ services:
   # =========================
   # Angular Frontend
   # =========================
-    # frontend:
-    #   image: garage-frontend:latest   # Ton image Docker Angular (ng build)
-    # container_name: garage_frontend
-      #depends_on:
-    #  - backend
-      #ports:
-      # - "80:80"   # Expose Angular via HTTP
-      #volumes:
-      # - ./frontend/dist:/usr/share/nginx/html   # Angular build output
-    #command: [ "nginx", "-g", "daemon off;" ]
+  frontend:
+    build:
+      context: ./frontend   # dossier contenant ton Dockerfile Angular
+    container_name: garage_frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
 
 volumes:
   pgdata:
