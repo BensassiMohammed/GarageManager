@@ -1,5 +1,5 @@
 # Build stage
-FROM maven:3.9.6-amazoncorretto-21-al2023 as builder
+FROM maven:3.9.6-amazoncorretto-21-al2023 AS builder
 LABEL authors="mehdi,mohammed" \
       org.opencontainers.image.authors="sfm.div@gmail.com"
 
@@ -11,8 +11,7 @@ COPY src ./src/
 
 # Download dependencies and build in separate layers
 RUN mvn dependency:go-offline && \
-    mvn clean package -Dmaven.test.skip=true \
-    -T 4
+    mvn clean package -Dmaven.test.skip=true -T 4
 
 # Runtime stage
 FROM amazoncorretto:21-alpine
