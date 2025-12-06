@@ -38,14 +38,14 @@ services:
   # =========================
   # Angular Frontend
   # =========================
-  frontend:
-    build:
-      context: ./frontend   # dossier contenant ton Dockerfile Angular
-    container_name: garage_frontend
-    depends_on:
-      - backend
-    ports:
-      - "80:80"
+    #frontend:
+      #  build:
+    #   context: ./frontend   # dossier contenant ton Dockerfile Angular
+    # container_name: garage_frontend
+      # depends_on:
+    #   - backend
+      #ports:
+    #   - "80:80"
 
 volumes:
   pgdata:
