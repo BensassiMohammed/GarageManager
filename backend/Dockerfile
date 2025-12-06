@@ -15,7 +15,7 @@ RUN mvn dependency:go-offline && \
     -T 4
 
 # Runtime stage
-FROM --platform=linux/amd64 amazoncorretto:21-alpine
+FROM amazoncorretto:21-alpine
 WORKDIR /app
 
 # Add non-root user
