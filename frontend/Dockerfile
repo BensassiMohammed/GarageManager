@@ -18,10 +18,10 @@ RUN npm run build --configuration=$PROFILE
 FROM nginx:latest
 
 # Copy compiled Angular app
-COPY --from=build /usr/local/app/dist/staff-management-web /usr/share/nginx/html
+COPY --from=build /usr/local/app/dist/garege-management /usr/share/nginx/html
 
 # Copy custom nginx config
-COPY /nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
 # Rename index.html -> index.template.html for envsubst
 RUN mv /usr/share/nginx/html/index.html /usr/share/nginx/html/index.template.html
