@@ -1,0 +1,29 @@
+# ========================
+# Java / Spring Boot
+# ========================
+/target/
+/*.jar
+*.class
+*.log
+*.tmp
+*.bak
+*.swp
+
+# ========================
+# IDE / OS
+# ========================
+.idea/
+*.iml
+*.ipr
+*.iws
+*.classpath
+*.project
+.settings/
+.DS_Store
+Thumbs.db
+
+# ========================
+# Docker
+# ========================
+docker-compose.override.yml
+*.dockerfile
