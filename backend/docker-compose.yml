@@ -33,11 +33,11 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
       SPRING_PROFILES_ACTIVE: pfv
     ports:
-      - "8090:8090"
+      - "8090:8091"
 
-  # =========================
+  # ======================
   # Angular Frontend
-  # =========================
+  # ======================
     #frontend:
       #  build:
     #   context: ./frontend   # dossier contenant ton Dockerfile Angular
