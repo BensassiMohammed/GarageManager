@@ -34,7 +34,7 @@ COPY --from=build /usr/local/app/dist/garage-frontend/browser /usr/share/nginx/h
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
 # Renomme index.html en index.html pour permettre l'injection de variables d'environnement au démarrage
-RUN mv /usr/share/nginx/html/index.html /usr/share/nginx/html/index.html
+#RUN mv /usr/share/nginx/html/index.html /usr/share/nginx/html/index.html
 
 # Expose le port 80 pour le serveur web
 EXPOSE 80
