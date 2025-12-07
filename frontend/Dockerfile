@@ -1,5 +1,5 @@
 # Stage 1: Compile and Build Angular codebase
-FROM node:20.10.0-alpine AS build
+FROM node:20.19.0-alpine AS build
 
 ARG PROFILE=production
 ARG BUILD_VERSION=1.0.0
@@ -10,7 +10,9 @@ ENV BUILD_VERSION=${BUILD_VERSION}
 ENV APP_VERSION=${APP_VERSION}
 
 WORKDIR /usr/local/app
+
 COPY ./ /usr/local/app/
+
 RUN npm install
 RUN npm run build --configuration=$PROFILE
 
