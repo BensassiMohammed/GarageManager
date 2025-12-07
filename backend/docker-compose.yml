@@ -45,8 +45,6 @@ services:
       - backend
     ports:
      - "8050:80"   # Expose Angular via HTTP
-    volumes:
-     - ./frontend/dist:/usr/share/nginx/html   # Angular build output
     command: [ "nginx", "-g", "daemon off;" ]
 
 volumes:
