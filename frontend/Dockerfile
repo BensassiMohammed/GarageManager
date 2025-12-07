@@ -21,7 +21,7 @@ COPY ./ /usr/local/app/
 # Installe les dépendances Node.js
 RUN npm install
 # Compile l'application Angular selon le profil spécifié
-RUN npm run build --configuration=$PROFILE
+RUN npm run build
 
 # Stage 2: Serve app with nginx server
 # Utilise l'image officielle Nginx pour servir l'application compilée
@@ -33,8 +33,8 @@ COPY --from=build /usr/local/app/dist/garage-frontend/browser /usr/share/nginx/h
 # Copie la configuration personnalisée de Nginx dans le conteneur
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-# Renomme index.html en index.template.html pour permettre l'injection de variables d'environnement au démarrage
-RUN mv /usr/share/nginx/html/index.html /usr/share/nginx/html/index.template.html
+# Renomme index.html en index.html pour permettre l'injection de variables d'environnement au démarrage
+RUN mv /usr/share/nginx/html/index.html /usr/share/nginx/html/index.html
 
 # Expose le port 80 pour le serveur web
 EXPOSE 80
