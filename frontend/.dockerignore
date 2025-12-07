@@ -1,0 +1,42 @@
+# Angular build output
+dist/
+build/
+out-tsc/
+
+# Angular cache
+.angular/
+
+# Node modules
+node_modules/
+
+# Environment files (optional — keep only if you don't want them inside images)
+src/environments/*.local.ts
+src/environments/*.dev.ts
+
+# Logs
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+package-lock.json.debug
+*.log
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+
+# Tests
+coverage/
+karma.conf.js
+*.spec.ts
