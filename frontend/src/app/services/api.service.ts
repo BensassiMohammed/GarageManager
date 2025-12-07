@@ -1,20 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { 
-  Company, Client, Vehicle, Supplier, Category, 
+import {
+  Company, Client, Vehicle, Supplier, Category,
   Product, ServiceItem, ExpenseCategory, Expense,
   SupplierOrder, WorkOrder, Invoice, Payment, StockMovement,
   ProductPriceHistory, ProductBuyingPriceHistory, ServicePriceHistory, WorkOrderProductLine,
   WorkOrderServiceLine, WorkOrderTotals, SupplierOrderLine, InvoiceLine,
   PaymentAllocation, DashboardStats, ApplyPaymentRequest
 } from '../models/models';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = '/api';
+  private baseUrl = environment.apiUrl+'/api';
 
   constructor(private http: HttpClient) {}
 

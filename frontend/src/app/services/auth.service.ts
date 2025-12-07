@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import {environment} from '../../environments/environment';
+
 
 export interface LoginRequest {
   username: string;
@@ -33,7 +35,7 @@ export interface ChangePasswordRequest {
 export class AuthService {
   private readonly TOKEN_KEY = 'access_token';
   private readonly USER_INFO_KEY = 'user_info';
-  private baseUrl = '/api/auth';
+  private baseUrl = environment.apiUrl+'/api/auth';
 
   private currentUserSubject = new BehaviorSubject<UserInfo | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
