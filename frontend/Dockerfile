@@ -1,27 +1,43 @@
-# Stage 1: Build Angular app
+# Stage 1: Compile and Build Angular codebase
+# Utilise l'image Node.js Alpine pour construire l'application Angular
 FROM node:20.19.0-alpine AS build
 
+# Définition des arguments de build pour le profil, la version de build et la version de l'application
 ARG PROFILE=production
-WORKDIR /app
+ARG BUILD_VERSION=1.0.0
+ARG APP_VERSION=1.0.0
 
-COPY package*.json ./
+# Définition des variables d'environnement à partir des arguments
+ENV PROFILE=${PROFILE}
+ENV BUILD_VERSION=${BUILD_VERSION}
+ENV APP_VERSION=${APP_VERSION}
+
+# Définit le répertoire de travail dans le conteneur
+WORKDIR /usr/local/app
+
+# Copie tous les fichiers du projet dans le conteneur
+COPY ./ /usr/local/app/
+
+# Installe les dépendances Node.js
 RUN npm install
-
-COPY . .
+# Compile l'application Angular selon le profil spécifié
 RUN npm run build --configuration=$PROFILE
 
-# Stage 2: Run with Nginx
-FROM nginx:1.25-alpine
+# Stage 2: Serve app with nginx server
+# Utilise l'image officielle Nginx pour servir l'application compilée
+FROM nginx:latest
 
-# Copy compiled Angular app (fix folder name if needed)
-COPY --from=build /app/dist/garage-frontend /usr/share/nginx/html
+# Copie l'application Angular compilée depuis le conteneur de build vers le dossier de distribution Nginx
+COPY --from=build /usr/local/app/dist/garage-frontend/browser /usr/share/nginx/html
 
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copie la configuration personnalisée de Nginx dans le conteneur
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-# Optional: prepare template for envsubst
+# Renomme index.html en index.template.html pour permettre l'injection de variables d'environnement au démarrage
 RUN mv /usr/share/nginx/html/index.html /usr/share/nginx/html/index.template.html
 
+# Expose le port 80 pour le serveur web
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+# Démarre Nginx en mode premier plan (foreground) pour servir l'application
+CMD ["/bin/sh", "-c", "exec nginx -g 'daemon off;'"]
