@@ -14,7 +14,7 @@ services:
       POSTGRES_USER: gm_user
       POSTGRES_PASSWORD: admin
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
@@ -27,13 +27,13 @@ services:
     depends_on:
       - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/garage_manager
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5433/garage_manager
       SPRING_DATASOURCE_USERNAME: gm_user
       SPRING_DATASOURCE_PASSWORD: admin
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
-      SPRING_PROFILES_ACTIVE: pfv
+      SPRING_PROFILES_ACTIVE: staging
     ports:
-      - "8090:8090"
+      - "8091:8090"
 
       # =========================
       # Angular Frontend
@@ -44,7 +44,7 @@ services:
     depends_on:
       - backend
     ports:
-     - "8050:80"   # Expose Angular via HTTP
+     - "8051:80"   # Expose Angular via HTTP
     restart: unless-stopped
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:80" ]

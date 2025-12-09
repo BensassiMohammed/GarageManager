@@ -447,4 +447,26 @@ export class ApiService {
   getDashboardStats(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(`${this.baseUrl}/dashboard/stats`);
   }
+
+  // --- User & Role Management ---
+
+  getUsers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/users`);
+  }
+
+  getRoles(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/roles`);
+  }
+
+  createUser(user: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/users`, user);
+  }
+
+  updateUser(id: number, user: any): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/users/${id}`, user);
+  }
+
+  deleteUser(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/users/${id}`);
+  }
 }
