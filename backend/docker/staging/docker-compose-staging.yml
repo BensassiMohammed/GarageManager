@@ -1,11 +1,5 @@
 version: "3.9"
 
-# =============================================================================
-# Docker Compose - Staging Environment
-# =============================================================================
-# Usage: docker-compose -f docker-compose-staging.yml up -d
-# =============================================================================
-
 services:
 
   # =========================
@@ -16,15 +10,15 @@ services:
     container_name: garage_postgres_staging
     restart: always
     environment:
-      POSTGRES_DB: garage_manager_staging
-      POSTGRES_USER: gm_user
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - pgdata_staging:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U gm_user -d garage_manager_staging"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -40,13 +34,18 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: staging
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/garage_manager_staging
-      SPRING_DATASOURCE_USERNAME: gm_user
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
     ports:
       - "8091:8090"
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8090/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   # =========================
   # Angular Frontend (Staging)
@@ -55,12 +54,13 @@ services:
     image: garage-frontend:staging
     container_name: garage_frontend_staging
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     ports:
       - "8051:80"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

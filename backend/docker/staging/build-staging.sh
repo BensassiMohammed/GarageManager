@@ -46,7 +46,7 @@ echo -e "${GREEN}✅ Staging environment is running!${NC}"
 echo ""
 echo "📍 Frontend: http://localhost:8051"
 echo "📍 Backend:  http://localhost:8091"
-echo "📍 Database: localhost:5433"
+echo "📍 Database: localhost:5432"
 echo ""
 echo -e "${YELLOW}⚠️  N'oubliez pas de configurer .env.staging avec les bons credentials${NC}"
 
