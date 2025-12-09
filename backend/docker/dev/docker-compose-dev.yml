@@ -1,0 +1,80 @@
+version: "3.9"
+
+# =============================================================================
+# Docker Compose - Development Environment
+# =============================================================================
+# Usage: docker-compose -f docker-compose-dev.yml up -d
+# =============================================================================
+
+services:
+
+  # =========================
+  # PostgreSQL Database (Dev)
+  # =========================
+  postgres:
+    image: postgres:15
+    container_name: garage_postgres_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: garage_manager_dev
+      POSTGRES_USER: gm_user
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gm_user -d garage_manager_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =========================
+  # Spring Boot Backend (Dev)
+  # =========================
+  backend:
+    image: garage-backend:dev
+    container_name: garage_backend_dev
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/garage_manager_dev
+      SPRING_DATASOURCE_USERNAME: gm_user
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+    ports:
+      - "8090:8090"
+    restart: unless-stopped
+
+  # =========================
+  # Angular Frontend (Dev)
+  # =========================
+  frontend:
+    image: garage-frontend:dev
+    container_name: garage_frontend_dev
+    build:
+      context: ../../../frontend
+      dockerfile: Dockerfile
+      args:
+        PROFILE: dev
+    depends_on:
+      - backend
+    ports:
+      - "8050:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  pgdata_dev:
+    name: garage_pgdata_dev
+

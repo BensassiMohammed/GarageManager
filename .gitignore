@@ -1,0 +1,40 @@
+# =============================================================================
+# Git Ignore - GarageManager
+# =============================================================================
+
+# Environment files (contain sensitive data)
+.env
+.env.*
+*.env
+!.env.example
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Backend - Java/Maven
+backend/target/
+backend/*.jar
+backend/*.log
+
+# Frontend - Node/Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database files (local dev)
+*.db
+*.sqlite
+
+# Docker
+docker-compose.override.yml
+

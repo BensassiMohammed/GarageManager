@@ -20,8 +20,8 @@ COPY ./ /usr/local/app/
 
 # Installe les dépendances Node.js
 RUN npm install
-# Compile l'application Angular selon le profil spécifié
-RUN npm run build
+# Compile l'application Angular selon le profil spécifié (development, staging, production)
+RUN npm run build:${PROFILE}
 
 # Stage 2: Serve app with nginx server
 # Utilise l'image officielle Nginx pour servir l'application compilée

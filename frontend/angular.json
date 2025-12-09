@@ -94,6 +94,9 @@
             "production": {
               "buildTarget": "garage-frontend:build:production"
             },
+            "staging": {
+              "buildTarget": "garage-frontend:build:staging"
+            },
             "development": {
               "buildTarget": "garage-frontend:build:development"
             }

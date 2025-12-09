@@ -1,0 +1,70 @@
+version: "3.9"
+
+# =============================================================================
+# Docker Compose - Production Environment
+# =============================================================================
+# Usage: docker-compose -f docker-compose.yml up -d
+# =============================================================================
+
+services:
+
+  # =========================
+  # PostgreSQL Database (Production)
+  # =========================
+  postgres:
+    image: postgres:15
+    container_name: garage_postgres_prod
+    restart: always
+    environment:
+      POSTGRES_DB: garage_manager
+      POSTGRES_USER: ${POSTGRES_USER:-gm_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gm_user} -d garage_manager"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =========================
+  # Spring Boot Backend (Production)
+  # =========================
+  backend:
+    image: garage-backend:latest
+    container_name: garage_backend_prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/garage_manager
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-gm_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+    ports:
+      - "8090:8090"
+    restart: always
+
+  # =========================
+  # Angular Frontend (Production)
+  # =========================
+  frontend:
+    image: garage-frontend:latest
+    container_name: garage_frontend_prod
+    depends_on:
+      - backend
+    ports:
+      - "8050:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  pgdata_prod:
+    name: garage_pgdata_prod
