@@ -5,4 +5,3 @@ export const environment = {
   apiUrl: 'http://51.178.80.186:8090',
   debug: false
 };
-
