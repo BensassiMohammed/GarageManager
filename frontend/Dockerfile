@@ -28,7 +28,8 @@ RUN npm run build:${PROFILE}
 FROM nginx:latest
 
 # Copie l'application Angular compilée depuis le conteneur de build vers le dossier de distribution Nginx
-COPY --from=build /usr/local/app/dist/garage-frontend/browser /usr/share/nginx/html
+# Le chemin correspond à outputPath dans angular.json: dist/garage-frontend
+COPY --from=build /usr/local/app/dist/garage-frontend /usr/share/nginx/html
 
 # Copie la configuration personnalisée de Nginx dans le conteneur
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
