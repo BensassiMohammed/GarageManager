@@ -3,8 +3,15 @@ version: "3.9"
 # =============================================================================
 # Docker Compose - Production Environment
 # =============================================================================
-# Usage: docker-compose -f docker-compose.yml up -d
+# Usage: docker-compose --env-file .env.prod -f docker-compose.yml up -d
 # =============================================================================
+
+networks:
+  garage-backend:
+    driver: bridge
+    internal: true
+  garage-frontend:
+    driver: bridge
 
 services:
 
@@ -16,15 +23,15 @@ services:
     container_name: garage_postgres_prod
     restart: always
     environment:
-      POSTGRES_DB: garage_manager
+      POSTGRES_DB: ${POSTGRES_DB:-garage_manager}
       POSTGRES_USER: ${POSTGRES_USER:-gm_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata_prod:/var/lib/postgresql/data
+    networks:
+      - garage-backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gm_user} -d garage_manager"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gm_user} -d ${POSTGRES_DB:-garage_manager}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,18 +42,28 @@ services:
   backend:
     image: garage-backend:latest
     container_name: garage_backend_prod
+    build:
+      context: ../../
+      dockerfile: Dockerfile
     depends_on:
       postgres:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/garage_manager
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-garage_manager}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-gm_user}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
-    ports:
-      - "8090:8090"
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - garage-backend
+      - garage-frontend
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8090/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   # =========================
   # Angular Frontend (Production)
@@ -54,13 +71,21 @@ services:
   frontend:
     image: garage-frontend:latest
     container_name: garage_frontend_prod
+    build:
+      context: ../../../frontend
+      dockerfile: Dockerfile
+      args:
+        PROFILE: production
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     ports:
       - "8050:80"
-    restart: unless-stopped
+    networks:
+      - garage-frontend
+    restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

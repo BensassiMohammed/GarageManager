@@ -43,6 +43,8 @@ The frontend is built with Angular 21 and TypeScript, featuring a tabbed interfa
 - **Angular**: Frontend framework.
 - **TypeScript**: Superset of JavaScript for frontend development.
 - **ngx-translate v17**: Angular library for internationalization.
+- **Docker**: Multi-environment containerization for VPS deployment.
+- **Nginx**: Production frontend server with API proxy.
 
 ## Database Configuration
 The application connects to PostgreSQL using environment variables:
@@ -53,3 +55,50 @@ The application connects to PostgreSQL using environment variables:
 - `PGPASSWORD` - Database password
 
 Schema migrations are managed by Flyway with `spring.jpa.hibernate.ddl-auto=none` to prevent Hibernate auto-DDL. Migration files should be placed in `backend/src/main/resources/db/migration/` following the naming convention `V{version}__{description}.sql`.
+
+## Docker Deployment Configuration
+
+### Environments
+Three Docker environments are configured for deployment:
+
+| Environment | Compose File | Frontend Port | Backend Port | Database |
+|-------------|--------------|---------------|--------------|----------|
+| Development | `backend/docker/dev/docker-compose-dev.yml` | 8050 | 8090 | Internal |
+| Staging | `backend/docker/staging/docker-compose-staging.yml` | 8051 | Internal | Internal |
+| Production | `backend/docker/prod/docker-compose.yml` | 8050 | Internal | Internal |
+
+### Network Isolation
+- `garage-backend`: Internal network for postgres-backend communication (isolated from external access)
+- `garage-frontend`: Network for frontend-backend communication
+
+### Environment Variables Required
+Before deploying, update the `.env.prod` or `.env.staging` files with:
+- `POSTGRES_PASSWORD`: Strong database password
+- `JWT_SECRET`: Secure 256-bit (32+ character) JWT signing key
+
+### Deployment Commands
+```bash
+# Development
+cd backend/docker/dev
+docker-compose -f docker-compose-dev.yml up -d
+
+# Staging
+cd backend/docker/staging
+docker-compose --env-file .env.staging -f docker-compose-staging.yml up -d
+
+# Production
+cd backend/docker/prod
+docker-compose --env-file .env.prod -f docker-compose.yml up -d
+```
+
+### Port Configuration
+All environments use port 8090 for the backend API. The frontend uses nginx to proxy `/api` requests to the backend container.
+
+## Recent Changes (December 2025)
+- Added Docker configuration for dev/staging/production environments
+- Configured network isolation for container security
+- Updated application properties to use environment variables (no hardcoded credentials)
+- Added JWT_SECRET environment variable support
+- Aligned all ports to use 8090 for backend
+- Updated nginx.conf with API proxy configuration
+- Fixed Angular 21 configuration for proper building

@@ -40,10 +40,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular/build:application",
           "options": {
             "outputPath": "dist/garage-frontend",
-            "main": "src/main.ts",
+            "index": "src/index.html",
+            "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -103,11 +104,7 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true
+              "extractLicenses": true
             }
           },
           "defaultConfiguration": "production"
@@ -116,8 +113,7 @@
           "builder": "@angular/build:dev-server",
           "options": {
             "port": 5000,
-            "host": "0.0.0.0",
-            "allowedHosts": true
+            "host": "0.0.0.0"
           },
           "configurations": {
             "production": {

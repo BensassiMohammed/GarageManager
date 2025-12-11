@@ -1,5 +1,18 @@
 version: "3.9"
 
+# =============================================================================
+# Docker Compose - Staging Environment
+# =============================================================================
+# Usage: docker-compose --env-file .env.staging -f docker-compose-staging.yml up -d
+# =============================================================================
+
+networks:
+  garage-backend:
+    driver: bridge
+    internal: true
+  garage-frontend:
+    driver: bridge
+
 services:
 
   # =========================
@@ -10,15 +23,15 @@ services:
     container_name: garage_postgres_staging
     restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB:-garage_manager_staging}
+      POSTGRES_USER: ${POSTGRES_USER:-gm_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata_staging:/var/lib/postgresql/data
+    networks:
+      - garage-backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gm_user} -d ${POSTGRES_DB:-garage_manager_staging}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,20 +42,25 @@ services:
   backend:
     image: garage-backend:staging
     container_name: garage_backend_staging
+    build:
+      context: ../../
+      dockerfile: Dockerfile
     depends_on:
       postgres:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: staging
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-garage_manager_staging}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-gm_user}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
-    ports:
-      - "8091:8090"
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - garage-backend
+      - garage-frontend
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8090/actuator/health || exit 1"]
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8090/actuator/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -53,14 +71,21 @@ services:
   frontend:
     image: garage-frontend:staging
     container_name: garage_frontend_staging
+    build:
+      context: ../../../frontend
+      dockerfile: Dockerfile
+      args:
+        PROFILE: staging
     depends_on:
       backend:
         condition: service_healthy
     ports:
       - "8051:80"
-    restart: unless-stopped
+    networks:
+      - garage-frontend
+    restart: always
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
