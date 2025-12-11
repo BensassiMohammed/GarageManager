@@ -1,4 +1,4 @@
-modules = ["java-graalvm22.3", "nodejs-20", "postgresql-16"]
+modules = ["java-graalvm22.3", "nodejs-20", "python-3.11", "postgresql-16"]
 [agent]
 expertMode = true
 
@@ -55,4 +55,4 @@ externalPort = 4200
 
 [nix]
 channel = "stable-25_05"
-packages = ["sqlite"]
+packages = ["cargo", "libiconv", "rustc", "sqlite"]
