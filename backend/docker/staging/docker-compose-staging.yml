@@ -71,8 +71,7 @@ services:
     ports:
       - "8051:80"
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     networks:
       - garage-network
     restart: always
