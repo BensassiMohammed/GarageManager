@@ -38,8 +38,8 @@ echo "🚀 Starting Staging Environment"
 echo "=========================================="
 
 cd "$SCRIPT_DIR"
-sudo docker-compose --env-file .env.staging -f docker-compose-staging.yml down 2>/dev/null || true
-sudo docker-compose --env-file .env.staging -f docker-compose-staging.yml up -d
+sudo docker compose --env-file .env.staging -f docker-compose-staging.yml down 2>/dev/null || true
+sudo docker compose --env-file .env.staging -f docker-compose-staging.yml up -d
 
 echo ""
 echo -e "${GREEN}✅ Staging environment is running!${NC}"
