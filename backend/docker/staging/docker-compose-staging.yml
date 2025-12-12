@@ -60,12 +60,7 @@ services:
       - garage-frontend
     restart: always
     ports:
-      - "8091:8090"
-    healthcheck:
-      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8091/actuator/health || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
+      - "8091:8091"
 
   # =========================
   # Angular Frontend (Staging)
