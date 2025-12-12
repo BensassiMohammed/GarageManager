@@ -38,3 +38,35 @@ Thumbs.db
 # Docker
 docker-compose.override.yml
 
+# ========================
+# Spring Boot / Java
+# ========================
+/target/
+*.class
+*.jar
+*.war
+*.iml
+*.log
+*.tmp
+*.bak
+*.swp
+
+# ========================
+# Maven / Gradle
+# ========================
+/.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+/build/
+/.gradle/
+/out/
+
+# ========================
+# IntelliJ IDEA / Eclipse
+# ========================
+.idea/
+*.ipr
+*.iws
+*.classpath
+*.project
+.settings/
+
