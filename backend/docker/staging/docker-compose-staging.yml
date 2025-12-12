@@ -21,18 +21,19 @@ services:
     container_name: garage_postgres_staging
     restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB:-garage_manager_staging}
+      POSTGRES_USER: ${POSTGRES_USER:-gm_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata_staging:/var/lib/postgresql/data
     networks:
       - garage-backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gm_user} -d ${POSTGRES_DB:-garage_manager_staging}"]
+      test: [ "CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8091/actuator/health || exit 1" ]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 10
+
 
   # =========================
   # Spring Boot Backend (Staging)
@@ -48,8 +49,8 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: staging
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-garage_manager_staging}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-gm_user}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
       JWT_SECRET: ${JWT_SECRET}
@@ -59,7 +60,7 @@ services:
       - garage-frontend
     restart: always
     ports:
-      - "8091:8091"
+      - "8091:8090"
     healthcheck:
       test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8091/actuator/health || exit 1"]
       interval: 15s
