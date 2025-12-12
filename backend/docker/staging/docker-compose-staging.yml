@@ -1,5 +1,5 @@
 # =============================================================================
-# Docker Compose - Staging Environment
+# Docker Compose - Staging Environment (PostgreSQL + Frontend)
 # =============================================================================
 # Usage: docker-compose --env-file .env.staging -f docker-compose-staging.yml up -d
 # =============================================================================
@@ -28,45 +28,8 @@ services:
       - "5433:5432"  # port externe 5433 -> port interne 5432
     volumes:
       - pgdata_staging:/var/lib/postgresql/data
-    #networks:
-    #  - garage-backend
-      #healthcheck:
-      #test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gm_user_staging} -d ${POSTGRES_DB:-garage_manager_staging}" ]
-      #interval: 10s
-      #timeout: 5s
-      #retries: 5
-
-  # =========================
-  # Spring Boot Backend (Staging)
-  # =========================
-  backend:
-    image: garage-backend:staging
-    container_name: garage_backend_staging
-    build:
-      context: ../../
-      dockerfile: Dockerfile
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      SPRING_PROFILES_ACTIVE: staging
-      # Connexion au conteneur postgres via son port interne 5432
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: none
-      JWT_SECRET: ${JWT_SECRET}
-      SERVER_PORT: 8091
-    ports:
-      - "8091:8091"
     networks:
       - garage-backend
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8091/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
   # =========================
   # Angular Frontend (Staging)
@@ -79,9 +42,6 @@ services:
       dockerfile: Dockerfile
       args:
         PROFILE: staging
-    depends_on:
-      backend:
-        condition: service_healthy
     ports:
       - "8051:80"
     networks:
