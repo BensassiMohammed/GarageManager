@@ -25,7 +25,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-gm_user_staging}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5433:5432"
+      - "5433:5432"  # port externe 5433 -> port interne 5432
     volumes:
       - pgdata_staging:/var/lib/postgresql/data
     networks:
@@ -50,7 +50,8 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: staging
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5433/${POSTGRES_DB}
+      # Connexion au conteneur postgres via son port interne 5432
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
@@ -58,6 +59,14 @@ services:
       SERVER_PORT: 8091
     ports:
       - "8091:8091"
+    networks:
+      - garage-backend
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8091/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   # =========================
   # Angular Frontend (Staging)
