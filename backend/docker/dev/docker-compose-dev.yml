@@ -7,9 +7,7 @@ version: "3.9"
 # =============================================================================
 
 networks:
-  garage-backend:
-    driver: bridge
-  garage-frontend:
+  garage-network:
     driver: bridge
 
 services:
@@ -30,7 +28,7 @@ services:
     volumes:
       - pgdata_dev:/var/lib/postgresql/data
     networks:
-      - garage-backend
+      - garage-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U gm_user -d garage_manager_dev"]
       interval: 10s
@@ -52,7 +50,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/garage_manager_dev
-      SPRING_DATASOURCE_USERNAME: gm_user_dev
+      SPRING_DATASOURCE_USERNAME: gm_user
       SPRING_DATASOURCE_PASSWORD: admin
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "true"
@@ -60,9 +58,13 @@ services:
     ports:
       - "8090:8090"
     networks:
-      - garage-backend
-      - garage-frontend
+      - garage-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8090/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   # =========================
   # Angular Frontend (Dev)
@@ -76,14 +78,15 @@ services:
       args:
         PROFILE: development
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     ports:
       - "8050:80"
     networks:
-      - garage-frontend
+      - garage-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:80/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -1,14 +1,11 @@
 # =============================================================================
-# Docker Compose - Staging Environment (PostgreSQL + Frontend)
+# Docker Compose - Staging Environment (PostgreSQL + Backend + Frontend)
 # =============================================================================
-# Usage: docker-compose --env-file .env.staging -f docker-compose-staging.yml up -d
+# Usage: docker compose --env-file .env.staging -f docker-compose-staging.yml up -d
 # =============================================================================
 
 networks:
-  garage-backend:
-    driver: bridge
-    internal: true
-  garage-frontend:
+  garage-network:
     driver: bridge
 
 services:
@@ -25,11 +22,45 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-gm_user_staging}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5433:5432"  # port externe 5433 -> port interne 5432
+      - "5433:5432"
     volumes:
       - pgdata_staging:/var/lib/postgresql/data
     networks:
-      - garage-backend
+      - garage-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gm_user_staging} -d ${POSTGRES_DB:-garage_manager_staging}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =========================
+  # Spring Boot Backend (Staging)
+  # =========================
+  backend:
+    image: garage-backend:staging
+    container_name: garage_backend_staging
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: staging
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-garage_manager_staging}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-gm_user_staging}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8091:8090"
+    networks:
+      - garage-network
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8090/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   # =========================
   # Angular Frontend (Staging)
@@ -44,11 +75,14 @@ services:
         PROFILE: staging
     ports:
       - "8051:80"
+    depends_on:
+      backend:
+        condition: service_healthy
     networks:
-      - garage-frontend
+      - garage-network
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:80/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

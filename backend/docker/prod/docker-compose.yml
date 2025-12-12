@@ -7,10 +7,7 @@ version: "3.9"
 # =============================================================================
 
 networks:
-  garage-backend:
-    driver: bridge
-    internal: true
-  garage-frontend:
+  garage-network:
     driver: bridge
 
 services:
@@ -29,7 +26,7 @@ services:
     volumes:
       - pgdata_prod:/var/lib/postgresql/data
     networks:
-      - garage-backend
+      - garage-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gm_user} -d ${POSTGRES_DB:-garage_manager}"]
       interval: 10s
@@ -56,8 +53,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
       JWT_SECRET: ${JWT_SECRET}
     networks:
-      - garage-backend
-      - garage-frontend
+      - garage-network
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8090/actuator/health || exit 1"]
@@ -82,10 +78,10 @@ services:
     ports:
       - "8050:80"
     networks:
-      - garage-frontend
+      - garage-network
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:80/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
