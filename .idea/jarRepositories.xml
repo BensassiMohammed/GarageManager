@@ -2,9 +2,39 @@
 <project version="4">
   <component name="RemoteRepositoriesConfiguration">
     <remote-repository>
+      <option name="id" value="B2B-DEPLOIEMENT-Snapshots" />
+      <option name="name" value="Snapshots" />
+      <option name="url" value="https://nexus.pic.services.prod/repository/B2B-DEPLOIEMENT-Snapshots" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven-public" />
+      <option name="name" value="Public maven Repository" />
+      <option name="url" value="https://nexus.pic.services.prod/repository/maven-public" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="B2B-DEPLOIEMENT-Releases" />
+      <option name="name" value="Releases" />
+      <option name="url" value="https://nexus.pic.services.prod/repository/B2B-DEPLOIEMENT-Releases" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="RGM-Releases" />
+      <option name="name" value="RGM Releases Repositories" />
+      <option name="url" value="http://nexus.pic.services.prod/repository/RGM-Releases" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Central Repository" />
       <option name="url" value="https://repo.maven.apache.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="SWT-Snapshots" />
+      <option name="name" value="SWT Snapshots Repositories" />
+      <option name="url" value="http://nexus.pic.services.prod/repository/SWT-Snapshots" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="RGM-Snapshots" />
+      <option name="name" value="RGM Snapshots Repositories" />
+      <option name="url" value="http://nexus.pic.services.prod/repository/RGM-Snapshots" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="central" />
@@ -15,6 +45,16 @@
       <option name="id" value="jboss.community" />
       <option name="name" value="JBoss Community repository" />
       <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="3rd-party" />
+      <option name="name" value="3rd Repository" />
+      <option name="url" value="https://nexus.pic.services.prod/repository/3rd-party" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="SWT-Releases" />
+      <option name="name" value="SWT Releases Repositories" />
+      <option name="url" value="http://nexus.pic.services.prod/repository/SWT-Releases" />
     </remote-repository>
   </component>
 </project>
