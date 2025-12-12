@@ -35,7 +35,7 @@ export interface ChangePasswordRequest {
 export class AuthService {
   private readonly TOKEN_KEY = 'access_token';
   private readonly USER_INFO_KEY = 'user_info';
-  private baseUrl = environment.apiUrl+'/api/auth';
+  private baseUrl = environment.apiUrl+'/auth';
 
   private currentUserSubject = new BehaviorSubject<UserInfo | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
