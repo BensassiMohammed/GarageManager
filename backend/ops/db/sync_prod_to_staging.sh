@@ -36,7 +36,12 @@ echo "---"
 # --- 1. DUMP DE LA BASE DE DONNÉES DE PRODUCTION ---
 echo "[$(date)] 📥 Dump de la base de données PROD en cours..."
 if docker exec "$PROD_CONTAINER" pg_dump -U "$PROD_POSTGRES_USER" -Fc "$PROD_POSTGRES_DB" > "$DUMP_FILE"; then
-    echo "[$(date)] ✅ Dump PROD réussi."
+    DUMP_SIZE=$(stat -c%s "$DUMP_FILE" 2>/dev/null || stat -f%z "$DUMP_FILE" 2>/dev/null || echo "0")
+    echo "[$(date)] ✅ Dump PROD réussi. Taille du fichier: ${DUMP_SIZE} bytes"
+    if [ "$DUMP_SIZE" -lt 1000 ]; then
+        echo "[$(date)] ❌ ERREUR: Le fichier dump est trop petit (${DUMP_SIZE} bytes). La base PROD est peut-être vide ou il y a un problème."
+        exit 1
+    fi
 else
     echo "[$(date)] ❌ ERREUR lors du dump de PROD. Arrêt du script."
     exit 1
@@ -74,11 +79,21 @@ fi
 
 # --- 3. RESTAURATION VERS STAGING ---
 echo "[$(date)] 📤 Restauration des données vers STAGING en cours..."
-if docker exec -i "$STAGING_CONTAINER" pg_restore -U "$STAGING_POSTGRES_USER" -d "$STAGING_POSTGRES_DB" --no-owner --no-acl -v < "$DUMP_FILE"; then
-    echo "[$(date)] ✅ Restauration vers STAGING réussie."
-else
-    echo "[$(date)] ❌ ERREUR lors de la restauration vers STAGING. Vérifiez les logs."
+# Note: pg_restore peut retourner un code non-zero pour des warnings, donc on capture la sortie
+docker exec -i "$STAGING_CONTAINER" pg_restore -U "$STAGING_POSTGRES_USER" -d "$STAGING_POSTGRES_DB" --no-owner --no-acl -v < "$DUMP_FILE" 2>&1 || true
+
+# --- 4. VÉRIFICATION POST-RESTAURATION ---
+echo "[$(date)] 🔍 Vérification de la restauration..."
+TABLE_COUNT=$(docker exec "$STAGING_CONTAINER" psql -U "$STAGING_POSTGRES_USER" -d "$STAGING_POSTGRES_DB" -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';" | tr -d ' ')
+
+echo "[$(date)] 📊 Nombre de tables dans STAGING: $TABLE_COUNT"
+
+if [ "$TABLE_COUNT" -lt 1 ]; then
+    echo "[$(date)] ❌ ERREUR: Aucune table trouvée dans STAGING après restauration!"
+    echo "[$(date)] 💡 Vérifiez que le dump contient des données et que les permissions sont correctes."
     exit 1
+else
+    echo "[$(date)] ✅ Restauration vers STAGING réussie avec $TABLE_COUNT tables."
 fi
 
 echo "---"
