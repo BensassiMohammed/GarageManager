@@ -29,3 +29,5 @@
 *.classpath
 *.project
 .settings/
+
+ops/db/.env*
