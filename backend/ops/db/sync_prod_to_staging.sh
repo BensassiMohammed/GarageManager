@@ -96,5 +96,19 @@ else
     echo "[$(date)] ✅ Restauration vers STAGING réussie avec $TABLE_COUNT tables."
 fi
 
+# --- 5. VÉRIFICATION DES DONNÉES ---
+echo "[$(date)] 🔍 Vérification des données dans app_users..."
+echo "--- Contenu de app_users dans STAGING ---"
+docker exec "$STAGING_CONTAINER" psql -U "$STAGING_POSTGRES_USER" -d "$STAGING_POSTGRES_DB" -c "SELECT * FROM app_users LIMIT 10;" 2>&1 || echo "⚠️ Table app_users non trouvée ou erreur"
+
+echo ""
+echo "--- Comptage des lignes dans les tables principales ---"
+docker exec "$STAGING_CONTAINER" psql -U "$STAGING_POSTGRES_USER" -d "$STAGING_POSTGRES_DB" -c "
+SELECT schemaname, relname as table_name, n_live_tup as row_count 
+FROM pg_stat_user_tables 
+ORDER BY n_live_tup DESC 
+LIMIT 10;
+" 2>&1 || echo "⚠️ Erreur lors du comptage"
+
 echo "---"
 echo "[$(date)] 🎉 Sync PROD -> STAGING terminé avec succès !"
